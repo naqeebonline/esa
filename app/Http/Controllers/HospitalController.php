@@ -16,8 +16,9 @@ class HospitalController extends Controller
             ->whereDistrictId(auth()->user()->district_id)
             ->get();
         $data["facility_type"] = FacilityType::get();
-        return view("hospital.add",$data);
+        return view("hospital.add", $data);
     }
+
 
     public function listHospital()
     {
@@ -27,19 +28,19 @@ class HospitalController extends Controller
         ];
 
         $data["data"] = Hospital::with(["facilityType"])
-            ->when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
-            return $q->where(["district_id"=>auth()->user()->district_id]);
-        })->get();
+            ->when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+                return $q->where(["district_id" => auth()->user()->district_id]);
+            })->get();
 
         //$role_name = auth()->user()->roles->pluck('name')[0];
-        return view("hospital.list",$data);
+        return view("hospital.list", $data);
     }
 
     public function saveHospital()
     {
 
         $data = request()->except(["_token"]);
-        if(auth()->user()->roles->pluck('name')[0] !="Super Admin"){
+        if (auth()->user()->roles->pluck('name')[0] != "Super Admin") {
             $data['district_id'] = auth()->user()->district_id;
         }
         Hospital::create($data);
@@ -52,12 +53,12 @@ class HospitalController extends Controller
         $data["police_station"] = DB::table("police_stations")->get();
         $data["facility_type"] = FacilityType::get();
         $data["data"] = Hospital::whereId($id)->first();
-        return view("hospital.edit",$data);
+        return view("hospital.edit", $data);
     }
 
     public function updateHospital()
     {
-        Hospital::where(["id"=>request()->id])->update(request()->except(["_token","id"]));
+        Hospital::where(["id" => request()->id])->update(request()->except(["_token", "id"]));
         return redirect()->route('list.hospital')->with('success', 'Hospital created successfully.');
     }
 
@@ -77,13 +78,11 @@ class HospitalController extends Controller
                          ) AS distance", [$latitude, $longitude, $latitude])
 
             ->having("distance", "<", $radius)
-            ->orderBy("distance",'asc')
+            ->orderBy("distance", 'asc')
             ->offset(0)
             ->limit(20)
             ->get();
 
         return $restaurants;
     }
-
-
 }
