@@ -62,6 +62,7 @@
 
 
                                             <td>
+                                                {{-- <td> --}}
 
                                                 {{-- <a href="{{ route('edit.hospital', $value->id) }}" style="co"
                                                     class="btn btn-primary btn-icon btn-sm">

@@ -127,4 +127,5 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('list-district', [\App\Http\Controllers\DistrictController::class, 'listdistricts'])->name('list.districts');
     Route::get('list-circle', [\App\Http\Controllers\CircleController::class, 'listcircles'])->name('list.circles');
+    // Route::get('list-circle', [\App\Http\Controllers\CircleController::class, 'listcircles'])->name('list.circles');
 });
