@@ -75,9 +75,17 @@
                                 <input type="number" class="form-control" onkeypress="limitKeypress(event,this.value,11)" name="contact_number" placeholder="">
                             </div>
 
+
+
                             <div class="col-md-6">
-                                <label class="form-label" for="multicol-last-name">Rank</label>
-                                <input type="text" class="form-control" onkeypress="limitKeypress(event,this.value,11)" name="rank" placeholder="">
+                                <label class="form-label" for="multicol-username">Rank</label>
+                                <select class="form-control select2" name="rank" id="rank">
+                                    <option value="">Select Rank....</option>
+                                    @foreach($rank as $key => $value)
+                                        <option   value="{{$value["name"]}}">{{$value["name"]}}</option>
+                                    @endforeach
+
+                                </select>
                             </div>
                         <div class="col-md-6">
                             <label class="form-label" for="multicol-email">Total Strength</label>

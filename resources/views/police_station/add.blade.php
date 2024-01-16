@@ -70,7 +70,7 @@
                         </div>
 
                     </div>
-                    <hr class="my-4 mx-n4">
+                  {{--  <hr class="my-4 mx-n4">
                     <h6 class="fw-normal">2. Police Post</h6>
                     <div class="row g-3">
                         <div class="col-md-6">
@@ -84,10 +84,10 @@
 
 
 
-                    </div>
+                    </div>--}}
 
                     <hr class="my-4 mx-n4">
-                    <h6 class="fw-normal">3. SHO Details</h6>
+                    <h6 class="fw-normal">2. SHO Details</h6>
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label" for="multicol-first-name"> Name</label>
@@ -98,9 +98,16 @@
                             <input type="number" class="form-control" onkeypress="limitKeypress(event,this.value,11)" name="sho_contact" placeholder="0302-00000000">
                         </div>
 
+
                         <div class="col-md-6">
-                            <label class="form-label" for="multicol-last-name">Rank</label>
-                            <input type="text" class="form-control" onkeypress="limitKeypress(event,this.value,11)" name="sho_rank" placeholder="">
+                            <label class="form-label" for="multicol-username">Rank</label>
+                            <select class="form-control select2" name="sho_rank" id="sho_rank">
+                                <option value="">Select Rank....</option>
+                                @foreach($rank as $key => $value)
+                                    <option   value="{{$value["name"]}}">{{$value["name"]}}</option>
+                                @endforeach
+
+                            </select>
                         </div>
 
 

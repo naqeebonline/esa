@@ -15,4 +15,9 @@ class PoliceStation extends Model
     {
         return $this->belongsTo(Districts::class, 'district_id');
     }
+
+    public function circle()
+    {
+        return $this->belongsTo(Circle::class, 'circle_id');
+    }
 }

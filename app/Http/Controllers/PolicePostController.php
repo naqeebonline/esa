@@ -12,6 +12,7 @@ class PolicePostController extends Controller
     public function index()
     {
         $data['district'] = Districts::get();
+        $data['rank'] = (new CommonApiController())->getRankForWeb();
         $data['police_stations'] = PoliceStation::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
             return $q->where(["district_id"=>auth()->user()->district_id]);
         })->get();
@@ -38,6 +39,7 @@ class PolicePostController extends Controller
         $res = request()->except(["_token"]);
         if(auth()->user()->roles->pluck('name')[0] !="Super Admin"){
             $res['district_id'] = auth()->user()->district_id;
+            $data['created_by'] = auth()->user()->id;
         }
         PolicePost::create($res);
         return redirect()->route('list.police.post')->with('success', 'Police Post created successfully.');
@@ -47,6 +49,7 @@ class PolicePostController extends Controller
     {
         $data["title"] = "Edit Police Post";
         $data['district'] = Districts::get();
+        $data['rank'] = (new CommonApiController())->getRankForWeb();
         $data['police_stations'] = PoliceStation::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
             return $q->where(["district_id"=>auth()->user()->district_id]);
         })->get();

@@ -20,6 +20,7 @@ class PoliceMobileController extends Controller
     {
         $data['district'] = Districts::get();
         $data['vehicle_type'] = VehicleType::get();
+        $data['rank'] = (new CommonApiController())->getRankForWeb();
         $data["police_stations"] =PoliceStation::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
             return $q->where(["district_id"=>auth()->user()->district_id]);
         })->get();
@@ -48,6 +49,7 @@ class PoliceMobileController extends Controller
     {
         $data = request()->except(["_token"]);
         $data['district_id'] = auth()->user()->district_id;
+        $data['created_by'] = auth()->user()->id;
         PoliceMobile::create($data);
         return redirect()->route('list.police.mobile')->with('success', 'Police Mobile created successfully.');
     }
@@ -57,6 +59,7 @@ class PoliceMobileController extends Controller
         $data["title"] = "Edit Police Mobile";
         $data['district'] = Districts::get();
         $data['vehicle_type'] = VehicleType::get();
+        $data['rank'] = (new CommonApiController())->getRankForWeb();
         $data["police_stations"] =PoliceStation::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
             return $q->where(["district_id"=>auth()->user()->district_id]);
         })->get();

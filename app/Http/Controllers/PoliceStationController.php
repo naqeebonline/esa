@@ -17,7 +17,7 @@ class PoliceStationController extends Controller
     public function index()
     {
         $data['district'] = Districts::get();
-        $data['rank'] = (new CommonApiController())->getRank();
+        $data['rank'] = (new CommonApiController())->getRankForWeb();
 
         $data["circles"] =Circle::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
             return $q->where(["district_id"=>auth()->user()->district_id]);
@@ -46,6 +46,7 @@ class PoliceStationController extends Controller
     {
         $data = request()->except(["_token"]);
         $data['district_id'] = auth()->user()->district_id;
+        $data['created_by'] = auth()->user()->id;
         PoliceStation::create($data);
         return redirect()->route('list.police.station')->with('success', 'Police Station created successfully.');
     }
@@ -54,6 +55,7 @@ class PoliceStationController extends Controller
     {
         $data["title"] = "Edit Police Station";
         $data['district'] = Districts::get();
+        $data['rank'] = (new CommonApiController())->getRankForWeb();
         $data["circles"] =Circle::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
             return $q->where(["district_id"=>auth()->user()->district_id]);
         })->get();

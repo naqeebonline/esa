@@ -67,7 +67,7 @@
                                             <td>{{$value->polling_station_name}}</td>
 
                                             <td>{{$value->district->title ?? ""}}</td>
-                                            <td>{{$value->policeStation->title}}</td>
+                                            <td>{{$value->policeStation->title ?? ""}}</td>
 
                                             <td>
 

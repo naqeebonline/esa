@@ -4,6 +4,8 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Districts;
+use App\Models\Hospital;
+use App\Models\PoliceMobile;
 use App\Models\PoliceStation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -102,4 +104,6 @@ class PoliceStationApiController extends Controller
         $ps = PoliceStation::whereId($police_station_id)->first();
         return $ps->district_id;
     }
+
+
 }

@@ -52,6 +52,8 @@ Route::prefix('v1')->group(function (){
 
         Route::post('create-meeting', [\App\Http\Controllers\API\MeetingApiController::class,'createMeeting']);
         Route::get('get-zoom-meetings', [\App\Http\Controllers\API\MeetingApiController::class,'getZoomMeetings']);
+        Route::post('save-mobile-user-token', [CommonActionController::class,'saveMobileUserToken']);
+        Route::post('find-nearest', [CommonActionController::class,'findNearest']);
     });//---- end of auth sanctum
 
 

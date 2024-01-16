@@ -45,11 +45,10 @@
                                     <tr>
 {{--                                        <th>#</th>--}}
                                         <th style="width: 10%">District</th>
-                                        <th style="width: 10%">Name</th>
+                                        <th style="width: 10%">Circle</th>
+                                        <th style="width: 10%">Police Station Name</th>
                                         <th  style="width: 7%">Strength</th>
                                         <th  style="width: 7%">Police Station Contact</th>
-                                        <th style="width: 10%">Police Post Name</th>
-                                        <th style="width: 10%">Police Post Contact</th>
                                         <th style="width: 10%">SHO Name</th>
                                         <th style="width: 10%">SHO Contact</th>
                                         <th style="width: 10%">SHO Rank</th>
@@ -64,11 +63,11 @@
                                     @foreach($data as $key => $value)
                                         <tr>
                                             <td>{{$value->district->title ?? ""}}</td>
+                                            <td>{{$value->circle->name ?? ""}}</td>
                                             <td>{{$value->title}}</td>
                                             <td>{{$value->strength}}</td>
                                             <td>{{$value->ps_contact_number}}</td>
-                                            <td>{{$value->post_name}}</td>
-                                            <td>{{$value->post_contact}}</td>
+
                                             <td>{{$value->sho_name}}</td>
                                             <td>{{$value->sho_contact}}</td>
                                             <td>{{$value->sho_rank}}</td>

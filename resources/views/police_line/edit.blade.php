@@ -81,9 +81,18 @@
                             <label class="form-label" for="multicol-first-name"> Name</label>
                             <input type="text" class="form-control" onkeypress="limitKeypress(event,this.value,100)" name="incharge_name" value="{{$data->incharge_name}}" placeholder="ALi Khan">
                         </div>
+
+
                         <div class="col-md-6">
-                            <label class="form-label" for="multicol-last-name">Rank</label>
-                            <input type="text" class="form-control" onkeypress="limitKeypress(event,this.value,11)" name="incharge_rank" value="{{$data->incharge_rank}}" placeholder="">
+                            <label class="form-label" for="multicol-username">Rank</label>
+                            <select class="form-control select2" name="incharge_rank" id="incharge_rank">
+                                <option value="">Select Rank....</option>
+                                @foreach($rank as $key => $value)
+                                    <option  <?php echo ($data->incharge_rank == $value['name']) ? "selected=selected" : "" ?> value="{{$value['name']}}">{{$value['name']}}</option>
+
+                                @endforeach
+
+                            </select>
                         </div>
 
                         <div class="col-md-6">

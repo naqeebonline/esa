@@ -30,7 +30,7 @@
 
                             <div class="col-md-6">
                                 <label class="form-label" for="multicol-username">Circle</label>
-                                <select class="form-control select2" required name="circle_id" id="circle_id">
+                                <select class="form-control select2" required disabled  id="circle_id">
                                     <option value="">Select Circle....</option>
                                     @foreach($circles as $key => $value)
                                         <option  <?php echo ($value->id == $data->circle_id) ? "selected=selected" : "" ?> value="{{$value->id}}">{{$value->name}}</option>
@@ -43,7 +43,7 @@
                         <div class="col-md-6">
 
                             <label class="form-label" for="multicol-username">Police Station Name</label>
-                            <input type="text" class="form-control" value="{{$data->title}}" required name="title" placeholder="Name">
+                            <input type="text" disabled class="form-control" value="{{$data->title}}" required  placeholder="Name">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label" for="multicol-email">Total Strength</label>
@@ -74,7 +74,7 @@
                         </div>
 
                     </div>
-                    <hr class="my-4 mx-n4">
+                   {{-- <hr class="my-4 mx-n4">
                     <h6 class="fw-normal">2. Police Post</h6>
                     <div class="row g-3">
                         <div class="col-md-6">
@@ -92,10 +92,10 @@
                         </div>
 
 
-                    </div>
+                    </div>--}}
 
                     <hr class="my-4 mx-n4">
-                    <h6 class="fw-normal">3. SHO Details</h6>
+                    <h6 class="fw-normal">2. SHO Details</h6>
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label" for="multicol-first-name"> Name</label>
@@ -106,9 +106,18 @@
                             <input type="number" class="form-control" onkeypress="limitKeypress(event,this.value,11)" value ="{{$data->sho_contact}}" name="sho_contact" placeholder="0302-00000000">
                         </div>
 
+
+
                         <div class="col-md-6">
-                            <label class="form-label" for="multicol-last-name">Rank</label>
-                            <input type="text" class="form-control" onkeypress="limitKeypress(event,this.value,11)" value="{{$data->sho_rank}}" name="sho_rank" placeholder="">
+                            <label class="form-label" for="multicol-username">Rank</label>
+                            <select class="form-control select2" name="sho_rank" id="sho_rank">
+                                <option value="">Select Rank....</option>
+                                @foreach($rank as $key => $value)
+                                    <option  <?php echo ($data->sho_rank == $value['name']) ? "selected=selected" : "" ?> value="{{$value['name']}}">{{$value['name']}}</option>
+
+                                @endforeach
+
+                            </select>
                         </div>
 
 

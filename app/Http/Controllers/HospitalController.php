@@ -24,7 +24,6 @@ class HospitalController extends Controller
     {
         $data = [
             'title' => 'List Hospitals',
-
         ];
 
         $data["data"] = Hospital::with(["facilityType"])
@@ -42,6 +41,7 @@ class HospitalController extends Controller
         $data = request()->except(["_token"]);
         if (auth()->user()->roles->pluck('name')[0] != "Super Admin") {
             $data['district_id'] = auth()->user()->district_id;
+            $data['created_by'] = auth()->user()->id;
         }
         Hospital::create($data);
         return redirect()->route('list.hospital')->with('success', 'Hospital created successfully.');

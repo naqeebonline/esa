@@ -150,6 +150,50 @@ class CommonApiController extends Controller
 
     }
 
+    public function getRankForWeb()
+    {
+        $res = array(
+            array(
+                "id" => 1,
+                "name" =>"Constable"
+            ),
+            array(
+                "id" => 2,
+                "name" =>"Head Constable"
+            ),
+            array(
+                "id" => 3,
+                "name" =>"ASI"
+            ),
+            array(
+                "id" => 4,
+                "name" =>"SI"
+            ),
+            array(
+                "id" => 5,
+                "name" =>"Inspector"
+            ),
+            array(
+                "id" => 6,
+                "name" =>"DSP"
+            ),
+            array(
+                "id" => 7,
+                "name" =>"SP"
+            ),
+            array(
+                "id" => 8,
+                "name" =>"SSP"
+            ),
+            array(
+                "id" => 9,
+                "name" =>"DIG"
+            )
+        );
+        return $res;
+
+    }
+
     public function getVehicleType($id=null)
     {
         $data = VehicleType::get();
