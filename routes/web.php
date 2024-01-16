@@ -52,8 +52,6 @@ Route::prefix('no-auth')->group(function () {
 
 Route::middleware(['auth'])->prefix('dropDown')->group(function () {
     Route::get('/', [\App\Http\Controllers\DynamicController::class, 'dropDown'])->name('dynamic.dropDown');
-
-
 });
 
 Route::get('/psw-generate', function () {
@@ -65,7 +63,7 @@ Route::get('/psw-generate', function () {
 
 })->name("create-meeting");*/
 
-Route::group(['middleware' => 'auth'],function(){
+Route::group(['middleware' => 'auth'], function () {
     Route::get('user-dashboard', [\App\Http\Controllers\HomeController::class, 'userDashboard'])->name('user.dashboard');
     Route::get('getAllPoliceStations', [\App\Http\Controllers\HomeController::class, 'getAllPoliceStations'])->name('getAllPoliceStations');
     Route::get('getAllPoliceMobiles', [\App\Http\Controllers\HomeController::class, 'getAllPoliceMobiles'])->name('getAllPoliceMobiles');
@@ -125,4 +123,9 @@ Route::group(['middleware' => 'auth'],function(){
     Route::post('emergency_alert', [\App\Http\Controllers\MeetingController::class, 'emergency_alert'])->name('emergency_alert');
     Route::post('assignUserToMeeting', [\App\Http\Controllers\MeetingController::class, 'assignUserToMeeting'])->name('assignUserToMeeting');
 
+
+
+    Route::get('list-district', [\App\Http\Controllers\DistrictController::class, 'listdistricts'])->name('list.districts');
+    Route::get('list-circle', [\App\Http\Controllers\CircleController::class, 'listcircles'])->name('list.circles');
+    // Route::get('list-circle', [\App\Http\Controllers\CircleController::class, 'listcircles'])->name('list.circles');
 });
