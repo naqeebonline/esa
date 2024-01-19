@@ -84,18 +84,21 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('save-police-station', [\App\Http\Controllers\PoliceStationController::class, 'savePoliceStation'])->name('save.police.station');
     Route::get('edit-police-station/{id}', [\App\Http\Controllers\PoliceStationController::class, 'editPoliceStation'])->name('edit.police.station');
     Route::post('update-police-station', [\App\Http\Controllers\PoliceStationController::class, 'updatePoliceStation'])->name('update.police.station');
+    Route::post('delete-police-station', [\App\Http\Controllers\PoliceStationController::class, 'destroy'])->name('delete.police.station');
 
     Route::get('add-police-post', [\App\Http\Controllers\PolicePostController::class, 'index'])->name('add.new.police.post');
     Route::get('list-police-post', [\App\Http\Controllers\PolicePostController::class, 'listPolicePost'])->name('list.police.post');
     Route::post('save-police-post', [\App\Http\Controllers\PolicePostController::class, 'savePolicePost'])->name('save.police.post');
     Route::get('edit-police-post/{id}', [\App\Http\Controllers\PolicePostController::class, 'editPolicePost'])->name('edit.police.post');
     Route::post('update-police-post', [\App\Http\Controllers\PolicePostController::class, 'updatePolicePost'])->name('update.police.post');
+    Route::post('delete-police-post', [\App\Http\Controllers\PolicePostController::class, 'destroy'])->name('delete.police.post');
 
     Route::get('add-police-line', [\App\Http\Controllers\PoliceLineController::class, 'index'])->name('add.new.police.line');
     Route::get('list-police-line', [\App\Http\Controllers\PoliceLineController::class, 'listPoliceLine'])->name('list.police.line');
     Route::post('save-police-line', [\App\Http\Controllers\PoliceLineController::class, 'savePoliceLine'])->name('save.police.line');
     Route::get('edit-police-line/{id}', [\App\Http\Controllers\PoliceLineController::class, 'editPoliceLine'])->name('edit.police.line');
     Route::post('update-police-line', [\App\Http\Controllers\PoliceLineController::class, 'updatePoliceLine'])->name('update.police.line');
+    Route::post('delete-police-line', [\App\Http\Controllers\PoliceLineController::class, 'destroy'])->name('delete.police.line');
 
 
     Route::get('add-polling-station', [\App\Http\Controllers\PollingStationController::class, 'index'])->name('add.new.polling.station');

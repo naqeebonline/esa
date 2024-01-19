@@ -34,6 +34,9 @@ class MyAppsController extends Controller
             'my_apps' => MyApp::all()
         ];
         $data['districts'] = Districts::whereProvinceId(1)->get();
+        $data['police_stations'] = PoliceStation::get();
+        $data['polling_stations'] = PollingStation::get();
+        $data['hospitals'] = Hospital::get();
        // $meetings = Zoom::getUpcomingMeeting();
         $role = auth()->user()->roles->pluck('name')[0] ?? '';
 

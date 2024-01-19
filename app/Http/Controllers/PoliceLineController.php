@@ -120,9 +120,10 @@ class PoliceLineController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy()
     {
-        //
+        PoliceLine::whereId(request()->id)->delete();
+        return ["status"=>true,"message"=>"Record deleted successfully"];
     }
     
 }

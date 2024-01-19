@@ -100,9 +100,7 @@ class HomeController extends Controller
     public function getAllPoliceMobiles()
     {
 
-        $data = PoliceMobile::get();
-
-
+        $data = PoliceMobile::whereNotNull("lat")->whereNotNull("lng")->get();
         return (["data"=>$data]);
 
     }

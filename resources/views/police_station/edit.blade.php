@@ -43,7 +43,7 @@
                         <div class="col-md-6">
 
                             <label class="form-label" for="multicol-username">Police Station Name</label>
-                            <input type="text" disabled class="form-control" value="{{$data->title}}" required  placeholder="Name">
+                            <input type="text"  class="form-control" name="title" value="{{$data->title}}" required  placeholder="Name">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label" for="multicol-email">Total Strength</label>
@@ -263,7 +263,7 @@
             var mymarker = L.marker([lat,lng], {icon: redIcon}).addTo(myMap);
             mymarker.bindPopup(`
                                             <div style="line-height:0.2rem">
-                                            <p><b>Name:</b>{{$data->name}}</p>
+                                            <p><b></b>{{$data->title}}</p>
 
                                             </div>
                                         `).openPopup();

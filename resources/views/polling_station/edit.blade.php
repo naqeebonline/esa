@@ -263,9 +263,9 @@
 
 
         window.onload = function() {
-            initMap("{{$data->latitude}}","{{$data->longitude}}");
+            initMap("{{$data->lat}}","{{$data->lng}}");
             loadBoundaryData();
-            loadMarker("{{$data->latitude}}","{{$data->longitude}}");
+            loadMarker("{{$data->lat}}","{{$data->lng}}");
             // loadIcon();
         }
 
@@ -310,7 +310,7 @@
             var mymarker = L.marker([lat,lng], {icon: redIcon}).addTo(myMap);
             mymarker.bindPopup(`
                                             <div style="line-height:0.2rem">
-                                            <p><b>Name:</b>{{$data->name}}</p>
+                                            <p><b>Name:</b>{{$data->polling_station_name}}</p>
 
                                             </div>
                                         `);

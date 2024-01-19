@@ -3,6 +3,53 @@
 
 @section('content')
 
+    <style>
+        .tags {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px 0;
+            width: 95%;
+            margin: 0 auto;
+
+        }
+
+        .tags li {
+            padding: 0 20px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .tags li.warning:after {
+            background-color: orange;
+        }
+
+        .tags li.success:after {
+            background-color: green;
+        }
+
+        .tags li.danger:after {
+            background-color: red;
+        }
+
+        .tags li:after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            left: 0px;
+            width: 10px;
+            border-radius: 10px;
+            height: 10px;
+        }
+
+
+
+    </style>
+
     <div class="row">
 
 
@@ -297,29 +344,43 @@
                 <div class="col-md-12">
                     <h4>Search By</h4>
                 </div>
-                <div class="col-md-4  ">
+
+                <div class="col-md-3  ">
                     <select class="form-select select2" id="search_district">
                         <option value="">Select District....</option>
+
                         @foreach($districts as $key => $value)
-                            <option value="{{strtoupper($value->title)}}">{{strtoupper($value->title)}}</option>
+                            <option value="{{strtoupper($value->title)}}" lat="{{$value->latitude}}" lng="{{$value->longitude}}">{{strtoupper($value->title)}}</option>
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-4 ">
-                    <select class="form-select">
-                        <option value=""> Polling Station</option>
-                        <option value="Hayatabad">Hayatabad</option>
-                        <option value="sadar">Peshawar Sadar</option>
+                <div class="col-md-3 ">
+                    <select class="form-select select2">
+                        <option value="">Select Police Station......</option>
+                        @foreach($police_stations as $key => $value)
+                            <option value="{{strtoupper($value->id)}}" lat="{{$value->latitude}}" lng="{{$value->longitude}}">{{strtoupper($value->title)}}</option>
+                        @endforeach
                     </select>
                 </div>
-                <div class="col-md-4 ">
-                    <select class="form-select">
-                        <option value=""> Health Facility...</option>
-                        <option value="Hospitals">Hospitals</option>
-                        <option value="Edhi">BHUs</option>
-                        <option value="Chhipa Centers">Chhipa Centers</option>
+
+                <div class="col-md-3 ">
+                    <select class="form-select select2">
+                        <option value="">Select Polling Station......</option>
+                        @foreach($polling_stations as $key => $value)
+                            <option value="{{strtoupper($value->id)}}" lat="{{$value->lat}}" lng="{{$value->lng}}">{{strtoupper($value->polling_station_name)}}</option>
+                        @endforeach
                     </select>
                 </div>
+
+                <div class="col-md-3 ">
+                    <select class="form-select select2">
+                        <option value="">Select Hospital......</option>
+                        @foreach($hospitals as $key => $value)
+                            <option value="{{strtoupper($value->id)}}" lat="{{$value->lat}}" lng="{{$value->lng}}">{{strtoupper($value->name)}}</option>
+                        @endforeach
+                    </select>
+                </div>
+
             </div>
         </div>
     </div>
@@ -328,6 +389,11 @@
         <div class="col-md-12 col-lg-12">
            <div class="card">
                <div class="card-body">
+                   <ul class="tags">
+                       <li class="success"> Police Stations</li>
+                       <li class="warning"> Polling Stations</li>
+                       <li class="danger"> Hospitals </li>
+                   </ul>
                    {{--<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3308.331328072957!2d71.42666777454747!3d33.98402242133152!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38d9105f342ff529%3A0x5b4ea1317180c1a7!2sKPITB%20Rd%2C%20Hayatabad%2C%20Peshawar%2C%20Khyber%20Pakhtunkhwa%2C%20Pakistan!5e0!3m2!1sen!2s!4v1702461233830!5m2!1sen!2s"  style="border:0;min-height: 400px;width: 100%;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>--}}
                    <div id="map" class="" style="height: 500px">
                </div>
@@ -457,44 +523,86 @@
 
                 $("body").on("change","#search_district",function (e) {
                     search_district_name = $(this).val();
+                    var element = $(this).find('option:selected');
+                    current_lat = element.attr("lat");
+                    current_lng = element.attr("lng");
+
+
                     loadBoundaryData();
                 });
 
                 window.onload = function() {
                     initMap();
-                    loadBoundaryData();
+                   // loadBoundaryData();
 
                     loadHospitals();
                     getAllPoliceStations();
                     getAllPoliceMobiles();
+                    getAllPollingStations();
                    // loadIcon();
                 }
 
                 // Initialize map
-                function initMap() {
+                function reinitMap(lat,lng) {
+                    myMap.off();
+                    myMap.remove();
                     myMap = L.map('map', {
-                        center: [34.0151,71.5249],
-                        zoom: 8,
+                        center: [lat,lng],
+                        zoom: 12,
                         zoomControl: true
                     });
 
                     //add basemap layer
                     lyrGoogleMap = L.tileLayer('http://mts3.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
                         maxZoom: 22,
-                        maxNativeZoom: 18
+                        maxNativeZoom: 12
                     }); //lyrGoogleMa
 
                     lyrGoogleHybrid = L.tileLayer('http://mts2.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
                         maxZoom: 22,
-                        maxNativeZoom: 18
+                        maxNativeZoom: 12
                     }); //lyrGoogleHybrid
 
                     lyrOSM = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                         maxZoom: 22,
-                        maxNativeZoom: 18
+                        maxNativeZoom: 12
                     }); //OSM
 
-                    myMap.addLayer(lyrOSM);
+                    myMap.addLayer(lyrGoogleMap);
+                    objBaseMap = {
+                        "Google Map": lyrGoogleMap,
+                        "Google Hybrid": lyrGoogleHybrid,
+                        "OSM map": lyrOSM
+                    }
+                    L.control.layers(objBaseMap).addTo(myMap);
+                    ctlPan = L.control.pan().addTo(myMap);
+                    ctlMousePosition = L.control.mousePosition().addTo(myMap);
+                }
+
+                function initMap() {
+                    myMap = L.map('map', {
+                        center: [34.0151,71.5249],
+                        zoom: 12,
+                        zoomControl: true
+                    });
+
+                    //add basemap layer
+                    lyrGoogleMap = L.tileLayer('http://mts3.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+                        maxZoom: 22,
+                        maxNativeZoom: 12
+                    }); //lyrGoogleMa
+
+                    lyrGoogleHybrid = L.tileLayer('http://mts2.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+                        maxZoom: 22,
+                        maxNativeZoom: 12
+                    }); //lyrGoogleHybrid
+
+                    lyrOSM = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        maxZoom: 22,
+                        maxNativeZoom: 12
+                    }); //OSM
+
+                    myMap.addLayer(lyrGoogleMap);
                     objBaseMap = {
                         "Google Map": lyrGoogleMap,
                         "Google Hybrid": lyrGoogleHybrid,
@@ -508,9 +616,9 @@
                 function loadHospitals() {
                     //https://img.lovepik.com/free-png/20210926/lovepik-car-icon-png-image_401452256_wh1200.png
                     var blueIcon = L.icon.pulse({iconSize:[10,10], color: "blue", fillColor: "blue", animate: false});
-                    var redIcon = L.icon.pulse({ color: "red", fillColor: "red", animate: false});
-                    var yellowIcon = L.icon.pulse({ color: "yellow", fillColor: "yellow", animate: false});
-                    var greenIcon = L.icon.pulse({ color: "green", fillColor: "green", animate: false});
+                    var redIcon = L.icon.pulse({ iconSize:[10,10],color: "red", fillColor: "red", animate: false});
+                    var yellowIcon = L.icon.pulse({ iconSize:[10,10],color: "yellow", fillColor: "yellow", animate: false});
+                    var greenIcon = L.icon.pulse({ iconSize:[10,10],color: "green", fillColor: "green", animate: false});
 
 
                     new L.geoJson.ajax("{{ URL::to('api/v1/getAllHospitals') }}", {
@@ -526,6 +634,7 @@
                                             <h6>Hospital</h6>
                                             <p><b>Name:</b> ${feature.properties.name}</p>
                                             <p><b>Contact:</b> ${feature.properties.contact_number}</p>
+                                            <a target="_blank" href="${base_url}edit-hospital/${feature.properties.id}">View Details<a>
                                             </div>
                                         `);
 
@@ -538,7 +647,7 @@
                                             <h6>Edhi Center</h6>
                                             <p><b>Name:</b> ${feature.properties.name}</p>
                                             <p><b>Contact:</b> ${feature.properties.contact_number}</p>
-
+                                            <a target="_blank" href="${base_url}edit-hospital/${feature.properties.id}">View Details<a>
                                             </div>
                                         `);
 
@@ -550,7 +659,7 @@
                                             <h6>Chhipa Centers</h6>
                                             <p><b>Name:</b> ${feature.properties.name}</p>
                                             <p><b>Contact:</b> ${feature.properties.contact_number}</p>
-
+<a target="_blank" href="${base_url}edit-hospital/${feature.properties.id}">View Details<a>
                                             </div>
                                         `);
 
@@ -562,7 +671,7 @@
                                             <h6>Rescue 1122</h6>
                                             <p><b>Name:</b> ${feature.properties.name}</p>
                                             <p><b>Contact:</b> ${feature.properties.contact_number}</p>
-
+                                            <a target="_blank" href="${base_url}edit-hospital/${feature.properties.id}">View Details<a>
                                             </div>
                                         `);
 
@@ -583,13 +692,17 @@
                 search_district_name = '';
                 function loadBoundaryData() {
 
-                    if (myMap.hasLayer(kp_boundary)) {
+
+                    reinitMap(current_lat,current_lng);
+                    /*if (myMap.hasLayer(kp_boundary)) {
                         myMap.removeLayer(kp_boundary);
 
                     }
                     kp_boundary = L.geoJson.ajax('theme/plugins/leaflet/boundary_data/kp_district_boundary.geojson',{filter: districts}).bindPopup(function(kp_boundary) {
                         return kp_boundary.feature.properties.DISTRICT;
-                    }).addTo(myMap);
+                    }).addTo(myMap);*/
+                    getAllPoliceStations();
+                    getAllPollingStations();
                 }
 
                 function districts(feature){
@@ -600,35 +713,75 @@
                 }
 
                 function getAllPoliceStations() {
-
-                    $.ajax({
-                        url: '{{ route("getAllPoliceStations") }}/', // Replace with your actual URL
-                        method: 'GET',
-                        success: function (response) {
-                            var blackIcon = L.icon.pulse({ color: "black", fillColor: "black", animate: true});
-                            $.each(response.data, function (index, item) {
-
-                                if(item.latitude != null && item.longitude != null){
+                    var greenIcon = L.icon.pulse({ iconSize:[10,10],color: "green", fillColor: "green", animate: false});
 
 
-                                    var mymarker = L.marker([item.latitude,item.longitude], {icon: blackIcon}).addTo(myMap);
-                                    mymarker.bindPopup(`
-                                            <div style="line-height:0.2rem">
+                    new L.geoJson.ajax("{{ URL::to('api/v1/getAllPoliceStation') }}", {
+                        middleware: function(data) {
+
+                            return L.geoJson(data, {
+
+                                onEachFeature: function(feature, layer) {
+                                        if(feature.properties.latitude !='' && feature.properties.longitude !=''){
+                                            var mymarker = L.marker([parseFloat(feature.properties.latitude).toFixed(4),parseFloat(feature.properties.longitude).toFixed(4)], {icon: greenIcon}).addTo(myMap);
+                                            mymarker.bindPopup(`
+                                           <div style="line-height:0.2rem">
                                             <h6>Police Stations</h6>
-                                            <p><b>Name:</b> ${item.title}</p>
-                                            <p><b>Contact:</b> ${item.ps_contact_number}</p>
-                                            <p><b>SHO Contact:</b> ${item.sho_contact}</p>
+                                            <p><b>Name:</b> ${feature.properties.title}</p>
+                                            <p><b>Contact:</b> ${feature.properties.ps_contact_number}</p>
+                                            <p><b>SHO Contact:</b> ${feature.properties.sho_contact}</p>
+                                            <a target="_blank" href="${base_url}edit-police-station/${feature.properties.id}">View Details<a>
 
                                             </div>
                                         `);
+                                        }
+
+
+
+
+
                                 }
-
-
-
-                            });
-
+                            }).addTo(myMap);
                         }
                     });
+
+
+                }
+
+                function getAllPollingStations() {
+                    var greenIcon = L.icon.pulse({ iconSize:[10,10],color: "orange", fillColor: "orange", animate: false});
+
+
+                    new L.geoJson.ajax("{{ URL::to('api/v1/getAllPollingStations') }}", {
+                        middleware: function(data) {
+
+                            return L.geoJson(data, {
+
+                                onEachFeature: function(feature, layer) {
+                                    if(feature.properties.lat !='' && feature.properties.lng !=''){
+                                        var mymarker = L.marker([parseFloat(feature.properties.lat).toFixed(4),parseFloat(feature.properties.lng).toFixed(4)], {icon: greenIcon}).addTo(myMap);
+                                        mymarker.bindPopup(`
+                                           <div style="line-height:0.2rem">
+                                            <h6>Polling Stations</h6>
+                                            <p><b>Name:</b> ${feature.properties.incharge_name}</p>
+                                            <p><b>Contact:</b> ${feature.properties.incharge_contact}</p>
+
+                                            <a target="_blank" href="${base_url}edit-polling-station/${feature.properties.id}">View Details<a>
+
+                                            </div>
+                                        `);
+                                    }
+
+
+
+
+
+                                }
+                            }).addTo(myMap);
+                        }
+                    });
+
+
                 }
 
 

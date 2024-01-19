@@ -18,6 +18,8 @@ use App\Http\Controllers\API\LoginController;
 
 Route::prefix('v1')->group(function (){
     Route::get('getAllHospitals', [\App\Http\Controllers\API\HospitalApiController::class,'getAllHospitals']);
+    Route::get('getAllPoliceStation', [\App\Http\Controllers\API\HospitalApiController::class,'getAllPoliceStation']);
+    Route::get('getAllPollingStations', [\App\Http\Controllers\API\HospitalApiController::class,'getAllPollingStations']);
 
 
     Route::middleware('auth:sanctum')->group(function(){

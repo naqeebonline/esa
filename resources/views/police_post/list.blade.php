@@ -79,6 +79,9 @@
                                                 <a href="{{route('edit.police.post',$value->id)}}" class="btn btn-primary btn-icon btn-sm">
                                                     <i class="tf-icons bx bx-pencil"></i>
                                                 </a>
+                                                <a href="javascript:void(0)" data-id="{{$value->id}}" class="btn btn-danger btn-icon btn-sm delete_button">
+                                                    <i class="tf-icons bx bx-window-close"></i>
+                                                </a>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -101,12 +104,34 @@
     <script src="{{ asset('assets/vendor/libs/datatables-responsive/datatables.responsive.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.js') }}"></script>
     <script>
+        var id =0;
         $(document).ready(function (){
             $('#users-list').DataTable({
                 lengthMenu: [100, 200, 300, 500],
                 pageLength: 100,
                 processing: true,
                 serverSide:false
+
+            });
+
+            $("body").on("click",".delete_button",function (e) {
+                id = $(this).attr("data-id");
+                if (confirm('Are you sure to delete this record ?')) {
+                    $.ajax({
+                        type: 'post',
+                        url: "{{ route('delete.police.post') }}",
+                        data: {
+                            id: id,
+                            _token: '{{ csrf_token() }}'
+
+                        },
+                        success: function(res) {
+                            window.location.reload();
+                        }
+                    })
+                } else {
+                    alert('Why did you press cancel? You should have confirmed');
+                }
 
             });
         })

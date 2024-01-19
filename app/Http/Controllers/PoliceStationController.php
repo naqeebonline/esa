@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Circle;
 use App\Models\Districts;
+use App\Models\Hospital;
 use App\Models\PoliceStation;
 use Illuminate\Http\Request;
 
@@ -46,6 +47,9 @@ class PoliceStationController extends Controller
     {
         $data = request()->except(["_token"]);
         $data['district_id'] = auth()->user()->district_id;
+        if(auth()->user()->roles->pluck('name')[0] =="Super Admin"){
+            $data['district_id'] = request()->district_id;
+        }
         $data['created_by'] = auth()->user()->id;
         PoliceStation::create($data);
         return redirect()->route('list.police.station')->with('success', 'Police Station created successfully.');
@@ -60,6 +64,7 @@ class PoliceStationController extends Controller
             return $q->where(["district_id"=>auth()->user()->district_id]);
         })->get();
         $data["data"] = PoliceStation::whereId($id)->first();
+        $data['nearest_hospital'] = $this->nearstHospital($data["data"]->latitude,$data["data"]->longitude,60);
         return view("police_station.edit",$data);
     }
 
@@ -131,9 +136,24 @@ class PoliceStationController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy()
     {
-        //
+            PoliceStation::whereId(request()->id)->delete();
+            return ["status"=>true,"message"=>"Record deleted successfully"];
+    }
+
+    public function nearstHospital($latitude,$longitude,$radius=60)
+    {
+        $hospitals = Hospital::selectRaw("id, name, contact_number, lat, lng,
+                         ( 6371 * acos( cos( radians(?) ) *
+                           cos( radians( lat ) )
+                           * cos( radians( lng ) - radians(?)
+                           ) + sin( radians(?) ) *
+                           sin( radians( lat ) ) )
+                         ) AS distance", [$latitude, $longitude, $latitude])
+
+            ->having("distance", "<", $radius)->orderBy("distance",'asc')->offset(0)->limit(20)->get();
+        return $hospitals;
     }
 
     private function findNearestPoliceStation($latitude, $longitude, $radius)
