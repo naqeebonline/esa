@@ -56,6 +56,9 @@ Route::prefix('v1')->group(function (){
         Route::get('get-zoom-meetings', [\App\Http\Controllers\API\MeetingApiController::class,'getZoomMeetings']);
         Route::post('save-mobile-user-token', [CommonActionController::class,'saveMobileUserToken']);
         Route::post('find-nearest', [CommonActionController::class,'findNearest']);
+        Route::get('contact-info', [\App\Http\Controllers\ContactInformationController::class,'contactInfo']);
+        Route::post('send-mobile-notification', [CommonActionController::class,'sendMobileNotification']);
+        Route::post('emergency-alert', [CommonActionController::class,'emergencyAlert']);
     });//---- end of auth sanctum
 
 

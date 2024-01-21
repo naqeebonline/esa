@@ -52,6 +52,8 @@
                                         <th style="width: 10%">Incharge Name</th>
                                         <th style="width: 10%">Contact Number</th>
                                         <th style="width: 10%">Rank</th>
+                                        <th style="width: 10%">Lat</th>
+                                        <th style="width: 10%">Lang</th>
                                         <th  style="width: 10%">Action</th>
                                     </tr>
                                     </thead>
@@ -68,6 +70,8 @@
                                             <td>{{$value->incharge_name}}</td>
                                             <td>{{$value->contact_number}}</td>
                                             <td>{{$value->rank}}</td>
+                                            <td>{{$value->lat}}</td>
+                                            <td>{{$value->lng}}</td>
 
                                             <td>
                                                 {{--<a href="{{route('edit.police.station',$value->id)}}" class="btn btn-primary">Edit</a>--}}
