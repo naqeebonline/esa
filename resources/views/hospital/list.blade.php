@@ -55,23 +55,7 @@
                                         <th  style="width: 10%">Action</th>
                                     </tr>
                                     </thead>
-                                    @foreach($data as $key => $value)
-                                    <tr>
-                                        <td>{{$value->name}}</td>
-                                        <td>{{$value->policeStation->title}}</td>
-                                        <td>{{$value->facilityType->name}}</td>
 
-                                        <td>{{$value->contact_number}}</td>
-                                        <td>{{$value->lat}}</td>
-                                        <td>{{$value->lng}}</td>
-                                        <td>
-
-                                            <a href="{{route('edit.hospital',$value->id)}}" style="co" class="btn btn-primary btn-icon btn-sm">
-                                                <i class="tf-icons bx bx-pencil"></i>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    @endforeach
 
                                     <tbody>
 
@@ -94,12 +78,44 @@
     <script src="{{ asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.js') }}"></script>
     <script>
         $(document).ready(function (){
-            $('#users-list').DataTable({
-                lengthMenu: [100, 200, 300, 500],
-                pageLength: 100,
+            user_table = $('#users-list').DataTable({
                 processing: true,
-                serverSide:false
+                serverSide: true,
 
+                lengthMenu: [
+                    [ 100, 250, 500, 1000 ],
+                    [ '100', '250', '500', '1000']
+                ],
+                pageLength: 50,
+                ajax: {
+                    url: '{{route("all.hospital")}}',
+                    data: {
+                        'post_param': '1'
+                    }
+
+                },
+
+                columns: [
+
+                    {data: 'name', name: 'name'},
+                    {data: 'police_station_name', name: 'police_station_name'},
+                    {data: 'facility_type', name: 'facility_type'},
+                    {data: 'contact_number', name: 'contact_number'},
+                    {data: 'lat', name: 'lat'},
+                    {data: 'lng', name: 'lng'},
+                    {data: 'action', name: 'action', orderable: false, searchable: false}
+                ],
+
+                responsive: true,
+                processing: true,
+                serverSide: true,
+                searching:  true,
+                sorting:    true,
+                paging:     true,
+                dom: 'Bfrtip',
+                buttons: [
+                    'copy', 'csv', 'excel', 'pdf', 'print'
+                ]
             });
         })
     </script>

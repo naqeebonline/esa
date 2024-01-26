@@ -8,6 +8,7 @@ use App\Models\PoliceMobile;
 use App\Models\PoliceStation;
 use App\Models\VehicleType;
 use Illuminate\Http\Request;
+use Yajra\DataTables\Facades\DataTables;
 
 class PoliceMobileController extends Controller
 {
@@ -31,14 +32,43 @@ class PoliceMobileController extends Controller
         return view("police_mobiles.add",$data);
     }
 
+    public function policeMobile()
+    {
+        $users = PoliceMobile::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
+            return $q->where(["district_id"=>auth()->user()->district_id]);
+        });
+        return DataTables::of($users)
+            ->addColumn('action', function($cert) {
+                $actionsBtn = '<a class="dropdown-item p-50" href="'.route('edit.police.mobile',[$cert->id]).'"><i class="bx bx-file-blank mr-1"></i> Edit</a>';
+
+                $actionsBtn .= '<div role="separator" class="dropdown-divider"></div>';
+
+
+                return $actionsBtn;
+            })
+            ->addColumn('district_name', function($cert) {
+                return $cert->district?->title ?? "";
+                })
+            ->addColumn('police_station_name', function($cert) {
+                return $cert->policeStation->title ?? "";
+            })
+            ->addColumn('circle_name', function($cert) {
+                return $cert->circle->name ?? "";
+            })
+            ->addColumn('vehicle_type', function($cert) {
+                return $cert->vehicleType->name ?? "";
+            })
+            ->rawColumns(["district_name","police_station_name","circle_name","vehicle_type","action"])
+            ->make(true);
+    }
+
     public function listPoliceMobile()
     {
         $data = [
             'title' => 'List Police Mobile',
 
         ];
-        $query = PoliceMobile::query();
-        $query->when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
+        $query = PoliceMobile::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
             return $q->where(["district_id"=>auth()->user()->district_id]);
         });
         $data["data"] = $query->get();

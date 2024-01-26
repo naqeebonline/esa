@@ -53,26 +53,7 @@
     <div class="row">
 
 
-            <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between">
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="avatar">
-                            <span class="avatar-initial rounded-circle bg-label-primary"
-                            ><i  class="bx bx-user fs-4"></i
-                                ></span>
-                                </div>
-                                <div class="card-info">
-                                    <small class="text-muted">Total Police Stations</small>
-                                    <h5 class="card-title mb-0 me-2">{{$total_police_stations}}</h5>
-                                </div>
-                            </div>
-                            <div id="conversationChart"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
         <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
             <div class="card">
                 <div class="card-body">
@@ -93,6 +74,91 @@
                 </div>
             </div>
         </div>
+
+        <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="avatar">
+                            <span class="avatar-initial rounded-circle bg-label-warning"
+                            ><i class="bx bx-buildings fs-4"></i
+                                ></span>
+                            </div>
+                            <div class="card-info">
+                                <small class="text-muted">Most Sensitive</small>
+                                <h5 class="card-title mb-0 me-2">{{$most_sensitive}}</h5>
+                            </div>
+                        </div>
+                        <div id="incomeChart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="avatar">
+                            <span class="avatar-initial rounded-circle bg-label-warning"
+                            ><i class="bx bx-buildings fs-4"></i
+                                ></span>
+                            </div>
+                            <div class="card-info">
+                                <small class="text-muted">Sensitive</small>
+                                <h5 class="card-title mb-0 me-2">{{$sensitive}}</h5>
+                            </div>
+                        </div>
+                        <div id="incomeChart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="avatar">
+                            <span class="avatar-initial rounded-circle bg-label-warning"
+                            ><i class="bx bx-buildings fs-4"></i
+                                ></span>
+                            </div>
+                            <div class="card-info">
+                                <small class="text-muted">Normal</small>
+                                <h5 class="card-title mb-0 me-2">{{$normal}}</h5>
+                            </div>
+                        </div>
+                        <div id="incomeChart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="avatar">
+                            <span class="avatar-initial rounded-circle bg-label-primary"
+                            ><i  class="bx bx-user fs-4"></i
+                                ></span>
+                            </div>
+                            <div class="card-info">
+                                <small class="text-muted">Total Police Stations</small>
+                                <h5 class="card-title mb-0 me-2">{{$total_police_stations}}</h5>
+                            </div>
+                        </div>
+                        <div id="conversationChart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
             <div class="card">
                 <div class="card-body">
@@ -346,16 +412,18 @@
                 </div>
 
                 <div class="col-md-3  ">
-                    <select class="form-select select2" id="search_district">
+                    <label>District</label>
+                    <select class="form-select select2" id="search_district" multiple="multiple">
                         <option value="">Select District....</option>
-
+                        {{--<option value="{{strtoupper($value->title)}}" lat="{{$value->latitude}}" lng="{{$value->longitude}}">{{strtoupper($value->title)}}</option>--}}
                         @foreach($districts as $key => $value)
-                            <option value="{{strtoupper($value->title)}}" lat="{{$value->latitude}}" lng="{{$value->longitude}}">{{strtoupper($value->title)}}</option>
+                            <option value="{{$value->id}}" lat="{{$value->latitude}}" lng="{{$value->longitude}}">{{strtoupper($value->title)}}</option>
                         @endforeach
                     </select>
                 </div>
                 <div class="col-md-3 ">
-                    <select class="form-select select2">
+                    <label>Police Station</label>
+                    <select class="form-select select2" multiple="multiple" id="police_station_id">
                         <option value="">Select Police Station......</option>
                         @foreach($police_stations as $key => $value)
                             <option value="{{strtoupper($value->id)}}" lat="{{$value->latitude}}" lng="{{$value->longitude}}">{{strtoupper($value->title)}}</option>
@@ -364,22 +432,32 @@
                 </div>
 
                 <div class="col-md-3 ">
+                    <label>Polling Station Sensitivity</label>
+                    <select class="form-select select2" multiple="multiple" id="ps_sensitivity">
+                        @foreach($sensitivity as $key => $value)
+                            <option   value="{{$value->id}}">{{$value->title}}</option>
+                        @endforeach
+
+                    </select>
+                </div>
+
+                {{--<div class="col-md-3 ">
                     <select class="form-select select2">
                         <option value="">Select Polling Station......</option>
                         @foreach($polling_stations as $key => $value)
                             <option value="{{strtoupper($value->id)}}" lat="{{$value->lat}}" lng="{{$value->lng}}">{{strtoupper($value->polling_station_name)}}</option>
                         @endforeach
                     </select>
-                </div>
+                </div>--}}
 
-                <div class="col-md-3 ">
+                {{--<div class="col-md-3 ">
                     <select class="form-select select2">
                         <option value="">Select Hospital......</option>
                         @foreach($hospitals as $key => $value)
                             <option value="{{strtoupper($value->id)}}" lat="{{$value->lat}}" lng="{{$value->lng}}">{{strtoupper($value->name)}}</option>
                         @endforeach
                     </select>
-                </div>
+                </div>--}}
 
             </div>
         </div>
@@ -448,12 +526,12 @@
 
 
 @push('scripts')
-
     <script type="text/javascript">
         function playSound(url) {
             const audio = new Audio(url);
             audio.play();
         }
+
         $("body").on("click",".create_new_meeting",function () {
             $(this).hide();
             var meeting_type = $("#meeting_type").val();
@@ -520,13 +598,30 @@
                 var lyrGoogleHybrid;
                 var lyrOSM;
                 var crimeLocations;
+                current_lat = 34.9526;
+                current_lng = 72.3311;
+                selected_districts = "";
+                police_station_ids = "";
+                sensitivity_type = "";
 
                 $("body").on("change","#search_district",function (e) {
-                    search_district_name = $(this).val();
-                    var element = $(this).find('option:selected');
-                    current_lat = element.attr("lat");
-                    current_lng = element.attr("lng");
 
+                    selected_districts = $(this).val();
+                //    var element = $(this).find('option:selected');
+
+                    loadBoundaryData();
+                });
+
+                $("body").on("change","#police_station_id",function (e) {
+                    police_station_ids = $(this).val();
+                //    var element = $(this).find('option:selected');
+
+                    loadBoundaryData();
+                });
+
+                $("body").on("change","#ps_sensitivity",function (e) {
+                    sensitivity_type = $(this).val();
+                //    var element = $(this).find('option:selected');
 
                     loadBoundaryData();
                 });
@@ -548,7 +643,7 @@
                     myMap.remove();
                     myMap = L.map('map', {
                         center: [lat,lng],
-                        zoom: 12,
+                        zoom: 8,
                         zoomControl: true
                     });
 
@@ -581,8 +676,8 @@
 
                 function initMap() {
                     myMap = L.map('map', {
-                        center: [34.0151,71.5249],
-                        zoom: 12,
+                        center: [34.9526,72.3311],
+                        zoom: 8,
                         zoomControl: true
                     });
 
@@ -611,6 +706,7 @@
                     L.control.layers(objBaseMap).addTo(myMap);
                     ctlPan = L.control.pan().addTo(myMap);
                     ctlMousePosition = L.control.mousePosition().addTo(myMap);
+
                 }
 
                 function loadHospitals() {
@@ -618,10 +714,10 @@
                     var blueIcon = L.icon.pulse({iconSize:[10,10], color: "blue", fillColor: "blue", animate: false});
                     var redIcon = L.icon.pulse({ iconSize:[10,10],color: "red", fillColor: "red", animate: false});
                     var yellowIcon = L.icon.pulse({ iconSize:[10,10],color: "yellow", fillColor: "yellow", animate: false});
-                    var greenIcon = L.icon.pulse({ iconSize:[10,10],color: "green", fillColor: "green", animate: false});
+                    var orangeIcon = L.icon.pulse({ iconSize:[10,10],color: "orange", fillColor: "orange", animate: true});
 
 
-                    new L.geoJson.ajax("{{ URL::to('api/v1/getAllHospitals') }}", {
+                    new L.geoJson.ajax("{{ URL::to('api/v1/getAllHospitals') }}?district_id="+selected_districts+"&police_station_id="+police_station_ids, {
                         middleware: function(data) {
 
                             return L.geoJson(data, {
@@ -641,7 +737,7 @@
                                     }
                                     else if (feature.properties.type == 2) {
 
-                                        var mymarker = L.marker([feature.properties.lat,feature.properties.lng], {icon: greenIcon}).addTo(myMap);
+                                        var mymarker = L.marker([feature.properties.lat,feature.properties.lng], {icon: orangeIcon}).addTo(myMap);
                                         mymarker.bindPopup(`
                                             <div style="line-height:0.2rem">
                                             <h6>Edhi Center</h6>
@@ -701,8 +797,16 @@
                     kp_boundary = L.geoJson.ajax('theme/plugins/leaflet/boundary_data/kp_district_boundary.geojson',{filter: districts}).bindPopup(function(kp_boundary) {
                         return kp_boundary.feature.properties.DISTRICT;
                     }).addTo(myMap);*/
+
+
                     getAllPoliceStations();
                     getAllPollingStations();
+                    loadHospitals();
+
+                    /*loadHospitals();
+                    getAllPoliceStations();
+                    getAllPoliceMobiles();
+                    getAllPollingStations();*/
                 }
 
                 function districts(feature){
@@ -715,8 +819,7 @@
                 function getAllPoliceStations() {
                     var greenIcon = L.icon.pulse({ iconSize:[10,10],color: "green", fillColor: "green", animate: false});
 
-
-                    new L.geoJson.ajax("{{ URL::to('api/v1/getAllPoliceStation') }}", {
+                    new L.geoJson.ajax("{{ URL::to('api/v1/getAllPoliceStation') }}?district_id="+selected_districts+"&police_station_id="+police_station_ids, {
                         middleware: function(data) {
 
                             return L.geoJson(data, {
@@ -749,28 +852,31 @@
                 }
 
                 function getAllPollingStations() {
-                    var greenIcon = L.icon.pulse({ iconSize:[10,10],color: "orange", fillColor: "orange", animate: false});
+                    var greenIcon = L.icon.pulse({ iconSize:[10,10],color: "#faa5a5", fillColor: "#faa5a5", animate: true});
 
 
-                    new L.geoJson.ajax("{{ URL::to('api/v1/getAllPollingStations') }}", {
+                    new L.geoJson.ajax("{{ URL::to('api/v1/getAllPollingStations') }}?district_id="+selected_districts+"&police_station_id="+police_station_ids+"&sensitivity_type="+sensitivity_type, {
                         middleware: function(data) {
 
                             return L.geoJson(data, {
 
                                 onEachFeature: function(feature, layer) {
-                                    if(feature.properties.lat !='' && feature.properties.lng !=''){
+
+
                                         var mymarker = L.marker([parseFloat(feature.properties.lat).toFixed(4),parseFloat(feature.properties.lng).toFixed(4)], {icon: greenIcon}).addTo(myMap);
                                         mymarker.bindPopup(`
                                            <div style="line-height:0.2rem">
                                             <h6>Polling Stations</h6>
+                                            <p><b>PS Name:</b> ${feature.properties.polling_station_name}</p>
                                             <p><b>Name:</b> ${feature.properties.incharge_name}</p>
                                             <p><b>Contact:</b> ${feature.properties.incharge_contact}</p>
+                                            <p><b>type:</b> ${feature.properties.sensitivity}</p>
 
                                             <a target="_blank" href="${base_url}edit-polling-station/${feature.properties.id}">View Details<a>
 
                                             </div>
                                         `);
-                                    }
+
 
 
 

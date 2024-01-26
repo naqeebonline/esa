@@ -11,6 +11,13 @@
 <script src="{{ asset('assets/vendor/libs/select2/select2.js') }}"></script>
 <script src="{{ asset('assets/js/app-custom.js') }}"></script>
 <script type="text/javascript">
+
+     var is_hospital = "<?php ($item->exists && $item->hospital_id) ? true : ''; ?>";
+     var is_polling_station = "<?php ($item->exists && $item->polling_station_id) ? true : ''; ?>";
+     if(is_polling_station){
+         $(".polling_station_id_div").show();
+     }
+
     function check_hod()
     {
         var company_id = $('#company_id').val();
@@ -47,13 +54,27 @@
         $(".polling_station_id_div").hide();
         $("#polling_station_id").val('');
         $("#polling_station_id").removeAttr("required");
+
+        $(".police_mobile_id_div").hide();
+        $("#police_mobile_id").val('');
+        $("#police_mobile_id").removeAttr("required");
+
+        $(".police_station_id_div").hide();
+        $("#police_station_id").val('');
+        $("#police_station_id").removeAttr("required");
     }
     $(document).ready(function() {
 
         $('#role_id').on('change', function () {
-
                 //var selectedRole = $(this).val();
+            var district_id = $("#district_id").val();
+            if(district_id == ''){
+                alert("Please select district");
+                $("#role_id").val('');
+                return false;
+            }
                 var selectedRole = $( "#role_id option:selected" ).text();
+
             reset_fields();
 
                 if(selectedRole == "Hospital User"){
@@ -63,6 +84,15 @@
                 if(selectedRole == "Polling Station"){
                     $(".polling_station_id_div").show();
                     $("#polling_station_id").attr("required","required");
+                }
+                if(selectedRole == "Police Mobile Vehicle"){
+                    $(".police_mobile_id_div").show();
+                    $("#police_mobile_id").attr("required","required");
+                }
+
+                if(selectedRole == "Police Station"){
+                    $(".police_station_id_div").show();
+                    $("#police_station_id").attr("required","required");
                 }
 
         });
@@ -95,6 +125,45 @@
                         psOptions += '<option value="' + item.id + '">' + item.title + '</option>';
                     });
                     $("#police_station_id").html(psOptions);
+                }
+            });
+
+            $.ajax({
+                url: '{{ route("getHospitals") }}/' + selectedDistrict, // Replace with your actual URL
+                method: 'GET',
+                success: function (response) {
+
+                    var psOptions = '<option value="">Select Hospital</option>';
+                    $.each(response.data, function (index, item) {
+                        psOptions += '<option value="' + item.id + '">' + item.name + '</option>';
+                    });
+                    $("#hospital_id").html(psOptions);
+                }
+            });
+
+            $.ajax({
+                url: '{{ route("getPoliceMobile") }}/' + selectedDistrict, // Replace with your actual URL
+                method: 'GET',
+                success: function (response) {
+
+                    var psOptions = '<option value="">Select Police Mobile Vehicle...</option>';
+                    $.each(response.data, function (index, item) {
+                        psOptions += '<option value="' + item.id + '">' + item.registration_number + '</option>';
+                    });
+                    $("#police_mobile_id").html(psOptions);
+                }
+            });
+
+            $.ajax({
+                url: '{{ route("getPollingStations") }}/' + selectedDistrict, // Replace with your actual URL
+                method: 'GET',
+                success: function (response) {
+
+                    var psOptions = '<option value="">Select Polling Station ....</option>';
+                    $.each(response.data, function (index, item) {
+                        psOptions += '<option value="' + item.id + '">' + item.polling_station_name + '</option>';
+                    });
+                    $("#polling_station_id").html(psOptions);
                 }
             });
 
@@ -292,20 +361,10 @@
                                 </div>
                             </div>
 
-                            <div class="col-6">
-                                <div class="form-group">
-                                    {!! Form::label('cnic', 'CNIC No', ['class' => 'form-label']) !!}
-                                    <span class="help">@if(session()->has('errors')) {!! session()->get('errors')->first('cnic') !!}@endif</span>
-                                    {!! Form::text('cnic', null, ['class' => 'form-control', 'id' => 'cnic',]) !!}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     {!! Form::label('district_id', 'District  ', ['class' => 'form-label']) !!}
-                                    {!! Form::select('district_id', [null=>'Select District']+$districts->toArray(), \Illuminate\Support\Facades\Auth::user()->district_id ?? null, ['class' => 'form-control select2']) !!}
+                                    {!! Form::select('district_id', [null=>'Select District']+$districts->toArray(), null, ['class' => 'form-control select2',"required"=>"required"]) !!}
                                     <span class="help" style="color: red">
                                                             @if ($errors->has('district_id'))
                                             <span>{{ $errors->first('district_id') }}</span>
@@ -315,10 +374,22 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-6">
+                            {{--<div class="col-6">
+                                <div class="form-group">
+                                    {!! Form::label('cnic', 'CNIC No', ['class' => 'form-label']) !!}
+                                    <span class="help">@if(session()->has('errors')) {!! session()->get('errors')->first('cnic') !!}@endif</span>
+                                    {!! Form::text('cnic', null, ['class' => 'form-control', 'id' => 'cnic',]) !!}
+                                </div>
+                            </div>--}}
+                        </div>
+
+                        <div class="row">
+
+
+                            {{--<div class="col-md-6">
                                 <div class="form-group">
                                     {!! Form::label('Tehsil', 'Tehsil  ', ['class' => 'form-label']) !!}
-                                    {!! Form::select('tehsil_id', [null=>'Select Tehsil']+$tehsil->toArray(), $item->tehsil_id ?? null, ['class' => 'form-control select2','id'=>"tehsil_id"]) !!}
+                                    {!! Form::select('tehsil_id', [null=>'Select Tehsil']+[], $item->tehsil_id ?? null, ['class' => 'form-control select2','id'=>"tehsil_id"]) !!}
                                     <span class="help" style="color: red">
                                                             @if ($errors->has('tehsil_id'))
                                             <span>{{ $errors->first('tehsil_id') }}</span>
@@ -326,12 +397,23 @@
 
                                                         </span>
                                 </div>
+                            </div>--}}
+
+
+
+                            <div class="col-6">
+                                <div class="form-group">
+                                    {!! Form::label('role_id[]', 'Select Roles ', ['class' => 'control-label']) !!}
+
+                                    <span class="help">@if(Session::has('errors')) {!! Session::get('errors')->first('role_id[]') !!} @endif</span>
+                                    {!! Form::select('role_id[]', [null=>'Select Role...']+$roles->toArray(), ($item->exists & $item->roles->count() > 0) ? $item->roles : null, ['class' => 'form-select select2', 'id' => 'role_id',"required"=>"required"]) !!}
+                                </div>
                             </div>
 
-                            <div class="col-md-6">
+                            <div class="col-md-6 police_station_id_div" style="{{($item->police_station_id) ? 'display:block' : 'display:none'}}">
                                 <div class="form-group">
                                     {!! Form::label('Police Station', 'Police Station  ', ['class' => 'form-label']) !!}
-                                    {!! Form::select('police_station_id', [null=>'Select Pilice Staiton']+$police_stations->toArray(), $item->police_station_id ?? null, ['class' => 'form-control select2','id'=>"police_station_id"]) !!}
+                                    {!! Form::select('police_station_id', [null=>'Select Police Station']+$police_stations->toArray(), $item->police_station_id ?? null, ['class' => 'form-control select2','id'=>"police_station_id"]) !!}
                                     <span class="help" style="color: red">
                                                             @if ($errors->has('police_station_id'))
                                             <span>{{ $errors->first('police_station_id') }}</span>
@@ -341,21 +423,12 @@
                                 </div>
                             </div>
 
-                            <div class="col-6">
-                                <div class="form-group">
-                                    {!! Form::label('role_id[]', 'Select Roles ', ['class' => 'control-label']) !!}
-
-                                    <span class="help">@if(Session::has('errors')) {!! Session::get('errors')->first('role_id[]') !!} @endif</span>
-                                    {!! Form::select('role_id[]', $roles->toArray(), ($item->exists & $item->roles->count() > 0) ? $item->roles : null, ['class' => 'form-select select2', 'id' => 'role_id']) !!}
-                                </div>
-                            </div>
-
                             <div class="col-md-6 hospital_id_div" style="{{($item->hospital_id) ? 'display:block' : 'display:none'}}">
                                 <div class="form-group">
                                     {!! Form::label('hospital', 'Hospital  ', ['class' => 'form-label']) !!}
                                     {!! Form::select('hospital_id', [null=>'Select Hospital...']+$hospital->toArray(), $item->hospital_id ?? null, ['class' => 'form-control select2','id'=>"hospital_id"]) !!}
                                     <span class="help" style="color: red">
-                                                            @if ($errors->has('tehsil_id'))
+                                                            @if ($errors->has('hospital_id'))
                                             <span>{{ $errors->first('hospital_id') }}</span>
                                         @endif
 
@@ -377,6 +450,20 @@
                                                         </span>
                                     </div>
                                 </div>
+
+                            <div class="col-md-6 police_mobile_id_div" style="{{($item->police_mobile_id) ? 'display:block' : 'display:none'}}">
+                                <div class="form-group">
+                                    {!! Form::label('police_mobile_id', 'Police Mobile Vehicle  ', ['class' => 'form-label']) !!}
+                                    {!! Form::select('police_mobile_id', [null=>'Select Police Mobile']+$police_mobile->toArray(), $item->polling_station_id ?? null, ['class' => 'form-control select2','id'=>"police_mobile_id"]) !!}
+
+                                    <span class="help" style="color: red">
+                                                            @if ($errors->has('police_mobile_id'))
+                                            <span>{{ $errors->first('police_mobile_id') }}</span>
+                                        @endif
+
+                                                        </span>
+                                </div>
+                            </div>
 
 
 

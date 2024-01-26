@@ -5,6 +5,7 @@ namespace Modules\Settings\Http\Controllers;
 use App\Models\Circle;
 use App\Models\Districts;
 use App\Models\Hospital;
+use App\Models\PoliceMobile;
 use App\Models\PoliceStation;
 use App\Models\PollingStation;
 use App\Models\Tehsils;
@@ -42,7 +43,11 @@ class UsersController extends Controller
                 'roles',
                 'parent',
                 'children'
-            ])->get()
+            ])
+                ->when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+                    return $q->where(["district_id" => auth()->user()->district_id])->where("name","!=","Super Admin");
+                })
+                ->get()
         ];
 
         return view('settings::users_mgt.index', $data);
@@ -59,12 +64,24 @@ class UsersController extends Controller
             'back_route' => ['settings.users-mgt.list', 'Users List'],
             'new_route' => ['settings.users-mgt.create', 'New User'],
             'item' => $item,
-            'roles' => MyRole::pluck('name', 'id'),
-            'districts' => Districts::pluck('title', 'id'),
+            'roles' => MyRole::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+                return $q->whereIn("id",[4,55,56,58]);
+            })->pluck('name', 'id'),
+            'districts' => Districts::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+                return $q->where(["id" => auth()->user()->district_id]);
+            })->pluck('title', 'id'),
             'police_stations' => PoliceStation::pluck('title', 'id'),
             'tehsil' => Tehsils::pluck('title', 'id'),
-            'hospital' => Hospital::pluck('name as title', 'id'),
-            'polling_station' => PollingStation::pluck('polling_station_name as title', 'id'),
+            'hospital' => Hospital::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+                return $q->where(["district_id" => auth()->user()->district_id]);
+            })->pluck('name as title', 'id'),
+            'polling_station' => PollingStation::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+                return $q->where(["district_id" => auth()->user()->district_id]);
+            })->pluck('polling_station_name as title', 'id'),
+            'police_mobile' => PoliceMobile::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+                return $q->where(["district_id" => auth()->user()->district_id]);
+            })
+                ->pluck('registration_number', 'id'),
             'sections' => collect([]),
             'parent_users' => collect([])
         ];
@@ -191,18 +208,44 @@ class UsersController extends Controller
     {
         $id = Crypt::decrypt($id);
         $item = User::with('roles')->find($id);
+        $district_id = $item->district_id;
 
         $data = [
             'title' => 'Create a New User',
             'back_route' => ['settings.users-mgt.list', 'Users List'],
             'new_route' => ['settings.users-mgt.create', 'New User'],
             'item' => $item,
-            'roles' => MyRole::pluck('name', 'id'),
-            'districts' => Districts::pluck('title', 'id'),
-            'tehsil' => Tehsils::pluck('title', 'id'),
-            'police_stations' => PoliceStation::pluck('title', 'id'),
-            'hospital' => Hospital::pluck('name as title', 'id'),
-            'polling_station' => PollingStation::pluck('polling_station_name as title', 'id'),
+            'roles' => MyRole::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+                return $q->whereIn("id",[4,55,56,57,58]);
+            })->pluck('name', 'id'),
+            'districts' => Districts::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+                return $q->where(["id" => auth()->user()->district_id]);
+            })->pluck('title', 'id'),
+           // 'tehsil' => Tehsils::pluck('title', 'id'),
+            'police_stations' => PoliceStation::when((auth()->user()->roles->pluck('name')[0] == "Super Admin"), function ($q) use($district_id) {
+                return $q->where(["district_id" => auth()->user()->district_id]);
+            })->pluck('title', 'id'),
+            'hospital' => Hospital::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+                return $q->where(["district_id" => auth()->user()->district_id]);
+            })
+                ->when(auth()->user()->roles->pluck('name')[0] == "Super Admin", function ($q) use($district_id) {
+                    return $q->where(["district_id" => $district_id]);
+                })
+                ->pluck('name as title', 'id'),
+            'polling_station' => PollingStation::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+                return $q->where(["district_id" => auth()->user()->district_id]);
+            })
+                ->when(auth()->user()->roles->pluck('name')[0] == "Super Admin", function ($q) use($district_id) {
+                    return $q->where(["district_id" => $district_id]);
+                })
+                ->pluck('polling_station_name as title', 'id'),
+            'police_mobile' => PoliceMobile::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+                return $q->where(["district_id" => auth()->user()->district_id]);
+            })
+                ->when(auth()->user()->roles->pluck('name')[0] == "Super Admin", function ($q) use($district_id) {
+                    return $q->where(["district_id" => $district_id]);
+                })
+                ->pluck('registration_number', 'id'),
             'sections' => Section::where('company_id', '=', $item->company_id)->pluck('title', 'id'),
             'parent_users' => User::where([
                 ['company_id', '=', $item->company_id],
@@ -442,7 +485,22 @@ class UsersController extends Controller
 
     public function getDistrictUser($district_id)
     {
-        return["message"=>"success","data"=>User::whereDistrictId($district_id)->get()];
+        $district_id = explode(",",$district_id);
+
+        $res["hospital_users"] = User::with("roles")->with('district')->whereHas("roles", function($q) {
+            $q->whereIn("roles.id", [55]);
+        })->whereIn("district_id",$district_id)->get();
+
+        $res["polling_station_user"] = User::with("roles")->with('district')->whereHas("roles", function($q) {
+            $q->whereIn("roles.id", [56]);
+        })->whereIn("district_id",$district_id)->get();
+
+        $res["police_mobile_user"] = User::with("roles")->with('district')->whereHas("roles", function($q) {
+            $q->whereIn("roles.id", [58]);
+        })->whereIn("district_id",$district_id)->get();
+
+
+        return["message"=>"success","data"=>User::whereDistrictId($district_id)->get(),"users"=>$res];
     }
 
     public function getCircles($district_id)
@@ -452,5 +510,105 @@ class UsersController extends Controller
             return $q->where(["district_id"=>$district_id]);
         })->get();
         return["message"=>"success","data"=>$data];
+    }
+
+    public function getPoliceMobile($district_id)
+    {
+        $district_id = $district_id ?? "";
+        $data =PoliceMobile::when($district_id, function ($q) use ($district_id) {
+            return $q->where(["district_id"=>$district_id]);
+        })->get();
+        return["message"=>"success","data"=>$data];
+    }
+
+    public function getPollingStations($district_id)
+    {
+        $district_id = $district_id ?? "";
+        $data =PollingStation::when($district_id, function ($q) use ($district_id) {
+            return $q->where(["district_id"=>$district_id]);
+        })->get();
+        return["message"=>"success","data"=>$data];
+    }
+
+    public function getHospitals($district_id)
+    {
+        $district_id = $district_id ?? "";
+        $data =Hospital::when($district_id, function ($q) use ($district_id) {
+            return $q->where(["district_id"=>$district_id]);
+        })->get();
+        return["message"=>"success","data"=>$data];
+    }
+
+    public function getMultiCircles()
+    {
+
+        $district_id = request()->districts;
+        $data =Circle::whereIn("district_id",$district_id)->get();
+        return["message"=>"success","data"=>$data];
+    }
+
+    public function loadMultiPoliceStations()
+    {
+
+        $circles = request()->circles;
+        $data =PoliceStation::whereIn("circle_id",$circles)->get();
+        return["message"=>"success","data"=>$data];
+    }
+
+
+    public function getMultiDistrictUser()
+    {
+        $district_id = request()->districts;
+
+        $res["polling_station_user"] = User::with("roles")->with('district')->whereHas("roles", function($q) {
+            $q->whereIn("roles.id", [56]);
+        })->whereIn("district_id",$district_id)->get();
+
+        $res["police_mobile_user"] = User::with("roles")->with('district')->whereHas("roles", function($q) {
+            $q->whereIn("roles.id", [58]);
+        })->whereIn("district_id",$district_id)->get();
+
+        $res["police_station_users"] = User::with("roles")->with('district')->whereHas("roles", function($q) {
+            $q->whereIn("roles.id", [4]);
+        })
+            ->whereIn("district_id",$district_id)
+            ->get();
+
+        return["message"=>"success","data"=>User::whereDistrictId($district_id)->get(),"users"=>$res];
+
+
+    }
+
+    public function getMultiPoliceStationUser()
+    {
+        $district_id = request()->districts;
+        $police_station_id = request()->police_station_id;
+
+
+
+        $res["polling_station_user"] = User::with("roles")->with('district')
+            ->whereHas("roles", function($q) {
+            $q->whereIn("roles.id", [56]);
+            })
+            ->whereIn("district_id",$district_id)
+            ->whereIn("police_station_id",$police_station_id)
+            ->get();
+
+        $res["police_mobile_user"] = User::with("roles")->with('district')->whereHas("roles", function($q) {
+            $q->whereIn("roles.id", [58]);
+        })
+            ->whereIn("district_id",$district_id)
+            ->whereIn("police_station_id",$police_station_id)
+            ->get();
+
+        $res["police_station_users"] = User::with("roles")->with('district')->whereHas("roles", function($q) {
+            $q->whereIn("roles.id", [4]);
+        })
+            ->whereIn("district_id",$district_id)
+            ->whereIn("police_station_id",$police_station_id)
+            ->get();
+        return["message"=>"success","data"=>User::whereDistrictId($district_id)->get(),"users"=>$res];
+
+        //return["message"=>"success","data"=>User::wherePoliceStationId($police_station_id)->get()];
     }
 }

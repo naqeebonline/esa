@@ -52,7 +52,8 @@ class HospitalApiController extends Controller
                 return response()->json(['error' => true, 'message' => implode(' ', $requestValidator->errors()->all())],500);
 
             }//..... end if() .....//
-            $data = request()->except(["id"]);
+            //$data = request()->except(["id"]);
+            $data = request()->only(["lat","lng"]);
             Hospital::updateOrCreate([
                 'id'=>request()->id,
             ],$data);
@@ -148,8 +149,25 @@ class HospitalApiController extends Controller
 
     public function getAllHospitals()
     {
+        $district_ids = "";
+        $police_station_id = "";
+        if($_GET["district_id"] && $_GET["district_id"] !="null"){
+            $district_ids = explode(",",$_GET['district_id']);
 
-        $hospital = Hospital::whereNotNull("lat")->whereNotNull("lng")->get();
+        }
+        if($_GET["police_station_id"] && $_GET["police_station_id"] != "null"){
+            $police_station_id = explode(",",$_GET['police_station_id']);
+
+        }
+
+        $hospital = Hospital::whereNotNull("lat")->whereNotNull("lng")
+            ->when($district_ids, function ($q) use ($district_ids) {
+                return $q->whereIn("district_id",$district_ids);
+            })
+            ->when($police_station_id, function ($q) use ($police_station_id) {
+                return $q->whereIn("police_station_id",$police_station_id);
+            })
+            ->get();
         $hospitals = $this->dbToJson($hospital);
         return ($hospitals);
 
@@ -157,16 +175,64 @@ class HospitalApiController extends Controller
 
     public function getAllPollingStations()
     {
+        $district_ids = "";
+        $police_station_id = "";
+        $sensitivity_type = "";
+        if($_GET["district_id"] && $_GET["district_id"] !="null"){
+            $district_ids = explode(",",$_GET['district_id']);
 
-        $hospital = PollingStation::whereNotNull("lat")->whereNotNull("lng")->get();
-        $hospitals = $this->dbToJson($hospital);
-        return ($hospitals);
+        }
+        if($_GET["police_station_id"] && $_GET["police_station_id"] != "null"){
+            $police_station_id = explode(",",$_GET['police_station_id']);
+
+        }
+        if($_GET["sensitivity_type"] && $_GET["sensitivity_type"] != "null"){
+
+            $sensitivity_type = explode(",",$_GET['sensitivity_type']);
+
+        }
+
+        $hospital = PollingStation::whereNotNull("lat")->whereNotNull("lng")
+            ->when($district_ids, function ($q) use ($district_ids) {
+                return $q->whereIn("district_id",$district_ids);
+            })
+            ->when($police_station_id, function ($q) use ($police_station_id) {
+
+                return $q->whereIn("police_station_id",$police_station_id);
+            })
+            ->when($sensitivity_type, function ($q) use ($sensitivity_type) {
+
+                return $q->whereIn("sensitivity",$sensitivity_type);
+            })
+           ->get();
+           if(count($hospital) > 0){
+               $hospital = $this->dbToJson($hospital);
+           }
+        return ($hospital);
 
     }
 
     public function getAllPoliceStation()
     {
-        $hospital = PoliceStation::whereNotNull("latitude")->whereNotNull("longitude")->get();
+        $district_ids = "";
+        $police_station_id = "";
+        if($_GET["district_id"] && $_GET["district_id"] !="null"){
+            $district_ids = explode(",",$_GET['district_id']);
+
+        }
+        if($_GET["police_station_id"] && $_GET["police_station_id"] != "null"){
+            $police_station_id = explode(",",$_GET['police_station_id']);
+
+        }
+        $hospital = PoliceStation::whereNotNull("latitude")
+            ->when($district_ids, function ($q) use ($district_ids) {
+                return $q->whereIn("district_id",$district_ids);
+            })
+            ->when($police_station_id, function ($q) use ($police_station_id) {
+                return $q->whereIn("id",$police_station_id);
+            })
+            ->whereNotNull("longitude")
+            ->get();
         $hospitals = $this->dbToJson2($hospital);
 
         return ($hospitals);

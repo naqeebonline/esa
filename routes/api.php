@@ -59,6 +59,8 @@ Route::prefix('v1')->group(function (){
         Route::get('contact-info', [\App\Http\Controllers\ContactInformationController::class,'contactInfo']);
         Route::post('send-mobile-notification', [CommonActionController::class,'sendMobileNotification']);
         Route::post('emergency-alert', [CommonActionController::class,'emergencyAlert']);
+        Route::post('update-vehicle-location', [\App\Http\Controllers\API\PoliceMobileHistory::class,'saveLocation']);
+        Route::get('get-user-meeting', [\App\Http\Controllers\API\MeetingApiController::class,'getUserMeeting']);
     });//---- end of auth sanctum
 
 

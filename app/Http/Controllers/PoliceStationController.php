@@ -6,7 +6,9 @@ use App\Models\Circle;
 use App\Models\Districts;
 use App\Models\Hospital;
 use App\Models\PoliceStation;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Yajra\DataTables\Facades\DataTables;
 
 class PoliceStationController extends Controller
 {
@@ -27,18 +29,39 @@ class PoliceStationController extends Controller
       return view("police_station.add",$data);
     }
 
+    public function allPoliceStations()
+    {
+        $users = PoliceStation::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
+            return $q->where(["district_id"=>auth()->user()->district_id]);
+        });
+        return DataTables::of($users)
+            ->addColumn('action', function($cert) {
+                $actionsBtn = '<a class="dropdown-item p-50" href="'.route('edit.police.station',[$cert->id]).'"><i class="bx bx-file-blank mr-1"></i> Edit</a>';
+
+                $actionsBtn .= '<div role="separator" class="dropdown-divider"></div>';
+                return $actionsBtn;
+            })
+            ->addColumn('district_name', function($cert) {
+                return $cert->district->title ?? "";
+            })
+            ->addColumn('circle_name', function($cert) {
+                return $cert->circle->name ?? "";
+            })
+
+            ->rawColumns(["circle_name","district_name","action"])
+            ->make(true);
+    }
+
     public function listPoliceStation()
     {
+
+
+
         $data = [
             'title' => 'List Police Stations',
 
         ];
-        $query = PoliceStation::query();
-        $query->when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
-            return $q->where(["district_id"=>auth()->user()->district_id]);
-        });
 
-        $data["data"] = $query->get();
 
         return view("police_station.list",$data);
     }

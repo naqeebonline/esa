@@ -28,7 +28,8 @@ class PoliceMobileApiController extends Controller
                 return response()->json(['error' => true, 'message' => implode(' ', $requestValidator->errors()->all())],500);
 
             }//..... end if() .....//
-            $data = request()->except(["id"]);
+           // $data = request()->except(["id"]);
+            $data = request()->only(["lat","lng"]);
             PoliceMobile::updateOrCreate([
                 'id'=>request()->id,
             ],$data);

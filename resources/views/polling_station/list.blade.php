@@ -39,7 +39,7 @@
 
                             <div class="table-responsive" style="min-height: 200px">
 
-                                <table id="users-list" class="table table-striped data_mf_table table-condensed" >
+                                <table id="users-list" class="table table-responsive table-striped data_mf_table table-condensed" >
 
                                     <thead>
                                     <tr>
@@ -49,11 +49,11 @@
                                         <th style="width: 20%">Police Station</th>
 
                                         <th style="width: 10%">SENSITIVITY</th>
-                                        <th style="width: 10%">Distance From Police Station</th>
-                                        <th style="width: 10%">No of Male Booth</th>
+                                       {{-- <th style="width: 10%">Distance From Police Station</th>--}}
+                                        {{--<th style="width: 10%">No of Male Booth</th>
                                         <th style="width: 10%">No of Female Booth</th>
                                         <th style="width: 10%">Male Voters</th>
-                                        <th style="width: 10%">Female Voters</th>
+                                        <th style="width: 10%">Female Voters</th>--}}
                                         <th style="width: 10%">In-charge Contact</th>
                                         <th style="width: 10%">Lat</th>
                                         <th style="width: 10%">Long</th>
@@ -62,39 +62,6 @@
                                     </thead>
 
                                     <tbody>
-                                    @foreach($data as $key => $value)
-                                        <tr>
-                                            <td>{{$value->polling_station_name}}</td>
-
-                                            <td>{{$value->district->title ?? ""}}</td>
-                                            <td>{{$value->policeStation->title ?? ""}}</td>
-
-                                            <td>
-
-                                                @if($value->sensitivitys->title == "Most Sensitive")
-                                                    <span class="badge badge-danger" style="color: red">{{$value->sensitivitys->title}}</span>
-                                                @elseif($value->sensitivitys->title == "Sensitive")
-                                                    <span class="badge badge-warning" style="color: orange">{{$value->sensitivitys->title}}</span>
-                                                @else
-                                                    <span class="badge badge-info" style="color:blue">{{$value->sensitivitys->title}}</span>
-                                                @endif
-                                            </td>
-                                            <td>{{$value->distance_from_ps}}</td>
-                                            <td>{{$value->number_of_male_booth}}</td>
-                                            <td>{{$value->number_of_female_booth}}</td>
-                                            <td>{{$value->male_voters}}</td>
-                                            <td>{{$value->female_voters}}</td>
-                                            <td>{{$value->incharge_contact}}</td>
-                                            <td>{{$value->lat}}</td>
-                                            <td>{{$value->lng}}</td>
-                                            <td>
-
-                                                <a href="{{route('edit.polling.station',$value->id)}}" class="btn btn-primary btn-icon btn-sm">
-                                                    <i class="tf-icons bx bx-pencil"></i>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    @endforeach
                                     </tbody>
                                 </table>
                             </div>
@@ -114,12 +81,49 @@
     <script src="{{ asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.js') }}"></script>
     <script>
         $(document).ready(function (){
-            $('#users-list').DataTable({
-                lengthMenu: [100, 200, 300, 500],
-                pageLength: 100,
+            user_table = $('#users-list').DataTable({
                 processing: true,
-                serverSide:false
+                serverSide: true,
 
+                lengthMenu: [
+                    [ 100, 250, 500, 1000 ],
+                    [ '100', '250', '500', '1000']
+                ],
+                pageLength: 50,
+                ajax: {
+                    url: '{{route("all.polling.station")}}',
+                    data: {
+                        'post_param': '1'
+                    }
+
+                },
+
+                columns: [
+                    {data: 'polling_station_name', name: 'polling_station_name', searchable: true},
+                    {data: 'district_name', name: 'district_name'},
+                    {data: 'police_station_name', name: 'police_station_name'},
+                    {data: 'sensitivity_name', name: 'sensitivity_name'},
+                    /*{data: 'distance_from_ps', name: 'distance_from_ps'},*/
+                    /*{data: 'number_of_male_booth', name: 'number_of_male_booth'},
+                    {data: 'number_of_female_booth', name: 'number_of_female_booth'},
+                    {data: 'male_voters', name: 'male_voters'},
+                    {data: 'female_voters', name: 'female_voters'},*/
+                    {data: 'incharge_contact', name: 'incharge_contact'},
+                    {data: 'lat', name: 'lat'},
+                    {data: 'lng', name: 'lng'},
+                    {data: 'action', name: 'action', orderable: false, searchable: false}
+                ],
+
+                responsive: true,
+                processing: true,
+                serverSide: true,
+                searching:  true,
+                sorting:    true,
+                paging:     true,
+                dom: 'Bfrtip',
+                buttons: [
+                    'copy', 'csv', 'excel', 'pdf', 'print'
+                ]
             });
         })
     </script>

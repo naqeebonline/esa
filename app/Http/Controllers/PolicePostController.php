@@ -6,6 +6,7 @@ use App\Models\Districts;
 use App\Models\PolicePost;
 use App\Models\PoliceStation;
 use Illuminate\Http\Request;
+use Yajra\DataTables\Facades\DataTables;
 
 class PolicePostController extends Controller
 {
@@ -19,17 +20,38 @@ class PolicePostController extends Controller
         return view("police_post.add",$data);
     }
 
+    public function allPolicePost()
+    {
+        $users = PolicePost::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
+            return $q->where(["district_id"=>auth()->user()->district_id]);
+        });
+        return DataTables::of($users)
+            ->addColumn('action', function($cert) {
+                $actionsBtn = '<a class="dropdown-item p-50" href="'.route('edit.police.post',[$cert->id]).'"><i class="bx bx-file-blank mr-1"></i> Edit</a>';
+
+                $actionsBtn .= '<div role="separator" class="dropdown-divider"></div>';
+
+
+                return $actionsBtn;
+            })
+            ->addColumn('district_name', function($cert) {
+                return $cert->district->title ?? "";
+            })
+            ->addColumn('police_station_name', function($cert) {
+                return $cert->policeStation->title ?? "";
+            })
+
+            ->rawColumns(["police_station_name","district_name","action"])
+            ->make(true);
+    }
+
     public function listPolicePost()
     {
         $data = [
             'title' => 'List Police Post',
 
         ];
-        $query = PolicePost::query();
-        $query->when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
-            return $q->where(["district_id"=>auth()->user()->district_id]);
-        });
-        $data["data"] = $query->get();
+
 
         return view("police_post.list",$data);
     }

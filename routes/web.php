@@ -73,11 +73,19 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('getTehsils/{id?}', [\Modules\Settings\Http\Controllers\UsersController::class, 'getTehsils'])->name('getTehsils');
     Route::get('getCircles/{district_id?}', [\Modules\Settings\Http\Controllers\UsersController::class, 'getCircles'])->name('getCircles');
+    Route::get('getPoliceMobile/{district_id?}', [\Modules\Settings\Http\Controllers\UsersController::class, 'getPoliceMobile'])->name('getPoliceMobile');
+    Route::get('getPollingStations/{district_id?}', [\Modules\Settings\Http\Controllers\UsersController::class, 'getPollingStations'])->name('getPollingStations');
+    Route::get('getHospitals/{district_id?}', [\Modules\Settings\Http\Controllers\UsersController::class, 'getHospitals'])->name('getHospitals');
+    Route::post('getMultiCircles', [\Modules\Settings\Http\Controllers\UsersController::class, 'getMultiCircles'])->name('getMultiCircles');
+    Route::post('loadMultiPoliceStations', [\Modules\Settings\Http\Controllers\UsersController::class, 'loadMultiPoliceStations'])->name('loadMultiPoliceStations');
     Route::get('getPoliceStations/{id?}', [\Modules\Settings\Http\Controllers\UsersController::class, 'getPoliceStations'])->name('getPoliceStations');
     Route::get('getPoliceStationUser/{id?}', [\Modules\Settings\Http\Controllers\UsersController::class, 'getPoliceStationUser'])->name('getPoliceStationUser');
     Route::get('getDistrictUser/{id?}', [\Modules\Settings\Http\Controllers\UsersController::class, 'getDistrictUser'])->name('getDistrictUser');
     Route::get('getCirclePoliceStations/{circle_id?}', [\Modules\Settings\Http\Controllers\UsersController::class, 'getCirclePoliceStations'])->name('getCirclePoliceStations');
     Route::get('list-hospital', [\App\Http\Controllers\HospitalController::class, 'listHospital'])->name('list.hospital');
+    Route::get('all-hospital', [\App\Http\Controllers\HospitalController::class, 'allHospital'])->name('all.hospital');
+    Route::post('getMultiDistrictUser', [\Modules\Settings\Http\Controllers\UsersController::class, 'getMultiDistrictUser'])->name('getMultiDistrictUser');
+    Route::post('getMultiPoliceStationUser', [\Modules\Settings\Http\Controllers\UsersController::class, 'getMultiPoliceStationUser'])->name('getMultiPoliceStationUser');
 
     Route::get('add-police-station', [\App\Http\Controllers\PoliceStationController::class, 'index'])->name('add.new.police.station');
     Route::get('list-police-station', [\App\Http\Controllers\PoliceStationController::class, 'listPoliceStation'])->name('list.police.station');
@@ -85,6 +93,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('edit-police-station/{id}', [\App\Http\Controllers\PoliceStationController::class, 'editPoliceStation'])->name('edit.police.station');
     Route::post('update-police-station', [\App\Http\Controllers\PoliceStationController::class, 'updatePoliceStation'])->name('update.police.station');
     Route::post('delete-police-station', [\App\Http\Controllers\PoliceStationController::class, 'destroy'])->name('delete.police.station');
+    Route::get('all-police-station', [\App\Http\Controllers\PoliceStationController::class, 'allPoliceStations'])->name('all.police.station');
 
     Route::get('add-police-post', [\App\Http\Controllers\PolicePostController::class, 'index'])->name('add.new.police.post');
     Route::get('list-police-post', [\App\Http\Controllers\PolicePostController::class, 'listPolicePost'])->name('list.police.post');
@@ -92,6 +101,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('edit-police-post/{id}', [\App\Http\Controllers\PolicePostController::class, 'editPolicePost'])->name('edit.police.post');
     Route::post('update-police-post', [\App\Http\Controllers\PolicePostController::class, 'updatePolicePost'])->name('update.police.post');
     Route::post('delete-police-post', [\App\Http\Controllers\PolicePostController::class, 'destroy'])->name('delete.police.post');
+    Route::get('all-police-post', [\App\Http\Controllers\PolicePostController::class, 'allPolicePost'])->name('all.police.post');
 
     Route::get('add-police-line', [\App\Http\Controllers\PoliceLineController::class, 'index'])->name('add.new.police.line');
     Route::get('list-police-line', [\App\Http\Controllers\PoliceLineController::class, 'listPoliceLine'])->name('list.police.line');
@@ -99,6 +109,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('edit-police-line/{id}', [\App\Http\Controllers\PoliceLineController::class, 'editPoliceLine'])->name('edit.police.line');
     Route::post('update-police-line', [\App\Http\Controllers\PoliceLineController::class, 'updatePoliceLine'])->name('update.police.line');
     Route::post('delete-police-line', [\App\Http\Controllers\PoliceLineController::class, 'destroy'])->name('delete.police.line');
+    Route::get('police-line', [\App\Http\Controllers\PoliceLineController::class, 'policeLine'])->name('all.police.line');
 
 
     Route::get('add-polling-station', [\App\Http\Controllers\PollingStationController::class, 'index'])->name('add.new.polling.station');
@@ -106,6 +117,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('save-polling-station', [\App\Http\Controllers\PollingStationController::class, 'savePollingStation'])->name('save.polling.station');
     Route::get('edit-polling-station/{id}', [\App\Http\Controllers\PollingStationController::class, 'editPollingStation'])->name('edit.polling.station');
     Route::post('update-polling-station', [\App\Http\Controllers\PollingStationController::class, 'updatePollingStation'])->name('update.polling.station');
+    Route::get('polling-station', [\App\Http\Controllers\PollingStationController::class, 'pollingStation'])->name('all.polling.station');
 
     Route::get('add-hospital', [\App\Http\Controllers\HospitalController::class, 'index'])->name('add.new.hospital');
     Route::post('save-hospital', [\App\Http\Controllers\HospitalController::class, 'saveHospital'])->name('save-hospital');
@@ -117,6 +129,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('save-police-mobile', [\App\Http\Controllers\PoliceMobileController::class, 'savePoliceMobile'])->name('save.police.mobile');
     Route::get('edit-police-mobile/{id}', [\App\Http\Controllers\PoliceMobileController::class, 'editPoliceMobile'])->name('edit.police.mobile');
     Route::post('update-police-mobile', [\App\Http\Controllers\PoliceMobileController::class, 'updatePoliceMobile'])->name('update.police.mobile');
+    Route::get('police-mobile', [\App\Http\Controllers\PoliceMobileController::class, 'policeMobile'])->name('all.police.mobile');
 
 
 
@@ -128,6 +141,7 @@ Route::group(['middleware' => 'auth'], function () {
 
 
 
+    Route::post('sendMeetingNotification', [\App\Http\Controllers\MeetingController::class, 'sendMeetingNotification'])->name('sendMeetingNotification');
     Route::get('list-district', [\App\Http\Controllers\DistrictController::class, 'listdistricts'])->name('list.districts');
     Route::get('list-circle', [\App\Http\Controllers\CircleController::class, 'listcircles'])->name('list.circles');
     // Route::get('list-circle', [\App\Http\Controllers\CircleController::class, 'listcircles'])->name('list.circles');

@@ -6,6 +6,7 @@ use App\Models\PollingStation;
 use App\Models\Sensitivity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Yajra\DataTables\Facades\DataTables;
 
 class PollingStationController extends Controller
 {
@@ -25,6 +26,34 @@ class PollingStationController extends Controller
         return view("polling_station.add",$data);
     }
 
+    public function pollingStation()
+    {
+        $users = PollingStation::with(["policeStation","sensitivitys"])
+            ->when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
+                return $q->where(["district_id"=>auth()->user()->district_id]);
+            });
+        return DataTables::of($users)
+            ->addColumn('action', function($cert) {
+                $actionsBtn = '<a class="dropdown-item p-50" href="'.route('edit.polling.station',[$cert->id]).'"><i class="bx bx-file-blank mr-1"></i> Edit</a>';
+
+                $actionsBtn .= '<div role="separator" class="dropdown-divider"></div>';
+
+
+                return $actionsBtn;
+            })
+            ->addColumn('district_name', function($cert) {
+                return $cert->district?->title ?? "";
+                })
+            ->addColumn('police_station_name', function($cert) {
+                return $cert->policeStation->title ?? "";
+                })
+            ->addColumn('sensitivity_name', function($cert) {
+                return $cert->sensitivitys->title ?? "";
+                })
+            ->rawColumns(["district_name","police_station_name","sensitivity_name","action"])
+            ->make(true);
+    }
+
     public function listPollingStation()
     {
 
@@ -32,10 +61,7 @@ class PollingStationController extends Controller
             'title' => 'List Polling Stations',
 
         ];
-        $data['data'] = PollingStation::with(["policeStation","sensitivitys"])
-            ->when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
-                return $q->where(["district_id"=>auth()->user()->district_id]);
-            })->get();
+        $data['data'] = [];
 
         return view("polling_station.list",$data);
     }

@@ -102,6 +102,7 @@ class User extends Authenticatable implements JWTSubject, HasMedia
         'police_station_id',
         'hospital_id',
         'polling_station_id',
+        'police_mobile_id',
     ];
 
     protected $connection = "mysql";
@@ -125,7 +126,7 @@ class User extends Authenticatable implements JWTSubject, HasMedia
         'email_verified_at' => 'datetime',
     ];
 
-    protected $with = ['roles'];
+    protected $with = ['roles','district','policeMobile'];
 
 
     protected $appends = ['roles_array', 'permissions_array'];
@@ -183,6 +184,11 @@ class User extends Authenticatable implements JWTSubject, HasMedia
     public function district()
     {
         return $this->belongsTo(Districts::class, 'district_id', 'id');
+    }
+
+    public function policeMobile()
+    {
+        return $this->belongsTo(PoliceMobile::class, 'police_mobile_id', 'id');
     }
 
     public function policeStations()

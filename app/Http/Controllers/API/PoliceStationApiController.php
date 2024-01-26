@@ -60,7 +60,7 @@ class PoliceStationApiController extends Controller
                 return response()->json(['error' => true, 'message' => implode(' ', $requestValidator->errors()->all())],500);
 
             }//..... end if() .....//
-            $data = request()->except(["id"]);
+            $data = request()->only(["latitude","longitude"]);
             PoliceStation::updateOrCreate([
                 'id'=>request()->id,
             ],$data);

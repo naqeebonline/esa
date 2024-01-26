@@ -134,6 +134,10 @@
                                             <td>
                                                 <a  class="btn btn-primary assign_to_user" data-id="{{$value->zoom_meeting_id}}"><i class="tf-icons bx bx-wrench"></i></a>
 
+                                                @if(count($value->meetingUsers) > 0)
+                                                <a  class="btn btn-danger generate_push" data-id="{{$value->zoom_meeting_id}}"><i class="tf-icons bx bx-play"></i></a>
+                                                @endif
+
                                             </td>
                                         </tr>
                                     @endforeach
@@ -160,7 +164,7 @@
                     <div class="row">
                         <div class="col mb-3">
                             <label for="nameAnimation" class="form-label">District</label>
-                            <select class="form-control select2" id="district_id">
+                            <select class="form-control select2" id="district_id" multiple="multiple">
                                 <option value="">Select District...</option>
                                 @foreach($districts as $key => $value)
                                 <option value="{{$value->id}}">{{$value->title}}</option>
@@ -170,11 +174,24 @@
                         </div>
                     </div>
 
+
+
+                    <div class="row">
+                        <div class="col mb-3">
+
+                            <label>Circle</label>
+                            <select class="form-control select2" name="circle_id" id="circle_id" multiple="multiple">
+
+                            </select>
+
+                        </div>
+                    </div>
+
                     <div class="row">
                         <div class="col mb-3">
 
                             {!! Form::label('Police Station', 'Police Station  ', ['class' => 'form-label']) !!}
-                            {!! Form::select('police_station_id', [],  null, ['class' => 'form-control select2','id'=>"police_station_id"]) !!}
+                            {!! Form::select('police_station_id', [],  null, ['class' => 'form-control select2','id'=>"police_station_id","multiple"=>"multiple"]) !!}
 
                         </div>
                     </div>
@@ -187,6 +204,32 @@
 
                         </div>
                     </div>
+
+                    <div class="row">
+                        <div class="col mb-3">
+                            <label for="nameAnimation" class="form-label">Polling Station Users</label>
+                            <select class="form-control select2" id="polling_station_user" multiple="multiple">
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col mb-3">
+                            <label for="nameAnimation" class="form-label">Police Mobile Users</label>
+                            <select class="form-control select2" id="police_mobile_user" multiple="multiple">
+                            </select>
+                        </div>
+                    </div>
+
+                    {{--<div class="row">
+                        <div class="col mb-3">
+                            <label for="nameAnimation" class="form-label">Hospital Users</label>
+                            <select class="form-control select2" id="hospital_users" multiple="multiple">
+                            </select>
+                        </div>
+                    </div>--}}
+
+
 
 
 
@@ -326,10 +369,29 @@
                 $("#animationModal").modal("show");
             });
 
+            $("body").on("click",".generate_push",function (e) {
+                meeting_id= $(this).attr("data-id");
+                $.ajax({
+                    url: '{{ route("sendMeetingNotification") }}', // Replace with your actual URL
+                    method: 'post',
+                    data: {
+                        meeting_id: meeting_id,
+                        _token: '{{ csrf_token() }}'
+
+                    },
+                    success: function (response) {
+                       alert("Invitation has been sent to all users");
+                    }
+                });
+
+            });
+
             $("body").on("click",".assign_user_to_meeting",function (e) {
                var district_id = $("#district_id").val();
                var police_station_id = $("#police_station_id").val();
                 var police_station_users = $("#police_station_users").val();
+                var polling_station_user = $("#polling_station_user").val();
+                var police_mobile_user = $("#police_mobile_user").val();
                if(police_station_users.length == 0){
                    alert("Please assign users to meeting");
                    return false;
@@ -340,9 +402,9 @@
                     }
                 });
                 $.ajax({
-                    type: 'POST',
-                    url: '{{ route("assignUserToMeeting") }}/', // Replace with your actual URL
-                    data:{meeting_id,district_id,police_station_id,police_station_users, _token: '{{ csrf_token() }}'},
+                    url: '{{ route("assignUserToMeeting") }}', // Replace with your actual URL
+                    method: 'post',
+                    data:{meeting_id,district_id,police_station_id,police_station_users,polling_station_user,police_mobile_user, _token: '{{ csrf_token() }}'},
                     success: function (response) {
                         if(response.status == true){
                              window.location.reload();
@@ -357,16 +419,43 @@
             $('#district_id').on('change', function () {
                 var selectedDistrict = $(this).val();
                 $.ajax({
-                    url: '{{ route("getDistrictUser") }}/' + selectedDistrict, // Replace with your actual URL
-                    method: 'get',
+                    url: '{{ route("getMultiDistrictUser") }}', // Replace with your actual URL
+                    method: 'post',
+                    data: {
+                        districts: selectedDistrict,
+                        _token: '{{ csrf_token() }}'
+
+                    },
                     success: function (response) {
+                        console.log(response);
 
                         var psOptions = '<option value=""></option>';
                         $.each(response.data, function (index, item) {
                             psOptions += '<option value="' + item.id + '">' + item.name + '</option>';
                         });
-
                         $("#police_station_users").html(psOptions);
+
+                        var psuOptions = '';
+                        $.each(response.users.polling_station_user, function (index, item) {
+                            psuOptions += '<option value="' + item.id + '">' + item.name + '</option>';
+                        });
+                        $("#polling_station_user").html(psuOptions);
+
+
+                        var policeMobileOptions = '';
+                        $.each(response.users.police_mobile_user, function (index, item) {
+
+                            policeMobileOptions += `<option value="${item.id}">${item.name} ( ${item.police_mobile.registration_number} )</option>`;
+                        });
+                        $("#police_mobile_user").html(policeMobileOptions);
+
+                        var police_station_UserOptions = '';
+                        $.each(response.users.police_station_users, function (index, item) {
+                            police_station_UserOptions += `<option value="${item.id}">${item.name} </option>`;
+                        });
+                        $("#police_station_users").html(police_station_UserOptions);
+
+
                     }
                 });
 
@@ -374,7 +463,6 @@
                     url: '{{ route("getPoliceStations") }}/' + selectedDistrict, // Replace with your actual URL
                     method: 'GET',
                     success: function (response) {
-
                         var psOptions = '<option value="">Select Police Station</option>';
                         $.each(response.data, function (index, item) {
                             psOptions += '<option value="' + item.id + '">' + item.title + '</option>';
@@ -383,22 +471,53 @@
                     }
                 });
 
+                loadCircle();
+
 
             });
 
-            $('#police_station_id').on('change', function () {
-                var selectedDistrict = $(this).val();
-                $.ajax({
-                    url: '{{ route("getPoliceStationUser") }}/' + selectedDistrict, // Replace with your actual URL
-                    method: 'get',
-                    success: function (response) {
+            $("body").on("change","#circle_id",function (e) {
+                loadMultiPoliceStations();
+            });
 
-                        var psOptions = '<option value=""></option>';
-                        $.each(response.data, function (index, item) {
-                            psOptions += '<option value="' + item.id + '">' + item.name + '</option>';
+            $('#police_station_id').on('change', function () {
+                var selectedDistrict = $("#district_id").val();
+                var police_station_id = $(this).val();
+                $.ajax({
+                    url: '{{ route("getMultiPoliceStationUser") }}', // Replace with your actual URL
+                    method: 'post',
+                    data: {
+                        districts: selectedDistrict,
+                        police_station_id: police_station_id,
+                        _token: '{{ csrf_token() }}'
+
+                    },
+                    success: function (response) {
+                        console.log(response);
+
+
+
+                        var psuOptions = '';
+                        $.each(response.users.polling_station_user, function (index, item) {
+                            psuOptions += '<option value="' + item.id + '">' + item.name + '</option>';
                         });
-                        console.log(psOptions);
-                        $("#police_station_users").html(psOptions);
+                        $("#polling_station_user").html(psuOptions);
+
+
+                        var policeMobileOptions = '';
+                        $.each(response.users.police_mobile_user, function (index, item) {
+
+                            policeMobileOptions += `<option value="${item.id}">${item.name} ( ${item.police_mobile.registration_number} )</option>`;
+                        });
+                        $("#police_mobile_user").html(policeMobileOptions);
+
+
+
+                        var police_station_UserOptions = '';
+                        $.each(response.users.police_station_users, function (index, item) {
+                            police_station_UserOptions += `<option value="${item.id}">${item.name} </option>`;
+                        });
+                        $("#police_station_users").html(police_station_UserOptions);
                     }
                 });
 
@@ -416,6 +535,50 @@
             $temp.remove();
             alert("Copy to clip board");
 
+        }
+
+        function loadCircle() {
+
+            var districts = $('#district_id').val();
+            $.ajax({
+                url: '{{ route("getMultiCircles") }}' , // Replace with your actual URL
+                method: 'post',
+                data: {
+                    districts: districts,
+                    _token: '{{ csrf_token() }}'
+
+                },
+                success: function (response) {
+
+                    var psOptions = '<option value="">Select Circle</option>';
+                    $.each(response.data, function (index, item) {
+                        psOptions += '<option value="' + item.id + '">' + item.name + '</option>';
+                    });
+                    $("#circle_id").html(psOptions);
+                }
+            });
+        }
+
+        function loadMultiPoliceStations() {
+
+            var circles = $("#circle_id").val();
+            $.ajax({
+                url: '{{ route("loadMultiPoliceStations") }}' , // Replace with your actual URL
+                method: 'post',
+                data: {
+                    circles: circles,
+                    _token: '{{ csrf_token() }}'
+
+                },
+                success: function (response) {
+
+                    var psOptions = '<option value="">Select Police Stations</option>';
+                    $.each(response.data, function (index, item) {
+                        psOptions += '<option value="' + item.id + '">' + item.title + '</option>';
+                    });
+                    $("#police_station_id").html(psOptions);
+                }
+            });
         }
 
     </script>

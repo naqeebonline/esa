@@ -48,10 +48,7 @@
                                         <th style="width: 10%">Circle</th>
                                         <th style="width: 10%">Police Station Name</th>
                                         <th  style="width: 7%">Strength</th>
-                                        <th  style="width: 7%">Police Station Contact</th>
-                                        <th style="width: 10%">SHO Name</th>
-                                        <th style="width: 10%">SHO Contact</th>
-                                        <th style="width: 10%">SHO Rank</th>
+
                                         <th style="width: 10%">Lat</th>
                                         <th style="width: 10%">Long</th>
                                         <th  style="width: 10%">Action</th>
@@ -60,30 +57,7 @@
 
                                     <tbody>
 
-                                    @foreach($data as $key => $value)
-                                        <tr>
-                                            <td>{{$value->district->title ?? ""}}</td>
-                                            <td>{{$value->circle->name ?? ""}}</td>
-                                            <td>{{$value->title}}</td>
-                                            <td>{{$value->strength}}</td>
-                                            <td>{{$value->ps_contact_number}}</td>
 
-                                            <td>{{$value->sho_name}}</td>
-                                            <td>{{$value->sho_contact}}</td>
-                                            <td>{{$value->sho_rank}}</td>
-                                            <td>{{$value->latitude}}</td>
-                                            <td>{{$value->longitude}}</td>
-                                            <td>
-                                                {{--<a href="{{route('edit.police.station',$value->id)}}" class="btn btn-primary">Edit</a>--}}
-                                                <a href="{{route('edit.police.station',$value->id)}}" class="btn btn-primary btn-icon btn-sm">
-                                                    <i class="tf-icons bx bx-pencil"></i>
-                                                </a>
-                                                <a href="javascript:void(0)" data-id="{{$value->id}}" class="btn btn-danger btn-icon btn-sm delete_button">
-                                                    <i class="tf-icons bx bx-window-close"></i>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    @endforeach
 
                                     </tbody>
                                 </table>
@@ -106,13 +80,48 @@
         var id = 0;
         $(document).ready(function (){
 
-            $('#users-list').DataTable({
-                lengthMenu: [100, 200, 300, 500],
-                pageLength: 100,
+            user_table = $('#users-list').DataTable({
                 processing: true,
-                serverSide:false
+                serverSide: true,
 
+                lengthMenu: [
+                    [ 100, 250, 500, 1000 ],
+                    [ '100', '250', '500', '1000']
+                ],
+                pageLength: 50,
+                ajax: {
+                    url: '{{route("all.police.station")}}',
+                    data: {
+                        'post_param': '1'
+                    }
+
+                },
+
+                columns: [
+
+                    {data: 'district_name', name: 'district_name'},
+                    {data: 'circle_name', name: 'circle_name'},
+                    {data: 'title', name: 'title'},
+                    {data: 'strength', name: 'strength'},
+                    {data: 'latitude', name: 'latitude'},
+                    {data: 'longitude', name: 'longitude'},
+                    {data: 'action', name: 'action', orderable: false, searchable: false}
+                ],
+
+                responsive: true,
+                processing: true,
+                serverSide: true,
+                searching:  true,
+                sorting:    true,
+                paging:     true,
+                dom: 'Bfrtip',
+                buttons: [
+                    'copy', 'csv', 'excel', 'pdf', 'print'
+                ]
             });
+
+
+
             $("body").on("click",".delete_button",function (e) {
                id = $(this).attr("data-id");
                 if (confirm('Are you sure to delete this record ?')) {

@@ -64,7 +64,7 @@ class CommonActionController extends Controller
             ->whereNotNull("longitude")
             ->having("distance", "<", $radius)->orderBy("distance",'asc')->offset(0)->limit(20)->get();
 
-        $police_mobile = PoliceMobile::selectRaw("id,contact_number,rank,lat,lng,
+        /*$police_mobile = PoliceMobile::selectRaw("id,contact_number,rank,lat,lng,
                          ( 6371 * acos( cos( radians(?) ) *
                            cos( radians( lat ) )
                            * cos( radians( lng ) - radians(?)
@@ -73,7 +73,7 @@ class CommonActionController extends Controller
                          ) AS distance", [$latitude, $longitude, $latitude])
             ->whereNotNull("lat")
             ->whereNotNull("lng")
-            ->having("distance", "<", $radius)->orderBy("distance",'asc')->offset(0)->limit(20)->get();
+            ->having("distance", "<", $radius)->orderBy("distance",'asc')->offset(0)->limit(20)->get();*/
 
         $hospitals = Hospital::selectRaw("id,name,contact_number,lat,lng,
                          ( 6371 * acos( cos( radians(?) ) *
@@ -88,7 +88,7 @@ class CommonActionController extends Controller
 
         return response()->json(['error' => false, 'message' => "data found",
             "police_station"=>$police_station,
-            "police_mobile"=>$police_mobile,
+            //"police_mobile"=>$police_mobile,
             "hospitals"=>$hospitals,
 
         ],200);

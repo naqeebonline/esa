@@ -31,7 +31,8 @@ class PollingStationApiController extends Controller
                 return response()->json(['error' => true, 'message' => implode(' ', $requestValidator->errors()->all())],500);
 
             }//..... end if() .....//
-            $data = request()->except(["id"]);
+           // $data = request()->except(["id"]);
+            $data = request()->only(["lat","lng"]);
             $data['district_id'] = $this->getPoliceStationDistrict(request()->police_station_id);
             $res = PollingStation::create($data);
 
@@ -67,7 +68,8 @@ class PollingStationApiController extends Controller
                 return response()->json(['error' => true, 'message' => implode(' ', $requestValidator->errors()->all())],500);
 
             }//..... end if() .....//
-            $data = request()->except(["id"]);
+            //$data = request()->except(["id"]);
+            $data = request()->only(["lat","lng"]);
             PollingStation::updateOrCreate([
                 'id'=>request()->id,
             ],$data);

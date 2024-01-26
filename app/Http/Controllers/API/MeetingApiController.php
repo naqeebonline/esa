@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\AssignMeetings;
 use App\Models\Meeting;
 use App\Models\User;
 use Carbon\Carbon;
@@ -129,5 +130,22 @@ class MeetingApiController extends Controller
         // FCM response
         return $result;
         dd($result);
+    }
+
+
+    public function getUserMeeting()
+    {
+        $user = auth()->user();
+        $meetings = AssignMeetings::where("to_user",$user->id)->pluck('zoom_meeting_id');
+        $meetings = Meeting::whereIn("zoom_meeting_id",$meetings)->orderBy('updated_at', 'asc')->first();
+        if($meetings){
+            return response()->json(['error' => false, 'user_id'=>$user->id,'message' => "data found","data"=>$meetings],200);
+        }else{
+            return response()->json(['error' => false,'user_id'=>$user->id, 'message' => "data not found","data"=>[]],200);
+        }
+
+
+
+
     }
 }

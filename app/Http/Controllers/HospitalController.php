@@ -6,6 +6,7 @@ use App\Models\FacilityType;
 use App\Models\Hospital;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Yajra\DataTables\Facades\DataTables;
 
 class HospitalController extends Controller
 {
@@ -19,6 +20,32 @@ class HospitalController extends Controller
         return view("hospital.add", $data);
     }
 
+    public function allHospital()
+    {
+        $users = Hospital::with(["facilityType"])
+            ->when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+                return $q->where(["district_id" => auth()->user()->district_id]);
+            });
+        return DataTables::of($users)
+            ->addColumn('action', function($cert) {
+                $actionsBtn = '<a class="dropdown-item p-50" href="'.route('edit.hospital',[$cert->id]).'"><i class="bx bx-file-blank mr-1"></i> Edit</a>';
+
+                $actionsBtn .= '<div role="separator" class="dropdown-divider"></div>';
+
+
+                return $actionsBtn;
+            })
+
+            ->addColumn('police_station_name', function($cert) {
+                return $cert->policeStation->title ?? "";
+            })
+            ->addColumn('facility_type', function($cert) {
+                return $cert->facilityType->name ?? "";
+            })
+            ->rawColumns(["police_station_name","facility_type","action"])
+            ->make(true);
+    }
+
 
     public function listHospital()
     {
@@ -26,10 +53,7 @@ class HospitalController extends Controller
             'title' => 'List Hospitals',
         ];
 
-        $data["data"] = Hospital::with(["facilityType"])
-            ->when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
-                return $q->where(["district_id" => auth()->user()->district_id]);
-            })->get();
+
 
         //$role_name = auth()->user()->roles->pluck('name')[0];
         return view("hospital.list", $data);

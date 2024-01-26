@@ -84,6 +84,19 @@
 
                     <div class="row my-3">
                         <div class="col-md-6">
+                            <label class="form-label" for="multicol-username">Internet Availability<label>
+                                    <select name="internet" class="form-control" required id="internet">
+                                        <option value="">Select Option....</option>
+                                        <option value="yes">Yes</option>
+                                        <option value="no">No</option>
+                                    </select>
+                        </div>
+
+
+                    </div>
+
+                    <div class="row my-3">
+                        <div class="col-md-6">
                             <label class="form-label" for="multicol-email">Incharge Name</label>
                             <div class="input-group">
                                 <input type="text" name="incharge_name" value="{{$data->incharge_name}}" class="form-control" placeholder="" >

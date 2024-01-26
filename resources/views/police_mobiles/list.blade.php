@@ -49,9 +49,7 @@
                                         <th style="width: 10%">Police Station</th>
                                         <th  style="width: 7%">Registration #</th>
                                         <th  style="width: 7%">Vehicle Type</th>
-                                        <th style="width: 10%">Incharge Name</th>
-                                        <th style="width: 10%">Contact Number</th>
-                                        <th style="width: 10%">Rank</th>
+
                                         <th style="width: 10%">Lat</th>
                                         <th style="width: 10%">Lang</th>
                                         <th  style="width: 10%">Action</th>
@@ -60,27 +58,7 @@
 
                                     <tbody>
 
-                                    @foreach($data as $key => $value)
-                                        <tr>
-                                            <td>{{$value->district->title ?? ""}}</td>
-                                            <td>{{$value->circle->name ?? ""}}</td>
-                                            <td>{{$value->policeStation->title ?? ""}}</td>
-                                            <td>{{$value->registration_number}}</td>
-                                            <td>{{$value->vehicleType->name ?? ""}}</td>
-                                            <td>{{$value->incharge_name}}</td>
-                                            <td>{{$value->contact_number}}</td>
-                                            <td>{{$value->rank}}</td>
-                                            <td>{{$value->lat}}</td>
-                                            <td>{{$value->lng}}</td>
 
-                                            <td>
-                                                {{--<a href="{{route('edit.police.station',$value->id)}}" class="btn btn-primary">Edit</a>--}}
-                                                <a href="{{route('edit.police.mobile',$value->id)}}" class="btn btn-primary btn-icon btn-sm">
-                                                    <i class="tf-icons bx bx-pencil"></i>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    @endforeach
 
                                     </tbody>
                                 </table>
@@ -101,13 +79,50 @@
     <script src="{{ asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.js') }}"></script>
     <script>
         $(document).ready(function (){
-            $('#users-list').DataTable({
-                lengthMenu: [100, 200, 300, 500],
-                pageLength: 100,
+            user_table = $('#users-list').DataTable({
                 processing: true,
-                serverSide:false
+                serverSide: true,
 
+                lengthMenu: [
+                    [ 100, 250, 500, 1000 ],
+                    [ '100', '250', '500', '1000']
+                ],
+                pageLength: 50,
+                ajax: {
+                    type: 'get',
+                    url:  "{{route("all.police.mobile")}}",
+                    data: {
+                        _token: '{{ csrf_token() }}'
+                    }
+                },
+
+
+                columns: [
+                    {data: 'district_name', name: 'district_name', searchable: true},
+                    {data: 'circle_name', name: 'circle_name'},
+                    {data: 'police_station_name', name: 'police_station_name'},
+                    {data: 'registration_number', name: 'registration_number'},
+
+                    {data: 'vehicle_type', name: 'vehicle_type',searchable:true},
+
+
+                    {data: 'lat', name: 'lat'},
+                    {data: 'lng', name: 'lng'},
+                    {data: 'action', name: 'action', orderable: false, searchable: false}
+                ],
+
+                responsive: true,
+                processing: true,
+                serverSide: true,
+                searching:  true,
+                sorting:    true,
+                paging:     true,
+                dom: 'Bfrtip',
+                buttons: [
+                    'copy', 'csv', 'excel', 'pdf', 'print'
+                ]
             });
+
         })
     </script>
 @endpush

@@ -6,11 +6,13 @@ use App\Models\Districts;
 use App\Models\PoliceLine;
 use App\Models\PoliceStation;
 use Illuminate\Http\Request;
+use Yajra\DataTables\Facades\DataTables;
 
 class PoliceLineController extends Controller
 {
     public function index()
     {
+
         $data['district'] = Districts::get();
         $data['rank'] = (new CommonApiController())->getRankForWeb();
         $data['police_stations'] = PoliceStation::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
@@ -19,15 +21,34 @@ class PoliceLineController extends Controller
         return view("police_line.add",$data);
     }
 
+    public function policeLine()
+    {
+        $users = PoliceLine::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
+            return $q->where(["district_id"=>auth()->user()->district_id]);
+        });
+        return DataTables::of($users)
+            ->addColumn('action', function($cert) {
+                $actionsBtn = '<a class="dropdown-item p-50" href="'.route('edit.police.line',[$cert->id]).'"><i class="bx bx-file-blank mr-1"></i> Edit</a>';
+
+                $actionsBtn .= '<div role="separator" class="dropdown-divider"></div>';
+                $actionsBtn .='<a class="dropdown-item p-50" href="#"><i class="bx bxs-eyedropper mr-1"></i> View</a>';
+
+                return $actionsBtn;
+            })
+            ->addColumn('district_name', function($cert) {
+                return $cert->district?->title;
+                })
+            ->rawColumns(["district_name","action"])
+            ->make(true);
+    }
+
     public function listPoliceLine()
     {
         $data = [
             'title' => 'List Police Line',
 
         ];
-        $data["data"] = PoliceLine::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
-            return $q->where(["district_id"=>auth()->user()->district_id]);
-        })->get();
+
 
         return view("police_line.list",$data);
     }

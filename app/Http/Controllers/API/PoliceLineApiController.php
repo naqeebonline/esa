@@ -60,7 +60,8 @@ class PoliceLineApiController extends Controller
                 return response()->json(['error' => true, 'message' => implode(' ', $requestValidator->errors()->all())],500);
 
             }//..... end if() .....//
-            $data = request()->except(["id"]);
+            //$data = request()->except(["id"]);
+            $data = request()->only(["lat","lng"]);
             PoliceLine::updateOrCreate([
                 'id'=>request()->id,
             ],$data);

@@ -146,10 +146,24 @@ class MeetingController extends Controller
 
     public function assignUserToMeeting()
     {
-        $police_station_users = request()->police_station_users;
+        $police_station_users = [];
+        $polling_station_user = [];
+        $police_mobile_user = [];
+        if(request()->police_station_users){
+            $police_station_users = request()->police_station_users;
+        }
+        if(request()->police_station_users){
+            $polling_station_user = request()->polling_station_user;
+        }
+        if(request()->police_mobile_user){
+            $police_mobile_user = request()->police_mobile_user;
+        }
+        $mergedArray = array_merge($police_station_users, $polling_station_user,$police_mobile_user);
+
+       // dd($mergedArray);
         $res = [];
         $users_id = [];
-        foreach ($police_station_users as $key => $value){
+        foreach ($mergedArray as $key => $value){
             array_push($res,["to_user"=>$value,"zoom_meeting_id"=>request()->meeting_id]);
             array_push($users_id,$value);
         }
@@ -161,7 +175,7 @@ class MeetingController extends Controller
             "password"=>$meeting->encrypted_password,
             "start_time"=>$meeting->start_time
         ];
-        $FcmToken = User::whereIn('id',$users_id)->pluck('device_token')->all();
+        $FcmToken = User::whereIn('id',$users_id)->pluck('android_token')->all();
         $this->sendCommonNotification("New Meeting created","Please join the meeting as soon as possiable",$notification_data,$FcmToken);
         return ["status" => true,"message"=>"users are assigned to meeting successfully"];
     }
@@ -301,5 +315,25 @@ class MeetingController extends Controller
         // FCM response
         return $result;
         dd($result);
+    }
+
+
+    public function sendMeetingNotification()
+    {
+        $meeting_id = request()->meeting_id;
+        $users_id = AssignMeetings::where("zoom_meeting_id",$meeting_id)->pluck('to_user');
+        $meeting = Meeting::where("zoom_meeting_id",$meeting_id)->first();
+        AssignMeetings::where("zoom_meeting_id",$meeting_id)->update(["updated_at"=>date("Y-m-d h:i:s")]);
+
+        $notification_data = [
+            "meeting_id"=>$meeting->zoom_meeting_id,
+            "join_url"=>$meeting->join_url,
+            "password"=>$meeting->encrypted_password,
+            "start_time"=>$meeting->start_time
+        ];
+        $FcmToken = User::whereIn('id',$users_id)->pluck('android_token')->all();
+        $this->sendCommonNotification("New Meeting created","Please join the meeting as soon as possiable",$notification_data,$FcmToken);
+        return ["status"=>true,"message"=>"Notification has been sent","users_token"=>$FcmToken,"users_id"=>$users_id];
+
     }
 }
