@@ -103,7 +103,7 @@ class HomeController extends Controller
         $district_id = request()->districts ?? "";
         $police_station_id = request()->police_station_id ?? "";
 
-         
+
         $data = PoliceMobile::whereNotNull("lat")->whereNotNull("lng")
             ->when($district_id, function ($q) use ($district_id) {
                 return $q->whereIn("district_id",$district_id);
