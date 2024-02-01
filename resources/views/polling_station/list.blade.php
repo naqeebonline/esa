@@ -38,7 +38,7 @@
                         <div class="col-12">
 
                             <div class="table-responsive" style="min-height: 200px">
-
+                                <a class="btn btn-primary" href="{{route('exportPollingStations')}}">Export To Excel</a>
                                 <table id="users-list" class="table table-responsive table-striped data_mf_table table-condensed" >
 
                                     <thead>
@@ -100,15 +100,15 @@
 
                 columns: [
                     {data: 'polling_station_name', name: 'polling_station_name', searchable: true},
-                    {data: 'district_name', name: 'district_name'},
-                    {data: 'police_station_name', name: 'police_station_name'},
-                    {data: 'sensitivity_name', name: 'sensitivity_name'},
+                    {data: 'district_name', name: 'district.title',searchable: true},
+                    {data: 'police_station_name', name: 'policeStation.title', searchable: true},
+                    {data: 'sensitivity_name', name: 'sensitivitys.title', searchable: true},
                     /*{data: 'distance_from_ps', name: 'distance_from_ps'},*/
                     /*{data: 'number_of_male_booth', name: 'number_of_male_booth'},
                     {data: 'number_of_female_booth', name: 'number_of_female_booth'},
                     {data: 'male_voters', name: 'male_voters'},
                     {data: 'female_voters', name: 'female_voters'},*/
-                    {data: 'incharge_contact', name: 'incharge_contact'},
+                    {data: 'incharge_contact', name: 'incharge_contact', searchable: true},
                     {data: 'lat', name: 'lat'},
                     {data: 'lng', name: 'lng'},
                     {data: 'action', name: 'action', orderable: false, searchable: false}
@@ -124,6 +124,28 @@
                 buttons: [
                     'copy', 'csv', 'excel', 'pdf', 'print'
                 ]
+            });
+
+            $("body").on("click",".delete_table_data",function (e) {
+                var id  = $(this).attr("data-id");
+                if (confirm('Are you sure to delete this record ?')) {
+                    $.ajax({
+                        type: 'post',
+                        url: "{{ route('delete-table-data') }}",
+                        data: {
+                            id: id,
+                            table:"polling_stations",
+                            _token: '{{ csrf_token() }}'
+
+                        },
+                        success: function(res) {
+                            //user_table.dataTable.reload();
+                            window.location.reload();
+                        }
+                    })
+                } else {
+                    alert('Why did you press cancel? You should have confirmed');
+                }
             });
         })
     </script>

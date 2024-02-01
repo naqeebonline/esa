@@ -92,7 +92,7 @@
 
 
                                                 {{--<a target="_blank" href="{{$value->start_url}}" class="bx bx-video" style="color: red"></a>--}}
-                                                &user={{auth()->user()->name}}
+
                                                 <a onClick="MyWindow=window.open(base_url+'zoom/index.html?id={{$value->zoom_meeting_id}}&pass={{$value->encrypted_password}}&title={{$value->topic}}&email={{auth()->user()->email}}&meeting_role=1&user={{auth()->user()->name}}','MyWindow','width=600,height=600'); return false;"   class="bx bx-video" style="color: green"></a>
 
                                                 <code id="copy{{$value->id}}" style="display: none">
@@ -116,7 +116,7 @@
                                             <td>
 
                                                 @foreach($value->meetingUsers as $key2 => $v2)
-                                                    <code>{{$v2->users->name}}</code>,
+                                                    <code>{{$v2->users->name ?? ""}}</code>,
                                                  @endforeach
                                             </td>
                                             <td>

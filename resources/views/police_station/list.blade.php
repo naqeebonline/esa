@@ -38,7 +38,7 @@
                         <div class="col-12">
 
                             <div class="table-responsive" style="min-height: 200px">
-
+                                <a class="btn btn-primary" href="{{route('exportPoliceStations')}}">Export To Excel</a>
                                 <table id="users-list" class="table table-striped data_mf_table table-condensed" >
 
                                     <thead>
@@ -120,6 +120,29 @@
                 ]
             });
 
+
+
+            $("body").on("click",".delete_table_data",function (e) {
+                var id  = $(this).attr("data-id");
+                if (confirm('Are you sure to delete this record ?')) {
+                    $.ajax({
+                        type: 'post',
+                        url: "{{ route('delete-table-data') }}",
+                        data: {
+                            id: id,
+                            table:"police_stations",
+                            _token: '{{ csrf_token() }}'
+
+                        },
+                        success: function(res) {
+                            //user_table.dataTable.reload();
+                            window.location.reload();
+                        }
+                    })
+                } else {
+                    alert('Why did you press cancel? You should have confirmed');
+                }
+            });
 
 
             $("body").on("click",".delete_button",function (e) {

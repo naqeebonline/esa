@@ -224,9 +224,7 @@
                     <label>Police Station</label>
                     <select class="form-select select2" multiple="multiple" id="police_station_id">
                         <option value="">Select Police Station......</option>
-                        @foreach($police_stations as $key => $value)
-                            <option value="{{strtoupper($value->id)}}" lat="{{$value->latitude}}" lng="{{$value->longitude}}">{{strtoupper($value->title)}}</option>
-                        @endforeach
+
                     </select>
                 </div>
 

@@ -121,25 +121,28 @@
                 ]
             });
 
-            $("body").on("click",".delete_button",function (e) {
-                id = $(this).attr("data-id");
+
+
+            $("body").on("click",".delete_table_data",function (e) {
+                var id  = $(this).attr("data-id");
                 if (confirm('Are you sure to delete this record ?')) {
                     $.ajax({
                         type: 'post',
-                        url: "{{ route('delete.police.line') }}",
+                        url: "{{ route('delete-table-data') }}",
                         data: {
                             id: id,
+                            table:"police_line",
                             _token: '{{ csrf_token() }}'
 
                         },
                         success: function(res) {
+                            //user_table.dataTable.reload();
                             window.location.reload();
                         }
                     })
                 } else {
                     alert('Why did you press cancel? You should have confirmed');
                 }
-
             });
         })
     </script>

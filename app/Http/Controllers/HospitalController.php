@@ -30,7 +30,7 @@ class HospitalController extends Controller
             ->addColumn('action', function($cert) {
                 $actionsBtn = '<a class="dropdown-item p-50" href="'.route('edit.hospital',[$cert->id]).'"><i class="bx bx-file-blank mr-1"></i> Edit</a>';
 
-                $actionsBtn .= '<div role="separator" class="dropdown-divider"></div>';
+                $actionsBtn .= '<a class="dropdown-item p-50 delete_table_data" data-id="'.$cert->id.'" href="javascript:void(0)"><i class="bx bx-window-close"></i> Delete</a>';
 
 
                 return $actionsBtn;
@@ -67,6 +67,9 @@ class HospitalController extends Controller
             $data['district_id'] = auth()->user()->district_id;
             $data['created_by'] = auth()->user()->id;
         }
+
+        $data['lat'] = preg_replace("/[^0-9.]/", "", request()->lat);
+        $data['lng'] = preg_replace("/[^0-9.]/", "", request()->lng);
         Hospital::create($data);
         return redirect()->route('list.hospital')->with('success', 'Hospital created successfully.');
     }
@@ -82,7 +85,10 @@ class HospitalController extends Controller
 
     public function updateHospital()
     {
-        Hospital::where(["id" => request()->id])->update(request()->except(["_token", "id"]));
+        $data = request()->except(["_token","id"]);
+        $data['lat'] = preg_replace("/[^0-9.]/", "", request()->lat);
+        $data['lng'] = preg_replace("/[^0-9.]/", "", request()->lng);
+        Hospital::where(["id" => request()->id])->update($data);
         return redirect()->route('list.hospital')->with('success', 'Hospital created successfully.');
     }
 

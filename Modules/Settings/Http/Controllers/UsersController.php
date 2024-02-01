@@ -65,7 +65,7 @@ class UsersController extends Controller
             'new_route' => ['settings.users-mgt.create', 'New User'],
             'item' => $item,
             'roles' => MyRole::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
-                return $q->whereIn("id",[4,55,56,58]);
+                return $q->whereIn("id",[56,57,58]);
             })->pluck('name', 'id'),
             'districts' => Districts::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
                 return $q->where(["id" => auth()->user()->district_id]);
@@ -216,7 +216,7 @@ class UsersController extends Controller
             'new_route' => ['settings.users-mgt.create', 'New User'],
             'item' => $item,
             'roles' => MyRole::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
-                return $q->whereIn("id",[4,55,56,57,58]);
+                return $q->whereIn("id",[56,57,58]);
             })->pluck('name', 'id'),
             'districts' => Districts::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
                 return $q->where(["id" => auth()->user()->district_id]);
@@ -544,6 +544,14 @@ class UsersController extends Controller
 
         $district_id = request()->districts;
         $data =Circle::whereIn("district_id",$district_id)->get();
+        return["message"=>"success","data"=>$data];
+    }
+
+    public function getMultiDistricts()
+    {
+
+        $region_id = request()->regions;
+        $data =Districts::whereIn("reagin",$region_id)->get();
         return["message"=>"success","data"=>$data];
     }
 

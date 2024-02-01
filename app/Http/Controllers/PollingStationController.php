@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\PoliceStationExport;
+use App\Exports\PollingStationExport;
 use App\Models\PollingStation;
 use App\Models\Sensitivity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
 class PollingStationController extends Controller
@@ -28,7 +31,7 @@ class PollingStationController extends Controller
 
     public function pollingStation()
     {
-        $users = PollingStation::with(["policeStation","sensitivitys"])
+        $users = PollingStation::with(["district","policeStation","sensitivitys"])
             ->when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
                 return $q->where(["district_id"=>auth()->user()->district_id]);
             });
@@ -36,7 +39,7 @@ class PollingStationController extends Controller
             ->addColumn('action', function($cert) {
                 $actionsBtn = '<a class="dropdown-item p-50" href="'.route('edit.polling.station',[$cert->id]).'"><i class="bx bx-file-blank mr-1"></i> Edit</a>';
 
-                $actionsBtn .= '<div role="separator" class="dropdown-divider"></div>';
+                $actionsBtn .= '<a class="dropdown-item p-50 delete_table_data" data-id="'.$cert->id.'" href="javascript:void(0)"><i class="bx bx-window-close"></i> Delete</a>';
 
 
                 return $actionsBtn;
@@ -73,6 +76,9 @@ class PollingStationController extends Controller
             $data['district_id'] = auth()->user()->district_id;
             $data['created_by'] = auth()->user()->id;
         }
+
+        $data['lat'] = preg_replace("/[^0-9.]/", "", request()->lat);
+        $data['lng'] = preg_replace("/[^0-9.]/", "", request()->lng);
         PollingStation::create($data);
         return redirect()->route('list.polling.station')->with('success', 'Polling Station created successfully.');
 
@@ -97,6 +103,8 @@ class PollingStationController extends Controller
             $data['district_id'] = auth()->user()->district_id;
         }
 
+        $data['lat'] = preg_replace("/[^0-9.]/", "", request()->lat);
+        $data['lng'] = preg_replace("/[^0-9.]/", "", request()->lng);
         PollingStation::where(["id"=>request()->id])->update($data);
         return redirect()->route('list.polling.station')->with('success', 'Polling Station Updated successfully.');
     }
@@ -188,5 +196,19 @@ class PollingStationController extends Controller
             ->get();
 
         return $restaurants;
+    }
+
+    public function exportPollingStations()
+    {
+        $res = DB::table("polling_stations")
+            ->select("districts.title as district_name","police_stations.title as ps_name","polling_station_name","lat","lng","incharge_name","incharge_contact")
+            ->leftJoin("districts","districts.id","=","polling_stations.district_id")
+            ->leftJoin("police_stations","police_stations.id","=","polling_stations.police_station_id")
+            ->when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
+                return $q->where(["polling_stations.district_id"=>auth()->user()->district_id]);
+            })
+            ->get();
+
+        return Excel::download(new PollingStationExport($res), 'polling_stations.xlsx');
     }
 }

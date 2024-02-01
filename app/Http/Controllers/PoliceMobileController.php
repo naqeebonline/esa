@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\PoliceMobileExport;
 use App\Models\Circle;
 use App\Models\Districts;
+use App\Models\PoliceLine;
 use App\Models\PoliceMobile;
 use App\Models\PoliceStation;
 use App\Models\VehicleType;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
 class PoliceMobileController extends Controller
@@ -26,6 +30,10 @@ class PoliceMobileController extends Controller
             return $q->where(["district_id"=>auth()->user()->district_id]);
         })->get();
 
+        $data["police_line"] =PoliceLine::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
+            return $q->where(["district_id"=>auth()->user()->district_id]);
+        })->get();
+
         $data["circles"] =Circle::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
             return $q->where(["district_id"=>auth()->user()->district_id]);
         })->get();
@@ -41,7 +49,7 @@ class PoliceMobileController extends Controller
             ->addColumn('action', function($cert) {
                 $actionsBtn = '<a class="dropdown-item p-50" href="'.route('edit.police.mobile',[$cert->id]).'"><i class="bx bx-file-blank mr-1"></i> Edit</a>';
 
-                $actionsBtn .= '<div role="separator" class="dropdown-divider"></div>';
+                $actionsBtn .= '<a class="dropdown-item p-50 delete_table_data" data-id="'.$cert->id.'" href="javascript:void(0)"><i class="bx bx-window-close"></i> Delete</a>';
 
 
                 return $actionsBtn;
@@ -80,6 +88,9 @@ class PoliceMobileController extends Controller
         $data = request()->except(["_token"]);
         $data['district_id'] = auth()->user()->district_id;
         $data['created_by'] = auth()->user()->id;
+
+        $data['lat'] = preg_replace("/[^0-9.]/", "", request()->lat);
+        $data['lng'] = preg_replace("/[^0-9.]/", "", request()->lng);
         PoliceMobile::create($data);
         return redirect()->route('list.police.mobile')->with('success', 'Police Mobile created successfully.');
     }
@@ -96,14 +107,20 @@ class PoliceMobileController extends Controller
         $data["circles"] =Circle::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
             return $q->where(["district_id"=>auth()->user()->district_id]);
         })->get();
+        $data["police_line"] =PoliceLine::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
+            return $q->where(["district_id"=>auth()->user()->district_id]);
+        })->get();
         $data["data"] = PoliceMobile::whereId($id)->first();
         return view("police_mobiles.edit",$data);
     }
 
     public function updatePoliceMobile()
     {
+        $data = request()->except(["_token","id"]);
+        $data['lat'] = preg_replace("/[^0-9.]/", "", request()->lat);
+        $data['lng'] = preg_replace("/[^0-9.]/", "", request()->lng);
 
-        PoliceMobile::where(["id"=>request()->id])->update(request()->except(["_token","id"]));
+        PoliceMobile::where(["id"=>request()->id])->update($data);
         return redirect()->route('list.police.mobile')->with('success', 'Police Mobile info updated successfully.');
     }
 
@@ -194,5 +211,19 @@ class PoliceMobileController extends Controller
             ->get();
 
         return $restaurants;
+    }
+
+    public function exportPoliceMobile()
+    {
+        $res = DB::table("police_mobiles")
+            ->select(["districts.title as district_name","police_stations.title as ps_name","vehicle_type.name as vehicle_type_name","registration_number","incharge_name","contact_number","lat","lng"])
+            ->join("vehicle_type","vehicle_type.id","=","police_mobiles.vehicle_type")
+            ->join("police_stations","police_stations.id","=","police_mobiles.police_station_id")
+            ->join("districts","districts.id","=","police_mobiles.district_id")
+            ->when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
+                return $q->where(["police_mobiles.district_id"=>auth()->user()->district_id]);
+            })
+            ->get();
+        return Excel::download(new PoliceMobileExport($res), 'police_mobile_export.xlsx');
     }
 }

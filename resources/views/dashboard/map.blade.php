@@ -46,6 +46,10 @@
             height: 10px;
         }
 
+        .text_height_map{
+            line-height: 18px;
+        }
+
 
 
     </style>
@@ -54,39 +58,31 @@
     <div class="row">
 
 
-        <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
+        <div class="col-lg-2 col-md-2 col-sm-6 mb-4">
             <div class="card">
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div class="d-flex align-items-center gap-3">
-                            <div class="avatar">
-                            <span class="avatar-initial rounded-circle bg-label-primary"
-                            ><i  class="bx bx-user fs-4"></i
-                                ></span>
-                            </div>
+
                             <div class="card-info">
-                                <small class="text-muted">Total Police Stations</small>
-                                <h5 class="card-title mb-0 me-2">{{$total_police_stations}}</h5>
+                                <small class="text-muted">Police Stations</small>
+                                <h6 class="card-title mb-0 me-2 text-center">{{$total_police_stations}}</h6>
                             </div>
                         </div>
-                        <div id="conversationChart"></div>
+
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
+        <div class="col-lg-2 col-md-2 col-sm-6 mb-4">
             <div class="card">
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div class="d-flex align-items-center gap-3">
-                            <div class="avatar">
-                            <span class="avatar-initial rounded-circle bg-label-warning"
-                            ><i class="bx bx-buildings fs-4"></i
-                                ></span>
-                            </div>
+
                             <div class="card-info">
                                 <small class="text-muted">Polling Stations</small>
-                                <h5 class="card-title mb-0 me-2">{{$total_polling_station}}</h5>
+                                <h6 class="card-title mb-0 me-2 text-center">{{$total_polling_station}}</h6>
                             </div>
                         </div>
                         <div id="incomeChart"></div>
@@ -94,19 +90,15 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
+        <div class="col-lg-2 col-md-2 col-sm-6 mb-4">
             <div class="card">
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div class="d-flex align-items-center gap-3">
-                            <div class="avatar">
-                            <span class="avatar-initial rounded-circle bg-label-danger"
-                            ><i class="bx bx-location-plus fs-4"></i
-                                ></span>
-                            </div>
+
                             <div class="card-info">
                                 <small class="text-muted">Health Services</small>
-                                <h5 class="card-title mb-0 me-2">{{$total_hospitals}}</h5>
+                                <h6 class="card-title mb-0 me-2 text-center">{{$total_hospitals}}</h6>
                             </div>
                         </div>
                         <div id="profitChart"></div>
@@ -115,32 +107,127 @@
             </div>
         </div>
 
-        <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
+        <div class="col-lg-2 col-md-2 col-sm-6 mb-4">
             <div class="card">
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div class="d-flex align-items-center gap-3">
-                            <div class="avatar">
-                            <span class="avatar-initial rounded-circle bg-label-danger"
-                            ><i class="bx bx-location-plus fs-4"></i
-                                ></span>
-                            </div>
+
                             <div class="card-info">
-                                <form action="{{ route('send.sendNotificationDashboard') }}" method="POST">
-                                    @csrf
-
-                                    <input type="hidden" value="{{rand(10,50)}} New University Announcemnet" class="form-control" name="title">
-                                    <input type="hidden" value="{{rand(220,890)}} university announcment are here" class="form-control" name="body">
-
-
-
-                                    <button type="submit" class="btn btn-success btn-block">Send Alert</button>
-                                </form>
-
+                                <small class="text-muted">Police Lines</small>
+                                <h6 class="card-title mb-0 me-2 text-center">{{$police_line}}</h6>
                             </div>
                         </div>
                         <div id="profitChart"></div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-2 col-md-2 col-sm-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div class="d-flex align-items-center gap-3">
+
+                            <div class="card-info">
+                                <small class="text-muted">Police Post</small>
+                                <h6 class="card-title mb-0 me-2 text-center">{{$police_post}}</h6>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-2 col-md-2 col-sm-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div class="d-flex align-items-center gap-3">
+
+                            <div class="card-info">
+                                <small class="text-muted">Mobile Vehicle</small>
+                                <h6 class="card-title mb-0 me-2 text-center">{{$police_mobile}}</h6>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+        <div class="col-lg-4 col-md-4 col-sm-4" >
+            <div id="chart-container" style="height: 322px"></div>
+        </div>
+
+        <div class="col-lg-4 col-md-4 col-sm-4" >
+            <div id="facility-chart" style="height: 322px"></div>
+        </div>
+
+        <div class="col-md-4 col-lg-4 col-xl-4 col-xl-4">
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between mb-3">
+                    <h6 class="card-title mb-0">Polling Booths & Registered Voters</h6>
+
+                </div>
+                <div class="card-body">
+                    <ul class="p-0 m-0">
+
+                        <li class="d-flex mb-4">
+                            <div class="avatar avatar-sm flex-shrink-0 me-3">
+                                <span class="avatar-initial rounded-circle bg-label-info"><i class="bx bx-male"></i></span>
+                            </div>
+                            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                                <div class="me-2">
+                                    <p class="mb-0 lh-1">MALE BOOTHS</p>
+
+                                </div>
+                                <div class="item-progress">{{$number_of_male_booth}}</div>
+                            </div>
+                        </li>
+                        <li class="d-flex mb-4">
+                            <div class="avatar avatar-sm flex-shrink-0 me-3">
+                                <span class="avatar-initial rounded-circle bg-label-danger"><i class="bx bx-female"></i></span>
+                            </div>
+                            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                                <div class="me-2">
+                                    <p class="mb-0 lh-1">FEMALE BOOTHS</p>
+
+                                </div>
+                                <div class="item-progress">{{$number_of_female_booth}}</div>
+                            </div>
+                        </li>
+                        <li class="d-flex mb-4">
+                            <div class="avatar avatar-sm flex-shrink-0 me-3">
+                                <span class="avatar-initial rounded-circle bg-label-success"><i class="bx bx-male"></i></span>
+                            </div>
+                            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                                <div class="me-2">
+                                    <p class="mb-0 lh-1">MALE VOTERS</p>
+
+                                </div>
+                                <div class="item-progress">{{$male_voters}}</div>
+                            </div>
+                        </li>
+
+                        <li class="d-flex mb-4">
+                            <div class="avatar avatar-sm flex-shrink-0 me-3">
+                                <span class="avatar-initial rounded-circle bg-label-success"><i class="bx bx-female"></i></span>
+                            </div>
+                            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                                <div class="me-2">
+                                    <p class="mb-0 lh-1">FEMALE VOTERS</p>
+
+                                </div>
+                                <div class="item-progress">{{$female_voters}}</div>
+                            </div>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -152,6 +239,17 @@
             <div class="row">
                 <div class="col-md-12">
                     <h4>Search By</h4>
+                </div>
+
+                <div class="col-md-3  ">
+                    <label>Region</label>
+                    <select class="form-select select2" id="search_region" multiple="multiple">
+                        <option value="">Select Region....</option>
+                        {{--<option value="{{strtoupper($value->title)}}" lat="{{$value->latitude}}" lng="{{$value->longitude}}">{{strtoupper($value->title)}}</option>--}}
+                        @foreach($region as $key => $value)
+                            <option value="{{$value->id}}">{{strtoupper($value->name)}}</option>
+                        @endforeach
+                    </select>
                 </div>
 
                 <div class="col-md-3  ">
@@ -168,17 +266,15 @@
                 <div class="col-md-3 ">
                     <label>Circle</label>
                     <select class="form-select select2" multiple="multiple" id="circle_id">
-                        
-                         
+
+
                     </select>
                 </div>
                 <div class="col-md-3 ">
                     <label>Police Station</label>
                     <select class="form-select select2" multiple="multiple" id="police_station_id">
-                        <option value="">Select Police Station......</option>
-                        @foreach($police_stations as $key => $value)
-                            <option value="{{strtoupper($value->id)}}" lat="{{$value->latitude}}" lng="{{$value->longitude}}">{{strtoupper($value->title)}}</option>
-                        @endforeach
+
+
                     </select>
                 </div>
 
@@ -190,6 +286,10 @@
                         @endforeach
 
                     </select>
+                </div>
+
+                <div class="col-md-3 ">
+                    <div class="btn btn-success checkbox_change mt-4">Search</div>
                 </div>
 
 
@@ -206,29 +306,36 @@
                 <div class="col-md-3  ">
 
                     <input type="checkbox" class="checkbox_change" name="police_station" id="police_station_checkbox">
-                    <label>Police Station</label>
+                    <label>Police Stations</label>
                     <span style="color: green" id="police_station_checkbox_count">0</span>
                 </div>
 
-                <div class="col-md-3  ">
+                <div class="col-md-3">
 
                     <input type="checkbox" class="checkbox_change" name="polling_station_che" id="polling_station_checkbox">
-                    <label>Polling Station</label>
+                    <label>Polling Stations</label>
                     <span style="color: green" id="polling_station_checkbox_count">0</span>
                 </div>
 
-                <div class="col-md-3  ">
+                <div class="col-md-2">
 
                     <input type="checkbox" class="checkbox_change" name="hospital" id="hospital_checkbox">
-                    <label>Hospital</label>
+                    <label>Hospitals</label>
                     <span style="color: green" id="hospital_checkbox_count">0</span>
                 </div>
 
-                <div class="col-md-3  ">
+                <div class="col-md-2">
 
                     <input type="checkbox" class="checkbox_change" name="police_mobile" id="police_mobile_checkbox">
-                    <label>Police Mobile</label>
+                    <label>Police Mobiles</label>
                     <span style="color: green" id="police_mobile_checkbox_count">0</span>
+                </div>
+
+                <div class="col-md-2">
+
+                    <input type="checkbox" class="checkbox_change" name="police_line" id="police_line_checkbox">
+                    <label>Police Lines</label>
+                    <span style="color: green" id="police_line_checkbox_count">0</span>
                 </div>
 
 
@@ -299,42 +406,130 @@
             </div>
         </div>
     </div>
+
+
 @endsection
 
 
 @push('scripts')
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script>
+        // Sample data for the pie chart
+        var chartData = [{
+            name: 'Most Sensitive',
+            y: <?php echo $most_sensitive; ?>
+        }, {
+            name: 'Sensitive',
+            y: <?php echo $sensitive; ?>
+        }, {
+            name: 'Normal',
+            y: <?php echo $normal; ?>
+        }];
 
+        // Initialize the pie chart
+        Highcharts.chart('chart-container', {
+            chart: {
+                type: 'pie'
+            },
+            title: {
+                text: 'Polling Stations'
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: false,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        format: '<b>{point.name}</b>: {point.y}'
+                    }
+                }
+            },
+            series: [{
+                name: 'Polling Station',
+                colorByPoint: true,
+                data: chartData
+            }]
+        });
+
+
+        var chartData = <?php echo json_encode($facility_chart) ?>;
+
+        // Initialize the pie chart
+        Highcharts.chart('facility-chart', {
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: 'Health Facility'
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        format: '<b>{point.y}</b> '
+                    }
+                }
+            },
+            series: [{
+                name: 'Health Faciltiy',
+                colorByPoint: true,
+                data: chartData
+            }]
+        });
+
+
+    </script>
     <script type="text/javascript">
+        count_checkbox = 0;
         function playSound(url) {
             const audio = new Audio(url);
             audio.play();
         }
-        $("body").on("click",".checkbox_change",function () {
+        function reload_map(){
             var police_station = $("#police_station_checkbox").is(':checked');
             var hospital_checkbox = $("#hospital_checkbox").is(':checked');
             var police_mobile = $("#police_mobile_checkbox").is(':checked');
             var polling_station_checkbox = $("#polling_station_checkbox").is(':checked');
+            var police_line_checkbox = $("#police_line_checkbox").is(':checked');
 
             $("#hospital_checkbox_count").text(0);
             $("#police_mobile_checkbox_count").text(0);
             $("#police_station_checkbox_count").text(0);
             $("#polling_station_checkbox_count").text(0);
+            $("#police_line_checkbox_count").text(0);
             reinitMap();
-            if(police_station){
 
+            if(police_station){
+                count_checkbox = 1;
                 getAllPoliceStations();
+
             }
             if(hospital_checkbox){
+                count_checkbox = 1;
                 loadHospitals();
             }
 
             if(police_mobile){
+                count_checkbox = 1;
                 getAllPoliceMobiles();
             }
             if(polling_station_checkbox){
+                count_checkbox = 1;
                 getAllPollingStations();
             }
 
+            if(police_line_checkbox){
+                count_checkbox = 1;
+                getAllPoliceLine();
+            }
+            if(count_checkbox == 0){
+                loadBoundaryData();
+            }
+        }
+        $("body").on("click",".checkbox_change",function () {
+            reload_map();
         });
         $("body").on("click",".create_new_meeting",function () {
             $(this).hide();
@@ -405,8 +600,21 @@
                 current_lat = 34.9526;
                 current_lng = 72.3311;
                 selected_districts = "";
+                selected_region = "";
                 police_station_ids = "";
                 sensitivity_type = "";
+
+                $("body").on("change","#search_region",function (e) {
+                    selected_region = $(this).val();
+                  if(selected_region != null && selected_region.length > 0){
+                      loadDistricts();
+                      //loadBoundaryData();
+                  }else{
+                      current_lat = 34.9526;
+                      current_lng = 72.3311;
+                     // reinitMap();
+                  }
+                });
 
                 $("body").on("change","#search_district",function (e) {
                     var option = $('option:selected', this);
@@ -414,40 +622,36 @@
                         current_lat = option.attr("lat");
                         current_lng = option.attr("lng");
                     }
-
                     selected_districts = $(this).val();
-
                   if(selected_districts != null && selected_districts.length > 0){
                       loadCircle();
-                      loadBoundaryData();
+                      //loadBoundaryData();
                   }else{
                       current_lat = 34.9526;
                       current_lng = 72.3311;
-                      reinitMap();
+                     // reinitMap();
                   }
-
-                //    var element = $(this).find('option:selected');
-
-
-
                 });
+
+
 
                 $("body").on("change","#circle_id",function (e) {
                     loadMultiPoliceStations();
                 });
 
                 $("body").on("change","#police_station_id",function (e) {
+
                     police_station_ids = $(this).val();
                 //    var element = $(this).find('option:selected');
 
-                    loadBoundaryData();
+                   // loadBoundaryData();
                 });
 
                 $("body").on("change","#ps_sensitivity",function (e) {
                     sensitivity_type = $(this).val();
                 //    var element = $(this).find('option:selected');
 
-                    loadBoundaryData();
+                    //loadBoundaryData();
                 });
 
                 window.onload = function() {
@@ -471,7 +675,7 @@
                         zoomControl: true
                     });
 
-                    //add basemap layer
+                    //add basemap layer         http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}
                     lyrGoogleMap = L.tileLayer('http://mts3.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
                         maxZoom: 22,
                         maxNativeZoom: 12
@@ -540,7 +744,7 @@
                     var yellowIcon = L.icon.pulse({ iconSize:[10,10],color: "yellow", fillColor: "yellow", animate: false});
                     var orangeIcon = L.icon.pulse({ iconSize:[10,10],color: "orange", fillColor: "orange", animate: true});
 
-
+                    var fg = L.featureGroup();
                     new L.geoJson.ajax("{{ URL::to('api/v1/getAllHospitals') }}?district_id="+selected_districts+"&police_station_id="+police_station_ids, {
                         middleware: function(data) {
                             $("#hospital_checkbox_count").text(data.features.length);
@@ -555,6 +759,7 @@
 
                                         var myIcon = L.icon({
                                             iconUrl: base_url+"markers/hospital.png",
+                                            className:"hospital_marker",
                                             iconSize: [30, 30],
 
                                         });
@@ -563,8 +768,8 @@
                                         mymarker.bindPopup(`
                                             <div style="line-height:0.2rem">
                                             <h6>Hospital</h6>
-                                            <p><b>Name:</b> ${feature.properties.name}</p>
-                                            <p><b>Contact:</b> ${feature.properties.contact_number}</p>
+                                            <p class="text_height_map"><b>Name:</b> ${feature.properties.name}</p>
+                                            <p class="text_height_map"><b>Contact:</b> ${feature.properties.contact_number}</p>
                                             <a target="_blank" href="${base_url}edit-hospital/${feature.properties.id}">View Details<a>
                                             </div>
                                         `);
@@ -575,6 +780,7 @@
                                         //var mymarker = L.marker([feature.properties.lat,feature.properties.lng], {icon: orangeIcon}).addTo(myMap);
                                         var myIcon = L.icon({
                                             iconUrl: base_url+"markers/1122.png",
+                                            className:"hospital_marker",
                                             iconSize: [40, 40],
 
                                         });
@@ -582,8 +788,8 @@
                                         mymarker.bindPopup(`
                                             <div style="line-height:0.2rem">
                                             <h6>Edhi Center</h6>
-                                            <p><b>Name:</b> ${feature.properties.name}</p>
-                                            <p><b>Contact:</b> ${feature.properties.contact_number}</p>
+                                            <p class="text_height_map"><b>Name:</b> ${feature.properties.name}</p>
+                                            <p class="text_height_map"><b>Contact:</b> ${feature.properties.contact_number}</p>
                                             <a target="_blank" href="${base_url}edit-hospital/${feature.properties.id}">View Details<a>
                                             </div>
                                         `);
@@ -593,6 +799,7 @@
                                         //var mymarker = L.marker([feature.properties.lat,feature.properties.lng], {icon: yellowIcon}).addTo(myMap);
                                         var myIcon = L.icon({
                                             iconUrl: base_url+"markers/chippa.png",
+                                            className:"hospital_marker",
                                             iconSize: [40, 40],
 
                                         });
@@ -600,8 +807,8 @@
                                         mymarker.bindPopup(`
                                             <div style="line-height:0.2rem">
                                             <h6>Chhipa Centers</h6>
-                                            <p><b>Name:</b> ${feature.properties.name}</p>
-                                            <p><b>Contact:</b> ${feature.properties.contact_number}</p>
+                                            <p class="text_height_map"><b>Name:</b> ${feature.properties.name}</p>
+                                            <p class="text_height_map"><b>Contact:</b> ${feature.properties.contact_number}</p>
 <a target="_blank" href="${base_url}edit-hospital/${feature.properties.id}">View Details<a>
                                             </div>
                                         `);
@@ -611,6 +818,7 @@
                                         //var mymarker = L.marker([feature.properties.lat,feature.properties.lng], {icon: blueIcon}).addTo(myMap);
                                         var myIcon = L.icon({
                                             iconUrl: base_url+"markers/rescue.png",
+                                            className:"hospital_marker",
                                             iconSize: [40, 40],
 
                                         });
@@ -619,8 +827,8 @@
                                         mymarker.bindPopup(`
                                             <div style="line-height:0.2rem">
                                             <h6>Rescue</h6>
-                                            <p><b>Name:</b> ${feature.properties.name}</p>
-                                            <p><b>Contact:</b> ${feature.properties.contact_number}</p>
+                                            <p class="text_height_map"><b>Name:</b> ${feature.properties.name}</p>
+                                            <p class="text_height_map"><b>Contact:</b> ${feature.properties.contact_number}</p>
                                             <a target="_blank" href="${base_url}edit-hospital/${feature.properties.id}">View Details<a>
                                             </div>
                                         `);
@@ -640,7 +848,29 @@
 
 
                 search_district_name = '';
-                
+
+                function loadDistricts() {
+
+                   var regions = $("#search_region").val();
+                    $.ajax({
+                        url: '{{ route("getMultiDistricts") }}' , // Replace with your actual URL
+                        method: 'post',
+                        data: {
+                            regions: regions,
+                            _token: '{{ csrf_token() }}'
+
+                        },
+                        success: function (response) {
+
+                            var psOptions = '<option value="">Select District</option>';
+                            $.each(response.data, function (index, item) {
+                                psOptions += '<option value="' + item.id + '" lat="' + item.latitude + '" lng="' + item.longitude + '">' + item.title + '</option>';
+                            });
+                            $("#search_district").html(psOptions);
+                        }
+                    });
+                }
+
                 function loadCircle() {
 
                    var districts = $("#search_district").val();
@@ -685,8 +915,6 @@
                     });
                 }
                 function loadBoundaryData() {
-
-
                     reinitMap();
                     getAllPoliceStations();
                     getAllPollingStations();
@@ -698,14 +926,6 @@
                     kp_boundary = L.geoJson.ajax('theme/plugins/leaflet/boundary_data/kp_district_boundary.geojson',{filter: districts}).bindPopup(function(kp_boundary) {
                         return kp_boundary.feature.properties.DISTRICT;
                     }).addTo(myMap);*/
-
-
-
-
-                    /*loadHospitals();
-                    getAllPoliceStations();
-                    getAllPoliceMobiles();
-                    getAllPollingStations();*/
                 }
 
                 function districts(feature){
@@ -729,7 +949,8 @@
                                         if(feature.properties.latitude !='' && feature.properties.longitude !=''){
                                             //var mymarker = L.marker([parseFloat(feature.properties.latitude).toFixed(4),parseFloat(feature.properties.longitude).toFixed(4)], {icon: greenIcon}).addTo(myMap);
                                             var myIcon = L.icon({
-                                                iconUrl: base_url+"markers/police_station.png",
+                                                iconUrl: base_url+"markers/ps.png",
+                                                className:"police_stations_marker",
                                                 iconSize: [40, 40],
 
                                             });
@@ -737,13 +958,14 @@
                                             mymarker.bindPopup(`
                                            <div style="line-height:0.2rem">
                                             <h6>Police Stations</h6>
-                                            <p><b>Name:</b> ${feature.properties.title}</p>
-                                            <p><b>Contact:</b> ${feature.properties.ps_contact_number}</p>
-                                            <p><b>SHO Contact:</b> ${feature.properties.sho_contact}</p>
+                                            <p class="text_height_map"><b>Name:</b> ${feature.properties.title}</p>
+                                            <p class="text_height_map"><b>Contact:</b> ${feature.properties.ps_contact_number}</p>
+                                            <p class="text_height_map"><b>SHO Contact:</b> ${feature.properties.sho_contact}</p>
                                             <a target="_blank" href="${base_url}edit-police-station/${feature.properties.id}">View Details<a>
 
                                             </div>
                                         `);
+
                                         }
 
 
@@ -754,6 +976,7 @@
                             }).addTo(myMap);
                         }
                     });
+
 
 
                 }
@@ -771,25 +994,74 @@
 
 
                                        // var mymarker = L.marker([parseFloat(feature.properties.lat).toFixed(4),parseFloat(feature.properties.lng).toFixed(4)], {icon: greenIcon}).addTo(myMap);
-                                    var myIcon = L.icon({
-                                        iconUrl: base_url+"markers/polling.png",
-                                        iconSize: [40, 40],
+                                    if(feature.properties.sensitivity == 1){
+                                        var myIcon = L.icon({
+                                            iconUrl: base_url+"markers/polling_ms.png",
+                                            className:"polling_station_marker most_sensitive",
+                                            iconSize: [30,30],
 
-                                    });
-                                    var mymarker = L.marker([parseFloat(feature.properties.lat).toFixed(6),parseFloat(feature.properties.lng).toFixed(6)], {icon: myIcon}).addTo(myMap);
-                                    console.log("pollingstation");
-                                    mymarker.bindPopup(`
+                                        });
+                                        var mymarker = L.marker([parseFloat(feature.properties.lat).toFixed(6),parseFloat(feature.properties.lng).toFixed(6)], {icon: myIcon}).addTo(myMap);
+                                        mymarker.bindPopup(`
                                            <div style="line-height:0.2rem">
                                             <h6>Polling Stations</h6>
-                                            <p><b>PS Name:</b> ${feature.properties.polling_station_name}</p>
-                                            <p><b>Name:</b> ${feature.properties.incharge_name}</p>
-                                            <p><b>Contact:</b> ${feature.properties.incharge_contact}</p>
-                                            <p><b>type:</b> ${feature.properties.sensitivity}</p>
+                                            <p><b class="text_height_map">PS Name:</b> ${feature.properties.polling_station_name}</p>
+                                            <p><b class="text_height_map">Name:</b> ${feature.properties.incharge_name}</p>
+                                            <p><b class="text_height_map">Contact:</b> ${feature.properties.incharge_contact}</p>
+                                            <p><b >type:</b> Most Sensitive</p>
 
                                             <a target="_blank" href="${base_url}edit-polling-station/${feature.properties.id}">View Details<a>
 
                                             </div>
                                         `);
+
+                                    }else if(feature.properties.sensitivity == 2){
+                                        var myIcon = L.icon({
+                                            iconUrl: base_url+"markers/sensiteve_ps.png",
+                                            className:"polling_station_marker sensitive",
+                                            iconSize: [40, 40],
+
+                                        });
+                                        var mymarker = L.marker([parseFloat(feature.properties.lat).toFixed(6),parseFloat(feature.properties.lng).toFixed(6)], {icon: myIcon}).addTo(myMap);
+                                        mymarker.bindPopup(`
+                                           <div style="line-height:0.2rem">
+                                            <h6>Polling Stations</h6>
+                                           <p><b class="text_height_map">PS Name:</b> ${feature.properties.polling_station_name}</p>
+                                            <p><b class="text_height_map">Name:</b> ${feature.properties.incharge_name}</p>
+                                            <p><b class="text_height_map">Contact:</b> ${feature.properties.incharge_contact}</p>
+
+                                            <p><b>type:</b> Sensitive</p>
+
+                                            <a target="_blank" href="${base_url}edit-polling-station/${feature.properties.id}">View Details<a>
+
+                                            </div>
+                                        `);
+
+                                    }else{
+                                        var myIcon = L.icon({
+                                            iconUrl: base_url+"markers/normal_ps.png",
+                                            className:"polling_station_marker normal_polling_station",
+                                            iconSize: [40, 40],
+
+                                        });
+                                        var mymarker = L.marker([parseFloat(feature.properties.lat).toFixed(6),parseFloat(feature.properties.lng).toFixed(6)], {icon: myIcon}).addTo(myMap);
+                                        mymarker.bindPopup(`
+                                           <div style="line-height:0.2rem">
+                                            <h6>Polling Stations</h6>
+                                            <p><b class="text_height_map">PS Name:</b> ${feature.properties.polling_station_name}</p>
+                                            <p><b class="text_height_map">Name:</b> ${feature.properties.incharge_name}</p>
+                                            <p><b class="text_height_map">Contact:</b> ${feature.properties.incharge_contact}</p>
+
+                                            <p><b>type:</b> Normal</p>
+
+                                            <a target="_blank" href="${base_url}edit-polling-station/${feature.properties.id}">View Details<a>
+
+                                            </div>
+                                        `);
+
+                                    }
+
+
 
 
 
@@ -809,28 +1081,74 @@
 
                     $.ajax({
                         url: '{{ route("getAllPoliceMobiles") }}', // Replace with your actual URL
-                        method: 'GET',
+                        type: 'post',
+                        data: {
+                            police_station_id:$("#police_station_id").val(),
+                            districts:$("#search_district").val(),
+                            _token: '{{ csrf_token() }}'
+
+                        },
                         success: function (response) {
                             var blackIcon = L.icon.pulse({ color: "black", fillColor: "black", animate: true});
-
                             $("#police_mobile_checkbox_count").text(response.data.length);
                             $.each(response.data, function (index, item) {
-
                                 if(item.lat != null && item.lng != null){
-                                    console.log("PoliceMobiles");
+
                                     var myIcon = L.icon({
                                         iconUrl: 'https://w7.pngwing.com/pngs/5/851/png-transparent-marker-map-icon-car-location-automobile-vehicle-target-design.png',
                                         iconSize: [20, 30],
-                                        iconAnchor: [22, 94],
+                                        className:"police_mobile_marker"
+
                                     });
                                     var mymarker = L.marker([item.lat,item.lng], {icon: myIcon}).addTo(myMap);
                                     mymarker.bindPopup(`
                                             <div style="line-height:0.2rem">
                                             <h6>Police Mobile</h6>
-                                            <p><b>Registration#:</b> ${item.registration_number}</p>
-                                            <p><b>Incharge Name:</b> ${item.incharge_name}</p>
-                                            <p><b>Contact:</b> ${item.contact_number}</p>
+                                            <p class="text_height_map"><b>Registration#:</b> ${item.registration_number}</p>
+                                            <p class="text_height_map"><b>Incharge Name:</b> ${item.incharge_name}</p>
+                                            <p class="text_height_map"><b>Contact:</b> ${item.contact_number}</p>
 
+                                            </div>
+                                        `);
+                                }
+
+
+
+                            });
+
+                        }
+                    });
+                }
+
+                function getAllPoliceLine() {
+
+                    $.ajax({
+                        url: '{{ route("getAllPoliceLines") }}', // Replace with your actual URL
+                        type: 'POST',
+                        data: {
+
+                            _token: '{{ csrf_token() }}'
+
+                        },
+                        success: function (response) {
+                            var blackIcon = L.icon.pulse({ color: "red", fillColor: "red", animate: false});
+                            $("#police_line_checkbox_count").text(response.data.length);
+                            $.each(response.data, function (index, item) {
+                                if(item.lat != null && item.lng != null){
+                                    console.log("PoliceMobiles");
+                                    var myIcon = L.icon({
+                                        iconUrl: 'https://w7.pngwing.com/pngs/5/851/png-transparent-marker-map-icon-car-location-automobile-vehicle-target-design.png',
+                                        iconSize: [20, 30],
+                                        className:"police_mobile_marker"
+
+                                    });
+                                    var mymarker = L.marker([item.lat,item.lng], {icon: blackIcon}).addTo(myMap);
+                                    mymarker.bindPopup(`
+                                            <div style="line-height:0.2rem">
+                                            <h6>Police Line</h6>
+                                            <p class="text_height_map"><b>Name:</b> ${item.name}</p>
+                                            <p class="text_height_map"><b>Incharge Name:</b> ${item.incharge_name}</p>
+                                            <p class="text_height_map"><b>Contact:</b> ${item.contact_number}</p>
                                             </div>
                                         `);
                                 }

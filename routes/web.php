@@ -66,7 +66,8 @@ Route::get('/psw-generate', function () {
 Route::group(['middleware' => 'auth'], function () {
     Route::get('user-dashboard', [\App\Http\Controllers\HomeController::class, 'userDashboard'])->name('user.dashboard');
     Route::get('getAllPoliceStations', [\App\Http\Controllers\HomeController::class, 'getAllPoliceStations'])->name('getAllPoliceStations');
-    Route::get('getAllPoliceMobiles', [\App\Http\Controllers\HomeController::class, 'getAllPoliceMobiles'])->name('getAllPoliceMobiles');
+    Route::post('getAllPoliceMobiles', [\App\Http\Controllers\HomeController::class, 'getAllPoliceMobiles'])->name('getAllPoliceMobiles');
+    Route::post('getAllPoliceLines', [\App\Http\Controllers\HomeController::class, 'getAllPoliceLines'])->name('getAllPoliceLines');
     Route::post('/store-token', [\App\Http\Controllers\NotificationSendController::class, 'updateDeviceToken'])->name('store.token');
     Route::post('/send-web-notification', [\App\Http\Controllers\NotificationSendController::class, 'sendNotification'])->name('send.web-notification');
     Route::post('/sendNotificationDashboard', [\App\Http\Controllers\NotificationSendController::class, 'sendNotificationDashboard'])->name('send.sendNotificationDashboard');
@@ -77,6 +78,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('getPollingStations/{district_id?}', [\Modules\Settings\Http\Controllers\UsersController::class, 'getPollingStations'])->name('getPollingStations');
     Route::get('getHospitals/{district_id?}', [\Modules\Settings\Http\Controllers\UsersController::class, 'getHospitals'])->name('getHospitals');
     Route::post('getMultiCircles', [\Modules\Settings\Http\Controllers\UsersController::class, 'getMultiCircles'])->name('getMultiCircles');
+    Route::post('getMultiDistricts', [\Modules\Settings\Http\Controllers\UsersController::class, 'getMultiDistricts'])->name('getMultiDistricts');
     Route::post('loadMultiPoliceStations', [\Modules\Settings\Http\Controllers\UsersController::class, 'loadMultiPoliceStations'])->name('loadMultiPoliceStations');
     Route::get('getPoliceStations/{id?}', [\Modules\Settings\Http\Controllers\UsersController::class, 'getPoliceStations'])->name('getPoliceStations');
     Route::get('getPoliceStationUser/{id?}', [\Modules\Settings\Http\Controllers\UsersController::class, 'getPoliceStationUser'])->name('getPoliceStationUser');
@@ -94,6 +96,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('update-police-station', [\App\Http\Controllers\PoliceStationController::class, 'updatePoliceStation'])->name('update.police.station');
     Route::post('delete-police-station', [\App\Http\Controllers\PoliceStationController::class, 'destroy'])->name('delete.police.station');
     Route::get('all-police-station', [\App\Http\Controllers\PoliceStationController::class, 'allPoliceStations'])->name('all.police.station');
+    Route::get('exportPoliceStations', [\App\Http\Controllers\PoliceStationController::class, 'exportPoliceStations'])->name('exportPoliceStations');
 
     Route::get('add-police-post', [\App\Http\Controllers\PolicePostController::class, 'index'])->name('add.new.police.post');
     Route::get('list-police-post', [\App\Http\Controllers\PolicePostController::class, 'listPolicePost'])->name('list.police.post');
@@ -118,6 +121,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('edit-polling-station/{id}', [\App\Http\Controllers\PollingStationController::class, 'editPollingStation'])->name('edit.polling.station');
     Route::post('update-polling-station', [\App\Http\Controllers\PollingStationController::class, 'updatePollingStation'])->name('update.polling.station');
     Route::get('polling-station', [\App\Http\Controllers\PollingStationController::class, 'pollingStation'])->name('all.polling.station');
+    Route::get('exportPollingStations', [\App\Http\Controllers\PollingStationController::class, 'exportPollingStations'])->name('exportPollingStations');
 
     Route::get('add-hospital', [\App\Http\Controllers\HospitalController::class, 'index'])->name('add.new.hospital');
     Route::post('save-hospital', [\App\Http\Controllers\HospitalController::class, 'saveHospital'])->name('save-hospital');
@@ -130,6 +134,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('edit-police-mobile/{id}', [\App\Http\Controllers\PoliceMobileController::class, 'editPoliceMobile'])->name('edit.police.mobile');
     Route::post('update-police-mobile', [\App\Http\Controllers\PoliceMobileController::class, 'updatePoliceMobile'])->name('update.police.mobile');
     Route::get('police-mobile', [\App\Http\Controllers\PoliceMobileController::class, 'policeMobile'])->name('all.police.mobile');
+    Route::get('exportPoliceMobile', [\App\Http\Controllers\PoliceMobileController::class, 'exportPoliceMobile'])->name('exportPoliceMobile');
 
 
 
@@ -144,5 +149,14 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('sendMeetingNotification', [\App\Http\Controllers\MeetingController::class, 'sendMeetingNotification'])->name('sendMeetingNotification');
     Route::get('list-district', [\App\Http\Controllers\DistrictController::class, 'listdistricts'])->name('list.districts');
     Route::get('list-circle', [\App\Http\Controllers\CircleController::class, 'listcircles'])->name('list.circles');
+    Route::post('delete-table-data', [\App\Http\Controllers\PoliceStationController::class, 'deleteTableData'])->name('delete-table-data');
     // Route::get('list-circle', [\App\Http\Controllers\CircleController::class, 'listcircles'])->name('list.circles');
+
+    Route::get('add-notification', [\App\Http\Controllers\NotificationController::class, 'index'])->name('add.new.notifications');
+    Route::get('list-notification', [\App\Http\Controllers\NotificationController::class, 'listNotification'])->name('list.notifications');
+    Route::post('save-notification', [\App\Http\Controllers\NotificationController::class, 'saveNotification'])->name('save.notifications');
+    Route::get('edit-notification/{id}', [\App\Http\Controllers\NotificationController::class, 'editNotification'])->name('edit.notifications');
+    Route::post('update-notification', [\App\Http\Controllers\NotificationController::class, 'updateNotification'])->name('update.notifications');
+    Route::get('notification', [\App\Http\Controllers\NotificationController::class, 'allNotification'])->name('all.notification');
+
 });

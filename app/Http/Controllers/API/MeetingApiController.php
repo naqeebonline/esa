@@ -82,8 +82,10 @@ class MeetingApiController extends Controller
 
     public function getZoomMeetings()
     {
-            $data = Meeting::get();
-            return response()->json(['error' => false, 'message' => "data found","data"=>$data],200);
+        $user = auth()->user();
+        $assign_meeting_to_user = AssignMeetings::where("to_user",$user->id)->pluck('zoom_meeting_id')->all();
+        $data = Meeting::whereIn("zoom_meeting_id",$assign_meeting_to_user)->orderBy("updated_at","desc")->get();
+        return response()->json(['error' => false, 'message' => "data found","data"=>$data],200);
     }
 
     public function sendNotification($title,$message)

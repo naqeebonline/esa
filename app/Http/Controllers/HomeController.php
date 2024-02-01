@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PoliceLine;
 use App\Models\PoliceMobile;
 use App\Models\PoliceStation;
 use Illuminate\Http\Request;
@@ -99,8 +100,26 @@ class HomeController extends Controller
 
     public function getAllPoliceMobiles()
     {
+        $district_id = request()->districts ?? "";
+        $police_station_id = request()->police_station_id ?? "";
 
-        $data = PoliceMobile::whereNotNull("lat")->whereNotNull("lng")->get();
+         
+        $data = PoliceMobile::whereNotNull("lat")->whereNotNull("lng")
+            ->when($district_id, function ($q) use ($district_id) {
+                return $q->whereIn("district_id",$district_id);
+            })
+            ->when($police_station_id, function ($q) use ($police_station_id) {
+                return $q->whereIn("police_station_id",$police_station_id);
+            })
+            ->get();
+        return (["data"=>$data]);
+
+    }
+
+    public function getAllPoliceLines()
+    {
+
+        $data = PoliceLine::whereNotNull("lat")->whereNotNull("lng")->get();
         return (["data"=>$data]);
 
     }

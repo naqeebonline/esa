@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\PoliceStationExport;
 use App\Models\Circle;
 use App\Models\Districts;
 use App\Models\Hospital;
 use App\Models\PoliceStation;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
 class PoliceStationController extends Controller
@@ -37,8 +40,9 @@ class PoliceStationController extends Controller
         return DataTables::of($users)
             ->addColumn('action', function($cert) {
                 $actionsBtn = '<a class="dropdown-item p-50" href="'.route('edit.police.station',[$cert->id]).'"><i class="bx bx-file-blank mr-1"></i> Edit</a>';
+                $actionsBtn .= '<a class="dropdown-item p-50 delete_table_data" data-id="'.$cert->id.'" href="javascript:void(0)"><i class="bx bx-window-close"></i> Delete</a>';
 
-                $actionsBtn .= '<div role="separator" class="dropdown-divider"></div>';
+
                 return $actionsBtn;
             })
             ->addColumn('district_name', function($cert) {
@@ -62,7 +66,6 @@ class PoliceStationController extends Controller
 
         ];
 
-
         return view("police_station.list",$data);
     }
 
@@ -73,6 +76,8 @@ class PoliceStationController extends Controller
         if(auth()->user()->roles->pluck('name')[0] =="Super Admin"){
             $data['district_id'] = request()->district_id;
         }
+        $data['latitude'] = preg_replace("/[^0-9.]/", "", request()->latitude);
+        $data['longitude'] = preg_replace("/[^0-9.]/", "", request()->longitude);
         $data['created_by'] = auth()->user()->id;
         PoliceStation::create($data);
         return redirect()->route('list.police.station')->with('success', 'Police Station created successfully.');
@@ -93,8 +98,11 @@ class PoliceStationController extends Controller
 
     public function updatePoliceStation()
     {
+        $data = request()->except(["_token","id"]);
+        $data['latitude'] = preg_replace("/[^0-9.]/", "", request()->latitude);
+        $data['longitude'] = preg_replace("/[^0-9.]/", "", request()->longitude);
 
-        PoliceStation::where(["id"=>request()->id])->update(request()->except(["_token","id"]));
+        PoliceStation::where(["id"=>request()->id])->update($data);
         return redirect()->route('list.police.station')->with('success', 'Police Station info updated successfully.');
     }
 
@@ -200,5 +208,26 @@ class PoliceStationController extends Controller
             ->get();
 
         return $restaurants;
+    }
+
+    public function deleteTableData()
+    {
+        $id = request()->id;
+        $table = request()->table;
+        DB::table($table)->whereId($id)->delete();
+        return ["status"=>true,"message"=>"record deleted successfully"];
+    }
+
+    public function exportPoliceStations()
+    {
+        $res = DB::table("police_stations")
+            ->select(["districts.title as district_name","police_stations.title as ps_name","police_stations.latitude","police_stations.longitude","police_stations.sho_name","police_stations.sho_contact"])
+            ->leftJoin("districts","districts.id","=","police_stations.district_id")
+            ->when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
+                return $q->where(["police_stations.district_id"=>auth()->user()->district_id]);
+            })
+            ->get();
+
+        return Excel::download(new PoliceStationExport($res), 'police_station.xlsx');
     }
 }

@@ -3,13 +3,18 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\EmergencyAlert;
 use App\Models\Hospital;
+use App\Models\Notification;
 use App\Models\PoliceMobile;
 use App\Models\PoliceStation;
 use App\Models\User;
 use App\Traits\CommonMethods;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Validator;
+use Intervention\Image\Facades\Image;
 use Modules\EIdentity\Entities\Designations;
 
 /**
@@ -94,8 +99,77 @@ class CommonActionController extends Controller
         ],200);
     }
 
+
+    public function findNearestMobile()
+    {
+        /*
+         * using eloquent approach, make sure to replace the "Restaurant" with your actual model name
+         * replace 6371000 with 6371 for kilometer and 3956 for miles
+         */
+
+        $latitude = request()->lat;
+        $longitude = request()->lng;
+        $radius = 40;
+        if(request()->radius){
+         $radius = request()->radius;
+        }
+
+
+        $police_mobile = PoliceMobile::selectRaw("id,registration_number,contact_number,lat,lng,
+                         ( 6371 * acos( cos( radians(?) ) *
+                           cos( radians( lat ) )
+                           * cos( radians( lng ) - radians(?)
+                           ) + sin( radians(?) ) *
+                           sin( radians( lat ) ) )
+                         ) AS distance", [$latitude, $longitude, $latitude])
+        ->whereNotNull("lat")
+        ->whereNotNull("lng")
+        ->having("distance", "<", $radius)->orderBy("distance",'asc')->offset(0)->limit(10)->get();
+
+        return response()->json(['error' => false, 'message' => "data found",
+
+            "police_mobile"=>$police_mobile,
+
+
+        ],200);
+    }
+
     public function sendMobileNotification()
     {
+        $user = auth()->user();
+        $requestValidator = Validator::make(request()->all(), [
+            'title' => 'required',
+        ]);
+
+        if ($requestValidator->fails()) {
+            return response()->json(['error' => true, 'message' => implode(' ', $requestValidator->errors()->all())],500);
+
+        }//..... end if() .....//
+
+        $data['title'] = request()->title;
+        $data['notification_type'] = "notification";
+
+        if(request()->has("attachment") && request()->attachment){
+            /*$image_resize = Image::make(request()->attachment->getRealPath());
+            $image_resize->resize(300, 300);
+            $filename = request()->attachment->hashName();
+            $image_resize->save(public_path('media/notifications/' .$filename));*/
+            $path = request()->file('attachment')->store('attachment', 'public');
+            $data['attachment'] = $path;
+        }
+        if(request()->has("audio") && request()->audio){
+            $path = request()->file('audio')->store('audio', 'public');
+            $data['audio']=$path;
+
+        }
+
+        if(request()->has("video") && request()->video){
+            $path = request()->file('video')->store('video', 'public');
+            $data['video']=$path;
+
+        }
+        $data['created_by'] = $user->id;
+        Notification::create($data);
         $url = 'https://fcm.googleapis.com/fcm/send';
 
         $FcmToken = User::whereNotNull('android_token')->pluck('android_token')->all();
@@ -136,11 +210,46 @@ class CommonActionController extends Controller
         // Close connection
         curl_close($ch);
         // FCM response
-        return response()->json(['error' => false, 'message' => "Notification sent successfully","response"=>json_decode($result)],200);
+        return response()->json(['error' => false, 'message' => "Notification sent successfully"],200);
     }
 
     public function emergencyAlert()
     {
+        $user = auth()->user();
+        $requestValidator = Validator::make(request()->all(), [
+            'title' => 'required',
+        ]);
+
+        if ($requestValidator->fails()) {
+            return response()->json(['error' => true, 'message' => implode(' ', $requestValidator->errors()->all())],500);
+
+        }//..... end if() .....//
+
+        $data['title'] = request()->title;
+        $data['type'] = request()->type;
+
+        if(request()->has("attachment") && request()->attachment){
+            /*$image_resize = Image::make(request()->attachment->getRealPath());
+            $image_resize->resize(300, 300);
+            $filename = request()->attachment->hashName();
+            $image_resize->save(public_path('media/notifications/' .$filename));*/
+            $path = request()->file('attachment')->store('attachment', 'public');
+            $data['attachment'] = $path;
+        }
+        if(request()->has("audio") && request()->audio){
+            $path = request()->file('audio')->store('audio', 'public');
+            $data['audio']=$path;
+
+        }
+
+        if(request()->has("video") && request()->video){
+            $path = request()->file('video')->store('video', 'public');
+            $data['video']=$path;
+
+        }
+        $data['created_by'] = $user->id;
+
+        EmergencyAlert::create($data);
         $url = 'https://fcm.googleapis.com/fcm/send';
 
         $FcmToken = User::whereNotNull('android_token')->pluck('android_token')->all();
@@ -184,6 +293,44 @@ class CommonActionController extends Controller
 
 
         return response()->json(['error' => false, 'message' => "Emergency Alert sent successfully","response"=>json_decode($result)],200);
+    }
+
+    public function getNotifications()
+    {
+        $data = Notification::get();
+         foreach ($data as $key => $value){
+             if($value->attachment){
+                 $value->attachment = URL::to('storage/')."/".$value->attachment;
+             }
+             if($value->audio){
+                 $value->audio = URL::to('storage/')."/".$value->audio;
+             }
+             if($value->video){
+                 $value->video = URL::to('storage/')."/".$value->video;
+             }
+
+         }
+        return response()->json(['error' => false, 'message' => "Data found","data"=>$data],200);
+
+    }
+
+    public function getEmergencyAlerts()
+    {
+        $data = EmergencyAlert::get();
+        foreach ($data as $key => $value){
+            if($value->attachment){
+                $value->attachment = URL::to('storage/')."/".$value->attachment;
+            }
+            if($value->audio){
+                $value->audio = URL::to('storage/')."/".$value->audio;
+            }
+            if($value->video){
+                $value->video = URL::to('storage/')."/".$value->video;
+            }
+
+        }
+        return response()->json(['error' => false, 'message' => "Data found","data"=>$data],200);
+
     }
 
 

@@ -29,7 +29,7 @@ class PolicePostController extends Controller
             ->addColumn('action', function($cert) {
                 $actionsBtn = '<a class="dropdown-item p-50" href="'.route('edit.police.post',[$cert->id]).'"><i class="bx bx-file-blank mr-1"></i> Edit</a>';
 
-                $actionsBtn .= '<div role="separator" class="dropdown-divider"></div>';
+                $actionsBtn .= '<a class="dropdown-item p-50 delete_table_data" data-id="'.$cert->id.'" href="javascript:void(0)"><i class="bx bx-window-close"></i> Delete</a>';
 
 
                 return $actionsBtn;
@@ -63,6 +63,9 @@ class PolicePostController extends Controller
             $res['district_id'] = auth()->user()->district_id;
             $data['created_by'] = auth()->user()->id;
         }
+
+        $res['lat'] = preg_replace("/[^0-9.]/", "", request()->lat);
+        $res['lng'] = preg_replace("/[^0-9.]/", "", request()->lng);
         PolicePost::create($res);
         return redirect()->route('list.police.post')->with('success', 'Police Post created successfully.');
     }
@@ -86,6 +89,9 @@ class PolicePostController extends Controller
         if(auth()->user()->roles->pluck('name')[0] !="Super Admin"){
             $data['district_id'] = auth()->user()->district_id;
         }
+
+        $data['lat'] = preg_replace("/[^0-9.]/", "", request()->lat);
+        $data['lng'] = preg_replace("/[^0-9.]/", "", request()->lng);
         PolicePost::where(["id"=>request()->id])->update($data);
 
         return redirect()->route('list.police.post')->with('success', 'Police Post info updated successfully.');

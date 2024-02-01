@@ -117,6 +117,28 @@
                     'copy', 'csv', 'excel', 'pdf', 'print'
                 ]
             });
+
+            $("body").on("click",".delete_table_data",function (e) {
+                var id  = $(this).attr("data-id");
+                if (confirm('Are you sure to delete this record ?')) {
+                    $.ajax({
+                        type: 'post',
+                        url: "{{ route('delete-table-data') }}",
+                        data: {
+                            id: id,
+                            table:"esa_hospital",
+                            _token: '{{ csrf_token() }}'
+
+                        },
+                        success: function(res) {
+                            //user_table.dataTable.reload();
+                            window.location.reload();
+                        }
+                    })
+                } else {
+                    alert('Why did you press cancel? You should have confirmed');
+                }
+            });
         })
     </script>
 @endpush

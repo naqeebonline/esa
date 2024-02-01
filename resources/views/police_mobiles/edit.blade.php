@@ -40,6 +40,17 @@
                             </div>
 
                             <div class="col-md-6">
+                                <label class="form-label" for="multicol-username">Police Line (Optional)</label>
+                                <select class="form-control select2" name="police_line_id" id="police_line_id">
+                                    <option value="">Select Police Line....</option>
+                                    @foreach($police_line as $key => $value)
+                                        <option  <?php echo ($value->id == $data->police_line_id) ? "selected=selected" : "" ?> value="{{$value->id}}">{{$value->name}}</option>
+                                    @endforeach
+
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
                                 <label class="form-label" for="multicol-username">Police Station</label>
                                 <select class="form-control select2" required name="police_station_id" id="police_station_id">
                                     <option value="">Select Police Station....</option>
