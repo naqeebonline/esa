@@ -36,6 +36,14 @@
 
 
                         <div class="col-12">
+                            <div class="col-md-3">
+                                <select class="form-control select2" id="district_id">
+                                    <option value="">Select District</option>
+                                    @foreach($districts as $key => $value)
+                                    <option value="{{$value->id}}">{{$value->title}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
 
                             <div class="table-responsive" style="min-height: 200px">
 
@@ -75,20 +83,18 @@
     <script src="{{ asset('assets/vendor/libs/datatables/jquery.dataTables.js') }}"></script>
 
     <script src="{{ asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
-    <script type="text/javascript" language="javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script>
-    <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
-    <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/2.0.1/js/dataTables.buttons.min.js"></script>
-    <script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-    <script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
-    <script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
-    <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.html5.min.js"></script>
-    <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.print.min.js"></script>
-
-
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/select2/select2.css') }}" />
+    <script src="{{ asset('assets/vendor/libs/select2/select2.js') }}"></script>
+    <script src="{{ asset('assets/js/app-custom.js') }}"></script>
 
     <script>
         var id =0;
+        district_id = "";
         $(document).ready(function (){
+            $("body").on("change","#district_id",function (e) {
+                 district_id = $(this).val();
+                user_table.ajax.reload();
+            });
             user_table = $('#users-list').DataTable({
                 processing: true,
                 serverSide: true,
@@ -96,16 +102,16 @@
                 pageLength: 50,
                 ajax: {
                     url: '{{route("all.emergency.alerts")}}',
-                    data: {
-                        'post_param': '1'
+                    data: function (d) {
+                        d.district_id = district_id;
                     }
 
                 },
 
                 columns: [
 
-                    {data: 'district_name', name: 'district.title'},
-                    {data: 'user_name', name: 'user_name'},
+                    {data: 'district.title', name: 'district.title'},
+                    {data: 'users.username', name: 'users.username'},
                     {data: 'message', name: 'message'},
                     {data: 'type', name: 'type'},
                     {data: 'attachment', name: 'attachment'},

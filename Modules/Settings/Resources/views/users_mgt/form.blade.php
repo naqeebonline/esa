@@ -59,6 +59,10 @@
         $("#police_mobile_id").val('');
         $("#police_mobile_id").removeAttr("required");
 
+        $(".region_id_div").hide();
+        $("#region_id").val('');
+        $("#region_id").removeAttr("required");
+
         $(".police_station_id_div").hide();
         $("#police_station_id").val('');
         $("#police_station_id").removeAttr("required");
@@ -93,6 +97,11 @@
                 if(selectedRole == "Police Station"){
                     $(".police_station_id_div").show();
                     $("#police_station_id").attr("required","required");
+                }
+
+                if(selectedRole == "Regional User"){
+                    $(".region_id_div").show();
+                    $("#region_id").attr("required","required");
                 }
 
         });
@@ -459,6 +468,20 @@
                                     <span class="help" style="color: red">
                                                             @if ($errors->has('police_mobile_id'))
                                             <span>{{ $errors->first('police_mobile_id') }}</span>
+                                        @endif
+
+                                                        </span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 region_id_div" style="{{($item->police_mobile_id) ? 'display:block' : 'display:none'}}">
+                                <div class="form-group">
+                                    {!! Form::label('region_id', 'Select Region  ', ['class' => 'form-label']) !!}
+                                    {!! Form::select('region_id', [null=>'Select Region']+$region->toArray(), $item->region_id ?? null, ['class' => 'form-control select2','id'=>"region_id"]) !!}
+
+                                    <span class="help" style="color: red">
+                                                            @if ($errors->has('region_id'))
+                                            <span>{{ $errors->first('region_id') }}</span>
                                         @endif
 
                                                         </span>

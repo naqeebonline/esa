@@ -103,6 +103,7 @@ class User extends Authenticatable implements JWTSubject, HasMedia
         'hospital_id',
         'polling_station_id',
         'police_mobile_id',
+        'region_id',
     ];
 
     protected $connection = "mysql";

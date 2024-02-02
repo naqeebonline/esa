@@ -392,10 +392,10 @@
                 var police_station_users = $("#police_station_users").val();
                 var polling_station_user = $("#polling_station_user").val();
                 var police_mobile_user = $("#police_mobile_user").val();
-               if(police_station_users.length == 0){
+               /*if(police_station_users.length == 0){
                    alert("Please assign users to meeting");
                    return false;
-               }
+               }*/
                 $.ajaxSetup({
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

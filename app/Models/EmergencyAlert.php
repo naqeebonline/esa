@@ -16,8 +16,8 @@ class EmergencyAlert extends Model
         return $this->belongsTo(Districts::class, 'district_id', 'id');
     }
 
-    public function user()
+    public function users()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(Users::class, 'user_id');
     }
 }

@@ -8,6 +8,7 @@ use App\Models\Hospital;
 use App\Models\PoliceMobile;
 use App\Models\PoliceStation;
 use App\Models\PollingStation;
+use App\Models\Reagin;
 use App\Models\Tehsils;
 use App\Models\User;
 use Illuminate\Contracts\Support\Renderable;
@@ -82,6 +83,7 @@ class UsersController extends Controller
                 return $q->where(["district_id" => auth()->user()->district_id]);
             })
                 ->pluck('registration_number', 'id'),
+            'region' => Reagin::pluck('name', 'id'),
             'sections' => collect([]),
             'parent_users' => collect([])
         ];

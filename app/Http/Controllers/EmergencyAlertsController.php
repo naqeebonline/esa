@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Districts;
 use App\Models\EmergencyAlert;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -18,14 +19,20 @@ class EmergencyAlertsController extends Controller
             'title' => 'Emergency Alerts',
 
         ];
+        $data['districts'] = Districts::get();
 
         return view("emergency_alerts.list",$data);
     }
 
     public function allAlerts()
     {
-        $users = EmergencyAlert::with('district')->when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
+        $district_id = request()->district_id ?? "";
+        $users = EmergencyAlert::with('district')->with('users')
+            ->when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
             return $q->where(["district_id"=>auth()->user()->district_id]);
+        })
+            ->when($district_id, function ($q) use ($district_id) {
+            return $q->where(["district_id"=>$district_id]);
         });
         return DataTables::of($users)
             ->addColumn('attachment', function($cert) {
@@ -37,14 +44,8 @@ class EmergencyAlertsController extends Controller
             ->addColumn('video', function($cert) {
                 return '<a href="'.URL::to('storage/')."/".$cert->video.'" target="_blank">Video</a>';
             })
-            ->addColumn('district_name', function($cert) {
-                return $cert->district->title ?? "";
-            })
-            ->addColumn('user_name', function($cert) {
-                return $this->getUserName($cert->user_id);
-            })
 
-            ->rawColumns(["district_name","user_name","attachment","audio","video"])
+            ->rawColumns(["attachment","audio","video"])
             ->make(true);
     }
 
