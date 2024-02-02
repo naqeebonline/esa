@@ -116,7 +116,7 @@
                                             <td>
 
                                                 @foreach($value->meetingUsers as $key2 => $v2)
-                                                    <code>{{$v2->users->name ?? ""}}</code>,
+                                                    <code>{{$v2->users?->name ?? ""}}</code>,
                                                  @endforeach
                                             </td>
                                             <td>

@@ -79,6 +79,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('getHospitals/{district_id?}', [\Modules\Settings\Http\Controllers\UsersController::class, 'getHospitals'])->name('getHospitals');
     Route::post('getMultiCircles', [\Modules\Settings\Http\Controllers\UsersController::class, 'getMultiCircles'])->name('getMultiCircles');
     Route::post('getMultiDistricts', [\Modules\Settings\Http\Controllers\UsersController::class, 'getMultiDistricts'])->name('getMultiDistricts');
+    Route::post('getAllPollingStations', [\Modules\Settings\Http\Controllers\UsersController::class, 'getAllPollingStations'])->name('getAllPollingStations');
     Route::post('loadMultiPoliceStations', [\Modules\Settings\Http\Controllers\UsersController::class, 'loadMultiPoliceStations'])->name('loadMultiPoliceStations');
     Route::get('getPoliceStations/{id?}', [\Modules\Settings\Http\Controllers\UsersController::class, 'getPoliceStations'])->name('getPoliceStations');
     Route::get('getPoliceStationUser/{id?}', [\Modules\Settings\Http\Controllers\UsersController::class, 'getPoliceStationUser'])->name('getPoliceStationUser');

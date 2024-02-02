@@ -587,6 +587,22 @@ class UsersController extends Controller
 
     }
 
+
+    public function getAllPollingStations()
+    {
+        $district_id = request()->districts ?? "";
+
+        $police_station_id = request()->police_station_id ?? "";
+        $data =PollingStation::when($district_id, function ($q) use ($district_id) {
+            return $q->whereIn("district_id",$district_id);
+        })
+        ->when($police_station_id, function ($q) use ($police_station_id) {
+            return $q->whereIn("police_station_id",$police_station_id);
+        })
+        ->get();
+        return["message"=>"success","data"=>$data];
+    }
+
     public function getMultiPoliceStationUser()
     {
         $district_id = request()->districts;

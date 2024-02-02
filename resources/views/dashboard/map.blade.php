@@ -288,6 +288,14 @@
                     </select>
                 </div>
 
+                <div class="col-md-4 ">
+                    <label>Polling Station</label>
+                    <select class="form-select select2" multiple="multiple" id="polling_stations_id">
+
+
+                    </select>
+                </div>
+
                 <div class="col-md-3 ">
                     <div class="btn btn-success checkbox_change mt-4">Search</div>
                 </div>
@@ -625,6 +633,7 @@
                     selected_districts = $(this).val();
                   if(selected_districts != null && selected_districts.length > 0){
                       loadCircle();
+                      allPollingStations();
                       //loadBoundaryData();
                   }else{
                       current_lat = 34.9526;
@@ -642,6 +651,8 @@
                 $("body").on("change","#police_station_id",function (e) {
 
                     police_station_ids = $(this).val();
+                    allPollingStations();
+
                 //    var element = $(this).find('option:selected');
 
                    // loadBoundaryData();
@@ -871,6 +882,30 @@
                     });
                 }
 
+                function allPollingStations() {
+
+                   var districts = $("#search_district").val();
+                   var police_station_id = $("#police_station_id").val();
+                    $.ajax({
+                        url: '{{ route("getAllPollingStations") }}' , // Replace with your actual URL
+                        method: 'post',
+                        data: {
+                            districts: districts,
+                            police_station_id: police_station_id,
+                            _token: '{{ csrf_token() }}'
+
+                        },
+                        success: function (response) {
+
+                            var psOptions = '<option value="">Select District</option>';
+                            $.each(response.data, function (index, item) {
+                                psOptions += '<option value="' + item.id + '">' + item.polling_station_name + '</option>';
+                            });
+                            $("#polling_stations_id").html(psOptions);
+                        }
+                    });
+                }
+
                 function loadCircle() {
 
                    var districts = $("#search_district").val();
@@ -982,10 +1017,12 @@
                 }
 
                 function getAllPollingStations() {
+                    var polling_stations_id = $("#polling_stations_id").val();
+                    var ps_sensitivity = $("#ps_sensitivity").val();
                     var greenIcon = L.icon.pulse({ iconSize:[10,10],color: "#faa5a5", fillColor: "#faa5a5", animate: true});
 
 
-                    new L.geoJson.ajax("{{ URL::to('api/v1/getAllPollingStations') }}?district_id="+selected_districts+"&police_station_id="+police_station_ids+"&sensitivity_type="+sensitivity_type, {
+                    new L.geoJson.ajax("{{ URL::to('api/v1/getAllPollingStations') }}?district_id="+selected_districts+"&police_station_id="+police_station_ids+"&sensitivity_type="+sensitivity_type+"&polling_station_id="+polling_stations_id+"&ps_sensitivity="+ps_sensitivity, {
                         middleware: function(data) {
                             $("#polling_station_checkbox_count").text(data.features.length);
                             return L.geoJson(data, {

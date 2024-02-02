@@ -168,8 +168,11 @@ class HospitalApiController extends Controller
                 return $q->whereIn("police_station_id",$police_station_id);
             })
             ->get();
-        $hospitals = $this->dbToJson($hospital);
-        return ($hospitals);
+        if(count($hospital) > 0){
+            $hospital = $this->dbToJson($hospital);
+        }
+
+        return ($hospital);
 
     }
 
@@ -178,6 +181,9 @@ class HospitalApiController extends Controller
         $district_ids = "";
         $police_station_id = "";
         $sensitivity_type = "";
+        $polling_station_id = "";
+        $ps_sensitivity = "";
+
         if($_GET["district_id"] && $_GET["district_id"] !="null"){
             $district_ids = explode(",",$_GET['district_id']);
 
@@ -189,6 +195,17 @@ class HospitalApiController extends Controller
         if($_GET["sensitivity_type"] && $_GET["sensitivity_type"] != "null"){
 
             $sensitivity_type = explode(",",$_GET['sensitivity_type']);
+
+        }
+        if($_GET["polling_station_id"] && $_GET["polling_station_id"] != "null"){
+
+            $polling_station_id = explode(",",$_GET['polling_station_id']);
+
+        }
+
+        if($_GET["ps_sensitivity"] && $_GET["ps_sensitivity"] != "null"){
+
+            $ps_sensitivity = explode(",",$_GET['ps_sensitivity']);
 
         }
 
@@ -204,6 +221,16 @@ class HospitalApiController extends Controller
 
                 return $q->whereIn("sensitivity",$sensitivity_type);
             })
+            ->when($polling_station_id, function ($q) use ($polling_station_id) {
+
+                return $q->whereIn("id",$polling_station_id);
+            })
+            ->when($ps_sensitivity, function ($q) use ($ps_sensitivity) {
+
+                return $q->whereIn("sensitivity",$ps_sensitivity);
+            })
+            ->whereNotNull("lat")
+            ->whereNotNull("lng")
            ->get();
            if(count($hospital) > 0){
                $hospital = $this->dbToJson($hospital);
