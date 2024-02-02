@@ -593,12 +593,18 @@ class UsersController extends Controller
         $district_id = request()->districts ?? "";
 
         $police_station_id = request()->police_station_id ?? "";
+        $ps_sensitivity = request()->ps_sensitivity ?? "";
         $data =PollingStation::when($district_id, function ($q) use ($district_id) {
             return $q->whereIn("district_id",$district_id);
         })
         ->when($police_station_id, function ($q) use ($police_station_id) {
             return $q->whereIn("police_station_id",$police_station_id);
         })
+        ->when($ps_sensitivity, function ($q) use ($ps_sensitivity) {
+            return $q->whereIn("sensitivity",$ps_sensitivity);
+        })
+            ->whereNotNull('lat')
+            ->whereNotNull('lng')
         ->get();
         return["message"=>"success","data"=>$data];
     }

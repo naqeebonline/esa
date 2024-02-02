@@ -660,6 +660,7 @@
 
                 $("body").on("change","#ps_sensitivity",function (e) {
                     sensitivity_type = $(this).val();
+                    allPollingStations();
                 //    var element = $(this).find('option:selected');
 
                     //loadBoundaryData();
@@ -886,12 +887,14 @@
 
                    var districts = $("#search_district").val();
                    var police_station_id = $("#police_station_id").val();
+                   var ps_sensitivity = $("#ps_sensitivity").val();
                     $.ajax({
                         url: '{{ route("getAllPollingStations") }}' , // Replace with your actual URL
                         method: 'post',
                         data: {
                             districts: districts,
                             police_station_id: police_station_id,
+                            ps_sensitivity: ps_sensitivity,
                             _token: '{{ csrf_token() }}'
 
                         },

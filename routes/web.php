@@ -160,4 +160,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('update-notification', [\App\Http\Controllers\NotificationController::class, 'updateNotification'])->name('update.notifications');
     Route::get('notification', [\App\Http\Controllers\NotificationController::class, 'allNotification'])->name('all.notification');
 
+
+    Route::get('list-emergency-alerts', [\App\Http\Controllers\EmergencyAlertsController::class, 'index'])->name('listEmergencyAlerts');
+    Route::get('emergency-alerts', [\App\Http\Controllers\EmergencyAlertsController::class, 'allAlerts'])->name('all.emergency.alerts');
 });

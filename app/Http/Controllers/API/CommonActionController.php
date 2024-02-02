@@ -217,7 +217,7 @@ class CommonActionController extends Controller
     {
         $user = auth()->user();
         $requestValidator = Validator::make(request()->all(), [
-            'title' => 'required',
+            'message' => 'required',
         ]);
 
         if ($requestValidator->fails()) {
@@ -225,8 +225,10 @@ class CommonActionController extends Controller
 
         }//..... end if() .....//
 
-        $data['title'] = request()->title;
+        $data['message'] = request()->message;
         $data['type'] = request()->type;
+        $data['district_id'] = $user->district_id;
+        $data['user_id'] = $user->id;
 
         if(request()->has("attachment") && request()->attachment){
             /*$image_resize = Image::make(request()->attachment->getRealPath());
