@@ -409,15 +409,26 @@
                                     </a>
                                 </div>
                             </div>
+
+
                             <!-- /Search -->
 
                             <ul class="navbar-nav flex-row align-items-center ms-auto">
+                                <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-3 me-xl-2">
+                                    <a class="nav-link dropdown-toggle hide-arrow" href="{{route('listEmergencyAlerts')}}">
+                                        <i class="bx bx-bell bx-sm"></i>
+                                        <span class="badge bg-danger rounded-pill badge-notifications" id="notification_count"></span>
+                                    </a>
+
+                                </li>
+
+
                                 <!-- User -->
                                 <li class="nav-item navbar-dropdown dropdown-user dropdown">
                                     <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);"
                                         data-bs-toggle="dropdown">
                                         <div class="avatar avatar-online">
-                                            <i class="fa fa-user fa-2x"></i>
+                                            <i class="fa fa-user fa-2x"> </i>
                                         </div>
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-end">
@@ -459,9 +470,7 @@
                                             </a>
                                         </li>--}}
 
-                                       {{-- <li>
-                                            <div class="dropdown-divider"></div>
-                                        </li>--}}
+
 
 
                                         <li>
@@ -484,6 +493,7 @@
                                 </li>
                                 <!--/ User -->
                             </ul>
+
                         </div>
 
                         <!-- Search Small Screens -->
@@ -719,6 +729,22 @@
         `);
 
         });
+
+
+        //notification_count
+        function update(){
+            $.ajax({
+                url: '{{ route("getCountEmergencyAlerts") }}',
+                method: 'GET',
+                success: function (response) {
+                    $("#notification_count").text(response.total);
+
+                }
+            });
+        }
+        setInterval(update, 30000);
+        update();
+
 
     </script>
     @stack('scripts')

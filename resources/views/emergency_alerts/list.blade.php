@@ -59,6 +59,8 @@
                                         <th style="width: 10%">Image</th>
                                         <th style="width: 10%">Audio</th>
                                         <th style="width: 10%">Video</th>
+                                        <th style="width: 10%">Status</th>
+                                        <th style="width: 10%">Action</th>
 
                                     </tr>
                                     </thead>
@@ -117,6 +119,8 @@
                     {data: 'attachment', name: 'attachment'},
                     {data: 'audio', name: 'audio'},
                     {data: 'video', name: 'video'},
+                    {data: 'status', name: 'status'},
+                    {data: 'action', name: 'action'},
 
 
                 ],

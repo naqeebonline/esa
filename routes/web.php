@@ -164,7 +164,9 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('notification', [\App\Http\Controllers\NotificationController::class, 'allNotification'])->name('all.notification');
 
 
-    Route::get('test', [\App\Http\Controllers\EmergencyAlertsController::class, 'index'])->name('list-emergency-alerts');
+
     Route::get('list-emergency-alerts', [\App\Http\Controllers\EmergencyAlertsController::class, 'index'])->name('listEmergencyAlerts');
     Route::get('emergency-alerts', [\App\Http\Controllers\EmergencyAlertsController::class, 'allAlerts'])->name('all.emergency.alerts');
+    Route::get('view-emergency-alert/{id}', [\App\Http\Controllers\EmergencyAlertsController::class, 'viewEmergencyAlert'])->name('view.emergency.alert');
+    Route::get('getCountEmergencyAlerts', [\App\Http\Controllers\EmergencyAlertsController::class, 'getCountEmergencyAlerts'])->name('getCountEmergencyAlerts');
 });

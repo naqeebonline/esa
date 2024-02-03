@@ -25,7 +25,7 @@ class NotificationController extends Controller
 
     public function allNotification()
     {
-        $users = Notification::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
+        $users = Notification::with("districts")->when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
             return $q->where(["district_id"=>auth()->user()->district_id]);
         });
         return DataTables::of($users)
@@ -54,7 +54,10 @@ class NotificationController extends Controller
                 return '<a href="'.URL::to('storage/')."/".$cert->video.'" target="_blank">Video</a>';
 
             })
-             ->rawColumns(["action","attachment","audio","video"])
+            ->addColumn('district_name', function($cert) {
+                return $cert->districts?->title ?? "";
+            })
+             ->rawColumns(["action","district_name","attachment","audio","video"])
             ->make(true);
     }
 
@@ -69,8 +72,15 @@ class NotificationController extends Controller
 
     public function saveNotification()
     {
-
+        $FcmToken = [];
         $data = request()->except(["_token","id"]);
+        if(auth()->user()->roles->pluck('name')[0] !="Super Admin"){
+                $data['district_id'] = auth()->user()->district_id;
+            $FcmToken = User::whereNotNull('android_token')->whereDistrictId(auth()->user()->district_id)->pluck('android_token')->all();
+
+        }else{
+            $FcmToken = User::whereNotNull('android_token')->pluck('android_token')->all();
+        }
         if(request()->has("attachment") && !empty(request()->attachment)){
             $path = request()->file('attachment')->store('attachment', 'public');
             $data['attachment'] = $path;
@@ -95,7 +105,7 @@ class NotificationController extends Controller
         $notification_data = [
             "data"=>$notification
         ];
-        $FcmToken = User::whereNotNull('android_token')->pluck('android_token')->all();
+
         (new MeetingController())->sendCommonNotification("Control Room Notification","New Notification issued from Control Room",$notification_data,$FcmToken);
         return redirect()->route('list.notifications')->with('success', 'Notification created successfully.');
     }

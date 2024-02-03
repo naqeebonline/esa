@@ -84,7 +84,7 @@ class MeetingApiController extends Controller
     {
         $user = auth()->user();
         $assign_meeting_to_user = AssignMeetings::where("to_user",$user->id)->pluck('zoom_meeting_id')->all();
-        $data = Meeting::whereIn("zoom_meeting_id",$assign_meeting_to_user)->orderBy("updated_at","desc")->get();
+        $data = Meeting::with("users:id,name,email,cnic")->whereIn("zoom_meeting_id",$assign_meeting_to_user)->where("is_active",1)->orderBy("updated_at","desc")->get();
         return response()->json(['error' => false, 'message' => "data found","data"=>$data],200);
     }
 

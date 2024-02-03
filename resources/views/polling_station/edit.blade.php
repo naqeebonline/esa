@@ -87,8 +87,8 @@
                             <label class="form-label" for="multicol-username">Internet Availability<label>
                                     <select name="internet" class="form-control" required id="internet">
                                         <option value="">Select Option....</option>
-                                        <option value="yes">Yes</option>
-                                        <option value="no">No</option>
+                                        <option {{($data->internet == "yes") ? "selected=selected" : ""}} value="yes">Yes</option>
+                                        <option {{($data->internet == "no") ? "selected=selected" : ""}} value="no">No</option>
                                     </select>
                         </div>
 

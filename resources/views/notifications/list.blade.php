@@ -44,6 +44,7 @@
                                     <thead>
                                     <tr>
 {{--                                        <th>#</th>--}}
+                                        <th style="width: 10%">District</th>
                                         <th style="width: 10%">message</th>
                                         <th style="width: 10%">Notification Type</th>
                                         <th style="width: 10%">Image</th>
@@ -102,6 +103,7 @@
 
                 columns: [
 
+                    {data: 'district_name', name: 'districts.title'},
                     {data: 'message', name: 'message'},
                     {data: 'notification_type', name: 'notification_type'},
                     {data: 'attachment', name: 'attachment'},

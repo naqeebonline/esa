@@ -271,7 +271,6 @@ class CommonActionController extends Controller
              if($value->video){
                  $value->video = URL::to('storage/')."/".$value->video;
              }
-
          }
         return response()->json(['error' => false, 'message' => "Data found","data"=>$data],200);
 

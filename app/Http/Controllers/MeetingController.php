@@ -26,8 +26,6 @@ class MeetingController extends Controller
     {
         $start_time = Carbon::now()->toDateTimeString();
         $end_time = Carbon::now()->addMinutes(60)->toDateTimeString();
-
-
         $meetings = Zoom::createMeeting([
             "agenda" => request()->meeting_type,
             "topic" => request()->meeting_title,
@@ -67,8 +65,9 @@ class MeetingController extends Controller
             "created_at" => date("Y-m-d h:i:s",strtotime($meetings['data']['created_at'])),
             "created_by" => auth()->user()->id,
         ];
+        Meeting::where("created_by",auth()->user()->id)->update(["is_active"=>0]);
         Meeting::create($meeting_data);
-        $meetings["notification"] = $this->sendNotification($meetings['data']['agenda'],$meetings['data']['topic']);
+        //$meetings["notification"] = $this->sendNotification($meetings['data']['agenda'],$meetings['data']['topic']);
         return response()->json($meetings);
     }
     public function createFullMeeting()
@@ -119,8 +118,9 @@ class MeetingController extends Controller
             "created_at" => date("Y-m-d h:i:s",strtotime($meetings['data']['created_at'])),
             "created_by" => auth()->user()->id,
         ];
+        Meeting::where("created_by",auth()->user()->id)->update(["is_active"=>0]);
         Meeting::create($meeting_data);
-        $meetings["notification"] = $this->sendNotification($meetings['data']['agenda'],$meetings['data']['topic']);
+       // $meetings["notification"] = $this->sendNotification($meetings['data']['agenda'],$meetings['data']['topic']);
         return response()->json($meetings);
     }
 
@@ -152,21 +152,23 @@ class MeetingController extends Controller
         if(request()->police_station_users){
             $police_station_users = request()->police_station_users;
         }
-        if(request()->police_station_users){
+        if(request()->polling_station_user){
             $polling_station_user = request()->polling_station_user;
         }
         if(request()->police_mobile_user){
             $police_mobile_user = request()->police_mobile_user;
         }
+
         $mergedArray = array_merge($police_station_users, $polling_station_user,$police_mobile_user);
 
-       // dd($mergedArray);
+
         $res = [];
         $users_id = [];
         foreach ($mergedArray as $key => $value){
             array_push($res,["to_user"=>$value,"zoom_meeting_id"=>request()->meeting_id]);
             array_push($users_id,$value);
         }
+
         AssignMeetings::insert($res);
         $meeting = Meeting::whereZoomMeetingId(request()->meeting_id)->first();
         $notification_data = [
@@ -175,7 +177,7 @@ class MeetingController extends Controller
             "password"=>$meeting->encrypted_password,
             "start_time"=>$meeting->start_time
         ];
-        $FcmToken = User::whereIn('id',$users_id)->pluck('android_token')->all();
+        $FcmToken = User::whereIn('id',$users_id)->whereNotNull("android_token")->pluck('android_token')->all();
         $this->sendCommonNotification("New Meeting created","Please join the meeting as soon as possiable",$notification_data,$FcmToken);
         return ["status" => true,"message"=>"users are assigned to meeting successfully"];
     }

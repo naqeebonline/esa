@@ -22,5 +22,10 @@ class Meeting extends Model
         return $this->belongsTo(User::class, 'created_by', 'id');
     }
 
+    public function users()
+    {
+        return $this->belongsTo(Users::class, 'created_by', 'id');
+    }
+
 
 }

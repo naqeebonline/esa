@@ -10,4 +10,9 @@ class Notification extends Model
     use HasFactory;
     protected $table = "notifications";
     protected $guarded = ["id"];
+
+    public function districts()
+    {
+        return $this->belongsTo(Districts::class, 'district_id', 'id');
+    }
 }
