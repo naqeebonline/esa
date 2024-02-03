@@ -5,13 +5,21 @@ namespace App\Http\Controllers;
 use App\Exports\PoliceMobileExport;
 use App\Models\Circle;
 use App\Models\Districts;
+use App\Models\FacilityType;
+use App\Models\Hospital;
 use App\Models\PoliceLine;
 use App\Models\PoliceMobile;
+use App\Models\PoliceMobileHistory;
+use App\Models\PolicePost;
 use App\Models\PoliceStation;
+use App\Models\PollingStation;
+use App\Models\Reagin;
+use App\Models\Sensitivity;
 use App\Models\VehicleType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
+use Modules\Settings\Entities\MyApp;
 use Yajra\DataTables\Facades\DataTables;
 
 class PoliceMobileController extends Controller
@@ -38,6 +46,41 @@ class PoliceMobileController extends Controller
             return $q->where(["district_id"=>auth()->user()->district_id]);
         })->get();
         return view("police_mobiles.add",$data);
+    }
+
+    public function mobileVehiclesOnMap()
+    {
+        //$res = $this->findNearestHospitals("34.0151","71.5249",20);
+
+        $data = [
+            'title' => 'Mobile Vehicle Dashboard',
+            'new_route' => ['settings.my-apps.create', 'New App'],
+            'my_apps' => MyApp::all()
+        ];
+
+        $data['region'] = Reagin::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+            return $q->where(["id" => auth()->user()->district->reagin ?? 0]);
+        })
+            ->get();
+        $data['districts'] = Districts::whereProvinceId(1)
+            ->when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+                return $q->where(["id" => auth()->user()->district_id]);
+            })
+            ->get();
+
+
+
+
+        $type = FacilityType::get();
+        $facility_chart = [];
+        foreach ($type as $key => $value){
+            array_push($facility_chart,["name"=> $value->name,'y'=> Hospital::where("type",$value->id)->count() ?? 0]);
+        }
+        $data['facility_chart'] = $facility_chart;
+        $data["sensitivity"] = Sensitivity::get();
+
+        return view('dashboard.vehicle_on_map', $data);
+
     }
 
     public function policeMobile()
@@ -226,4 +269,12 @@ class PoliceMobileController extends Controller
             ->get();
         return Excel::download(new PoliceMobileExport($res), 'police_mobile_export.xlsx');
     }
+
+    public function getMobileHistory()
+    {
+        $data = PoliceMobileHistory::where("police_mobile_id",request()->mobile_id)->get();
+        return ["status"=>true,"data"=>$data];
+    }
+
+
 }

@@ -46,6 +46,7 @@
 {{--                                        <th>#</th>--}}
                                         <th style="width: 10%">Name</th>
                                         <th  style="width: 7%">Email</th>
+                                        <th style="width: 10%">Role</th>
                                         <th style="width: 10%">Username</th>
                                         <th style="width: 10%">District</th>
                                         <th style="width: 10%">Parent User</th>
@@ -64,6 +65,11 @@
 {{--                                            <td>{{ $loop->iteration }}</td>--}}
                                             <td><strong>{{ $item->name }}</strong></td>
                                             <td>{{ $item->email }}</td>
+                                            <td>
+                                                @foreach($item->roles as $key2 => $value)
+                                                    <code>{{ $value->name ?? "" }}</code>
+                                                @endforeach
+                                            </td>
                                             <td><code>{{ $item->username }}</code></td>
                                             <td><code style="color: green">{{ $item->district->title ?? "" }}</code></td>
                                             <td>{{ $item->parent->name ?? "" }}</td>

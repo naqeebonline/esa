@@ -49,7 +49,7 @@ class MyAppsController extends Controller
             })
             ->get();
         $data['districts'] = Districts::whereProvinceId(1)
-            ->when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+            ->when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Regional User"), function ($q) {
                 return $q->where(["id" => auth()->user()->district_id]);
             })
             ->get();

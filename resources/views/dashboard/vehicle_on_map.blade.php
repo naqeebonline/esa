@@ -55,184 +55,7 @@
     </style>
 
 
-    <div class="row">
 
-
-        <div class="col-lg-2 col-md-2 col-sm-6 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div class="d-flex align-items-center gap-3">
-
-                            <div class="card-info">
-                                <small class="text-muted">Police Stations</small>
-                                <h6 class="card-title mb-0 me-2 text-center">{{$total_police_stations}}</h6>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-2 col-md-2 col-sm-6 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div class="d-flex align-items-center gap-3">
-
-                            <div class="card-info">
-                                <small class="text-muted">Polling Stations</small>
-                                <h6 class="card-title mb-0 me-2 text-center">{{$total_polling_station}}</h6>
-                            </div>
-                        </div>
-                        <div id="incomeChart"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-2 col-md-2 col-sm-6 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div class="d-flex align-items-center gap-3">
-
-                            <div class="card-info">
-                                <small class="text-muted">Health Services</small>
-                                <h6 class="card-title mb-0 me-2 text-center">{{$total_hospitals}}</h6>
-                            </div>
-                        </div>
-                        <div id="profitChart"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-2 col-md-2 col-sm-6 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div class="d-flex align-items-center gap-3">
-
-                            <div class="card-info">
-                                <small class="text-muted">Police Lines</small>
-                                <h6 class="card-title mb-0 me-2 text-center">{{$police_line}}</h6>
-                            </div>
-                        </div>
-                        <div id="profitChart"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-2 col-md-2 col-sm-6 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div class="d-flex align-items-center gap-3">
-
-                            <div class="card-info">
-                                <small class="text-muted">Police Post</small>
-                                <h6 class="card-title mb-0 me-2 text-center">{{$police_post}}</h6>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-2 col-md-2 col-sm-6 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div class="d-flex align-items-center gap-3">
-
-                            <div class="card-info">
-                                <small class="text-muted">Mobile Vehicle</small>
-                                <h6 class="card-title mb-0 me-2 text-center">{{$police_mobile}}</h6>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-
-
-        <div class="col-lg-4 col-md-4 col-sm-4" >
-            <div id="chart-container" style="height: 322px"></div>
-        </div>
-
-        <div class="col-lg-4 col-md-4 col-sm-4" >
-            <div id="facility-chart" style="height: 322px"></div>
-        </div>
-
-        <div class="col-md-4 col-lg-4 col-xl-4 col-xl-4">
-            <div class="card">
-                <div class="card-header d-flex align-items-center justify-content-between mb-3">
-                    <h6 class="card-title mb-0">Polling Booths & Registered Voters</h6>
-
-                </div>
-                <div class="card-body">
-                    <ul class="p-0 m-0">
-
-                        <li class="d-flex mb-4">
-                            <div class="avatar avatar-sm flex-shrink-0 me-3">
-                                <span class="avatar-initial rounded-circle bg-label-info"><i class="bx bx-male"></i></span>
-                            </div>
-                            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                                <div class="me-2">
-                                    <p class="mb-0 lh-1">MALE BOOTHS</p>
-
-                                </div>
-                                <div class="item-progress">{{$number_of_male_booth}}</div>
-                            </div>
-                        </li>
-                        <li class="d-flex mb-4">
-                            <div class="avatar avatar-sm flex-shrink-0 me-3">
-                                <span class="avatar-initial rounded-circle bg-label-danger"><i class="bx bx-female"></i></span>
-                            </div>
-                            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                                <div class="me-2">
-                                    <p class="mb-0 lh-1">FEMALE BOOTHS</p>
-
-                                </div>
-                                <div class="item-progress">{{$number_of_female_booth}}</div>
-                            </div>
-                        </li>
-                        <li class="d-flex mb-4">
-                            <div class="avatar avatar-sm flex-shrink-0 me-3">
-                                <span class="avatar-initial rounded-circle bg-label-success"><i class="bx bx-male"></i></span>
-                            </div>
-                            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                                <div class="me-2">
-                                    <p class="mb-0 lh-1">MALE VOTERS</p>
-
-                                </div>
-                                <div class="item-progress">{{$male_voters}}</div>
-                            </div>
-                        </li>
-
-                        <li class="d-flex mb-4">
-                            <div class="avatar avatar-sm flex-shrink-0 me-3">
-                                <span class="avatar-initial rounded-circle bg-label-success"><i class="bx bx-female"></i></span>
-                            </div>
-                            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                                <div class="me-2">
-                                    <p class="mb-0 lh-1">FEMALE VOTERS</p>
-
-                                </div>
-                                <div class="item-progress">{{$female_voters}}</div>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-    </div>
 
     <div class="card my-3">
         <div class="card-body">
@@ -278,7 +101,7 @@
                     </select>
                 </div>
 
-                <div class="col-md-3 ">
+                <div class="col-md-3 " style="display: none">
                     <label>Polling Station Sensitivity</label>
                     <select class="form-select select2" multiple="multiple" id="ps_sensitivity">
                         @foreach($sensitivity as $key => $value)
@@ -288,9 +111,17 @@
                     </select>
                 </div>
 
-                <div class="col-md-4 ">
+                <div class="col-md-4 " style="display: none">
                     <label>Polling Station</label>
                     <select class="form-select select2" multiple="multiple" id="polling_stations_id">
+
+
+                    </select>
+                </div>
+
+                <div class="col-md-4 " >
+                    <label>Police Mobile</label>
+                    <select class="form-select select2" multiple="multiple" id="police_mobile_id">
 
 
                     </select>
@@ -311,21 +142,21 @@
             <div class="row">
 
 
-                <div class="col-md-3  ">
+                <div class="col-md-3  " style="display: none">
 
                     <input type="checkbox" class="checkbox_change" name="police_station" id="police_station_checkbox">
                     <label>Police Stations</label>
                     <span style="color: green" id="police_station_checkbox_count">0</span>
                 </div>
 
-                <div class="col-md-3">
+                <div class="col-md-3" style="display: none">
 
                     <input type="checkbox" class="checkbox_change" name="polling_station_che" id="polling_station_checkbox">
                     <label>Polling Stations</label>
                     <span style="color: green" id="polling_station_checkbox_count">0</span>
                 </div>
 
-                <div class="col-md-2">
+                <div class="col-md-2" style="display: none">
 
                     <input type="checkbox" class="checkbox_change" name="hospital" id="hospital_checkbox">
                     <label>Hospitals</label>
@@ -339,7 +170,7 @@
                     <span style="color: green" id="police_mobile_checkbox_count">0</span>
                 </div>
 
-                <div class="col-md-2">
+                <div class="col-md-2" style="display: none">
 
                     <input type="checkbox" class="checkbox_change" name="police_line" id="police_line_checkbox">
                     <label>Police Lines</label>
@@ -421,74 +252,7 @@
 
 @push('scripts')
     <script src="https://code.highcharts.com/highcharts.js"></script>
-    <script>
-        // Sample data for the pie chart
-        var chartData = [{
-            name: 'Most Sensitive',
-            y: <?php echo $most_sensitive; ?>
-        }, {
-            name: 'Sensitive',
-            y: <?php echo $sensitive; ?>
-        }, {
-            name: 'Normal',
-            y: <?php echo $normal; ?>
-        }];
 
-        // Initialize the pie chart
-        Highcharts.chart('chart-container', {
-            chart: {
-                type: 'pie'
-            },
-            title: {
-                text: 'Polling Stations'
-            },
-            plotOptions: {
-                pie: {
-                    allowPointSelect: false,
-                    cursor: 'pointer',
-                    dataLabels: {
-                        enabled: true,
-                        format: '<b>{point.name}</b>: {point.y}'
-                    }
-                }
-            },
-            series: [{
-                name: 'Polling Station',
-                colorByPoint: true,
-                data: chartData
-            }]
-        });
-
-
-        var chartData = <?php echo json_encode($facility_chart) ?>;
-
-        // Initialize the pie chart
-        Highcharts.chart('facility-chart', {
-            chart: {
-                type: 'column'
-            },
-            title: {
-                text: 'Health Facility'
-            },
-            plotOptions: {
-                pie: {
-                    allowPointSelect: true,
-                    cursor: 'pointer',
-                    dataLabels: {
-                        enabled: true,
-                        format: '<b>{point.y}</b> '
-                    }
-                }
-            },
-            series: [{
-                name: 'Health Faciltiy',
-                colorByPoint: true,
-                data: chartData
-            }]
-        });
-
-
-    </script>
     <script type="text/javascript">
         count_checkbox = 0;
         function playSound(url) {
@@ -508,6 +272,7 @@
             $("#polling_station_checkbox_count").text(0);
             $("#police_line_checkbox_count").text(0);
             reinitMap();
+
 
             if(police_station){
                 count_checkbox = 1;
@@ -625,6 +390,7 @@
                 });
 
                 $("body").on("change","#search_district",function (e) {
+                    getAllPoliceMobilesDD();
                     var option = $('option:selected', this);
                     if(option){
                         current_lat = option.attr("lat");
@@ -668,6 +434,7 @@
 
                 window.onload = function() {
                     initMap();
+                    getAllPoliceMobiles();
                    // loadBoundaryData();
 
                     /*loadHospitals();
@@ -1119,12 +886,14 @@
 
                 function getAllPoliceMobiles() {
 
+
                     $.ajax({
                         url: '{{ route("getAllPoliceMobiles") }}', // Replace with your actual URL
                         type: 'post',
                         data: {
                             police_station_id:$("#police_station_id").val(),
                             districts:$("#search_district").val(),
+                            police_mobile_id:$("#police_mobile_id").val(),
                             _token: '{{ csrf_token() }}'
 
                         },
@@ -1150,11 +919,38 @@
                                             <a target="_blank" href="${base_url}edit-police-mobile/${item.id}">View Details<a>
                                             </div>
                                         `);
+
+
                                 }
 
 
 
+
                             });
+
+                        }
+                    });
+                }
+
+                function getAllPoliceMobilesDD() {
+
+
+                    $.ajax({
+                        url: '{{ route("getAllPoliceMobilesDD") }}', // Replace with your actual URL
+                        type: 'post',
+                        data: {
+                            police_station_id: $("#police_station_id").val(),
+                            districts: $("#search_district").val(),
+                            _token: '{{ csrf_token() }}'
+
+                        },
+                        success: function (response) {
+
+                            var psOptions = '<option value="">Select Police Mobile Vehicle...</option>';
+                            $.each(response.data, function (index, item) {
+                                psOptions += '<option value="' + item.id + '">' + item.registration_number + '</option>';
+                            });
+                            $("#police_mobile_id").html(psOptions);
 
                         }
                     });
@@ -1175,7 +971,7 @@
                             $("#police_line_checkbox_count").text(response.data.length);
                             $.each(response.data, function (index, item) {
                                 if(item.lat != null && item.lng != null){
-
+                                    console.log("PoliceMobiles");
                                     var myIcon = L.icon({
                                         iconUrl: 'https://w7.pngwing.com/pngs/5/851/png-transparent-marker-map-icon-car-location-automobile-vehicle-target-design.png',
                                         iconSize: [20, 30],
@@ -1189,7 +985,6 @@
                                             <p class="text_height_map"><b>Name:</b> ${item.name}</p>
                                             <p class="text_height_map"><b>Incharge Name:</b> ${item.incharge_name}</p>
                                             <p class="text_height_map"><b>Contact:</b> ${item.contact_number}</p>
-
                                             </div>
                                         `);
                                 }

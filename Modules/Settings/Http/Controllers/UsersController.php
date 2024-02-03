@@ -48,8 +48,10 @@ class UsersController extends Controller
                 ->when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
                     return $q->where(["district_id" => auth()->user()->district_id])->where("name","!=","Super Admin");
                 })
+
                 ->get()
         ];
+         
 
         return view('settings::users_mgt.index', $data);
     }
@@ -252,7 +254,8 @@ class UsersController extends Controller
             'parent_users' => User::where([
                 ['company_id', '=', $item->company_id],
                 ['id', '!=', $id]
-            ])->pluck('name', 'id')
+            ])->pluck('name', 'id'),
+            'region' => Reagin::pluck('name', 'id')
         ];
         // dd($data);
 
@@ -643,4 +646,5 @@ class UsersController extends Controller
 
         //return["message"=>"success","data"=>User::wherePoliceStationId($police_station_id)->get()];
     }
+
 }

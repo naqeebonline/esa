@@ -102,6 +102,7 @@ class HomeController extends Controller
     {
         $district_id = request()->districts ?? "";
         $police_station_id = request()->police_station_id ?? "";
+        $police_mobile_id = request()->police_mobile_id ?? "";
 
 
         $data = PoliceMobile::whereNotNull("lat")->whereNotNull("lng")
@@ -110,6 +111,31 @@ class HomeController extends Controller
             })
             ->when($police_station_id, function ($q) use ($police_station_id) {
                 return $q->whereIn("police_station_id",$police_station_id);
+            })
+            ->when($police_mobile_id, function ($q) use ($police_mobile_id) {
+                return $q->whereIn("id",$police_mobile_id);
+            })
+            ->get();
+        return (["data"=>$data]);
+
+    }
+
+    public function getAllPoliceMobilesDD()
+    {
+        $district_id = request()->districts ?? "";
+        $police_station_id = request()->police_station_id ?? "";
+        $police_mobile_id = request()->police_mobile_id ?? "";
+
+
+        $data = PoliceMobile::whereNotNull("lat")->whereNotNull("lng")
+            ->when($district_id, function ($q) use ($district_id) {
+                return $q->whereIn("district_id",$district_id);
+            })
+            ->when($police_station_id, function ($q) use ($police_station_id) {
+                return $q->whereIn("police_station_id",$police_station_id);
+            })
+            ->when($police_mobile_id, function ($q) use ($police_mobile_id) {
+                return $q->whereIn("id",$police_mobile_id);
             })
             ->get();
         return (["data"=>$data]);

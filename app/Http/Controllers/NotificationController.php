@@ -95,7 +95,7 @@ class NotificationController extends Controller
         $notification_data = [
             "data"=>$notification
         ];
-        $FcmToken = User::pluck('android_token')->all();
+        $FcmToken = User::whereNotNull('android_token')->pluck('android_token')->all();
         (new MeetingController())->sendCommonNotification("Control Room Notification","New Notification issued from Control Room",$notification_data,$FcmToken);
         return redirect()->route('list.notifications')->with('success', 'Notification created successfully.');
     }

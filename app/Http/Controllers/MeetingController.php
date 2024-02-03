@@ -186,6 +186,7 @@ class MeetingController extends Controller
         $url = 'https://fcm.googleapis.com/fcm/send';
         $serverKey = 'AAAAU8XTJY0:APA91bH7TE5CJSLwW00Kjv0qg93d5yA8Ite6Pz1nHI2CVJi8VtYzsrbmYYsXR_hEnxoEJp_bv-uXNFeKA-JZi82yj_vY4AgWC78vqMqJb25FRp4UF_RVHMm9frRnUp-paO3iFfDafoKO'; // ADD SERVER KEY HERE PROVIDED BY FCM
 
+        //dd($notification_data,$FcmToken);
         $data = [
             "registration_ids" => $FcmToken,
             "notification" => [

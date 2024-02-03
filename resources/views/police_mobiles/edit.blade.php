@@ -224,9 +224,10 @@
 
 
         window.onload = function() {
-            initMap("{{$data->latitude}}","{{$data->longitude}}");
-            loadBoundaryData();
-            loadMarker("{{$data->latitude}}","{{$data->longitude}}");
+            initMap("{{$data->lat}}","{{$data->lng}}");
+            //loadBoundaryData();
+            loadMarker("{{$data->lat}}","{{$data->lng}}");
+            getMobileHistory();
             // loadIcon();
         }
 
@@ -267,6 +268,7 @@
 
         function loadMarker(lat,lng) {
 
+
             var redIcon = L.icon.pulse({iconSize:[14,14], color: "red", fillColor: "blue", animate: true});
             var mymarker = L.marker([lat,lng], {icon: redIcon}).addTo(myMap);
             mymarker.bindPopup(`
@@ -276,6 +278,50 @@
                                             </div>
                                         `);
 
+        }
+
+        function getMobileHistory() {
+
+            $.ajax({
+                url: '{{ route("getMobileHistory") }}', // Replace with your actual URL
+                type: 'post',
+                data: {
+                    mobile_id:29,
+                    police_station_id:$("#police_station_id").val(),
+                    districts:$("#search_district").val(),
+                    _token: '{{ csrf_token() }}'
+
+                },
+                success: function (response) {
+                    var blackIcon = L.icon.pulse({iconSize:[8,8], color: "black", fillColor: "black", animate: false});
+                    $("#police_mobile_checkbox_count").text(response.data.length);
+                    $.each(response.data, function (index, item) {
+                        if(item.lat != null && item.lng != null){
+
+                            var myIcon = L.icon({
+                                iconUrl: 'https://w7.pngwing.com/pngs/5/851/png-transparent-marker-map-icon-car-location-automobile-vehicle-target-design.png',
+                                iconSize: [20, 30],
+                                className:"police_mobile_marker"
+
+                            });
+                            var mymarker = L.marker([item.lat,item.lng], {icon: blackIcon}).addTo(myMap);
+                            mymarker.bindPopup(`
+                                            <div style="line-height:0.2rem">
+                                            <h6>Police Mobile</h6>
+                                            <p class="text_height_map"><b>Registration#:</b> ${item.registration_number}</p>
+                                            <p class="text_height_map"><b>Incharge Name:</b> ${item.incharge_name}</p>
+                                            <p class="text_height_map"><b>Contact:</b> ${item.contact_number}</p>
+                                            <a target="_blank" href="${base_url}edit-police-mobile/${item.id}">View Details<a>
+                                            </div>
+                                        `);
+                        }
+
+
+
+                    });
+
+                }
+            });
         }
 
 

@@ -67,6 +67,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('user-dashboard', [\App\Http\Controllers\HomeController::class, 'userDashboard'])->name('user.dashboard');
     Route::get('getAllPoliceStations', [\App\Http\Controllers\HomeController::class, 'getAllPoliceStations'])->name('getAllPoliceStations');
     Route::post('getAllPoliceMobiles', [\App\Http\Controllers\HomeController::class, 'getAllPoliceMobiles'])->name('getAllPoliceMobiles');
+    Route::post('getAllPoliceMobilesDD', [\App\Http\Controllers\HomeController::class, 'getAllPoliceMobilesDD'])->name('getAllPoliceMobilesDD');
     Route::post('getAllPoliceLines', [\App\Http\Controllers\HomeController::class, 'getAllPoliceLines'])->name('getAllPoliceLines');
     Route::post('/store-token', [\App\Http\Controllers\NotificationSendController::class, 'updateDeviceToken'])->name('store.token');
     Route::post('/send-web-notification', [\App\Http\Controllers\NotificationSendController::class, 'sendNotification'])->name('send.web-notification');
@@ -136,7 +137,9 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('update-police-mobile', [\App\Http\Controllers\PoliceMobileController::class, 'updatePoliceMobile'])->name('update.police.mobile');
     Route::get('police-mobile', [\App\Http\Controllers\PoliceMobileController::class, 'policeMobile'])->name('all.police.mobile');
     Route::get('exportPoliceMobile', [\App\Http\Controllers\PoliceMobileController::class, 'exportPoliceMobile'])->name('exportPoliceMobile');
-
+    Route::get('mobile_vehicles_on_map', [\App\Http\Controllers\PoliceMobileController::class, 'mobileVehiclesOnMap'])->name('mobileVehiclesOnMap');
+    Route::post('getMobileHistory', [\App\Http\Controllers\PoliceMobileController::class, 'getMobileHistory'])->name('getMobileHistory');
+    Route::post('getPoliceMobileByDistrictPoliceStation', [\Modules\Settings\Http\Controllers\UsersController::class, 'getPoliceMobileByDistrictPoliceStation'])->name('getPoliceMobileByDistrictPoliceStation');
 
 
     Route::POST('create-meeting', [\App\Http\Controllers\MeetingController::class, 'createMeeting'])->name('create-meeting');

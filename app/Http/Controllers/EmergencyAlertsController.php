@@ -33,7 +33,8 @@ class EmergencyAlertsController extends Controller
         })
             ->when($district_id, function ($q) use ($district_id) {
             return $q->where(["district_id"=>$district_id]);
-        });
+        })
+        ->orderBy("created_at","desc");
         return DataTables::of($users)
             ->addColumn('attachment', function($cert) {
                 return '<a href="'.URL::to('storage/')."/".$cert->attachment.'" target="_blank">View Image</a>';
