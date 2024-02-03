@@ -37,133 +37,91 @@ class MyAppsController extends Controller
     {
 
         //$res = $this->findNearestHospitals("34.0151","71.5249",20);
+        $current_user_role = auth()->user()->roles->pluck('name')[0];
 
         $data = [
             'title' => 'Dashboard',
             'new_route' => ['settings.my-apps.create', 'New App'],
             'my_apps' => MyApp::all()
         ];
+        if($current_user_role == "Regional User"){
+            $res = $this->getRegionalData();
+            $data = array_merge($data,$res);
 
-        $data['region'] = Reagin::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+        }else{
+            $data['region'] = Reagin::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
                 return $q->where(["id" => auth()->user()->district->reagin ?? 0]);
             })
-            ->get();
-        $data['districts'] = Districts::whereProvinceId(1)
-            ->when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Regional User"), function ($q) {
-                return $q->where(["id" => auth()->user()->district_id]);
-            })
-            ->get();
+                ->get();
+            $data['districts'] = Districts::whereProvinceId(1)
+                ->when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Regional User"), function ($q) {
+                    return $q->where(["id" => auth()->user()->district_id]);
+                })
+                ->get();
 
-        $data['most_sensitive'] = PollingStation::where("sensitivity",1)
-            ->when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+            $data['most_sensitive'] = PollingStation::where("sensitivity",1)
+                ->when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+                    return $q->where(["district_id" => auth()->user()->district_id]);
+                })
+                ->count();
+            $data['sensitive'] = PollingStation::where("sensitivity",2)
+                ->when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+                    return $q->where(["district_id" => auth()->user()->district_id]);
+                })
+                ->count();
+            $data['normal'] = PollingStation::where("sensitivity",3)
+                ->when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+                    return $q->where(["district_id" => auth()->user()->district_id]);
+                })
+                ->count();
+            $data['number_of_male_booth'] = PollingStation::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
                 return $q->where(["district_id" => auth()->user()->district_id]);
-            })
-            ->count();
-        $data['sensitive'] = PollingStation::where("sensitivity",2)
-            ->when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+            })->sum('number_of_male_booth');
+            $data['number_of_female_booth'] = PollingStation::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
                 return $q->where(["district_id" => auth()->user()->district_id]);
-            })
-            ->count();
-        $data['normal'] = PollingStation::where("sensitivity",3)
-            ->when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+            })->sum('number_of_female_booth');
+            $data['male_voters'] = PollingStation::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
                 return $q->where(["district_id" => auth()->user()->district_id]);
-            })
-            ->count();
-        $data['number_of_male_booth'] = PollingStation::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
-            return $q->where(["district_id" => auth()->user()->district_id]);
-        })->sum('number_of_male_booth');
-        $data['number_of_female_booth'] = PollingStation::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
-            return $q->where(["district_id" => auth()->user()->district_id]);
-        })->sum('number_of_female_booth');
-        $data['male_voters'] = PollingStation::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
-            return $q->where(["district_id" => auth()->user()->district_id]);
-        })->sum('male_voters');
-        $data['female_voters'] = PollingStation::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
-            return $q->where(["district_id" => auth()->user()->district_id]);
-        })->sum('female_voters');
+            })->sum('male_voters');
+            $data['female_voters'] = PollingStation::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+                return $q->where(["district_id" => auth()->user()->district_id]);
+            })->sum('female_voters');
 
-        $data["total_police_stations"] = PoliceStation::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
-            return $q->where(["district_id" => auth()->user()->district_id]);
-        })->count();
-        $data["total_polling_station"] = PollingStation::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
-            return $q->where(["district_id" => auth()->user()->district_id]);
-        })->count();
-        $data["total_hospitals"] = Hospital::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
-            return $q->where(["district_id" => auth()->user()->district_id]);
-        })->count();
+            $data["total_police_stations"] = PoliceStation::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+                return $q->where(["district_id" => auth()->user()->district_id]);
+            })->count();
+            $data["total_polling_station"] = PollingStation::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+                return $q->where(["district_id" => auth()->user()->district_id]);
+            })->count();
+            $data["total_hospitals"] = Hospital::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+                return $q->where(["district_id" => auth()->user()->district_id]);
+            })->count();
 
-        $data["police_line"] = PoliceLine::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
-            return $q->where(["district_id" => auth()->user()->district_id]);
-        })->count();
+            $data["police_line"] = PoliceLine::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+                return $q->where(["district_id" => auth()->user()->district_id]);
+            })->count();
 
-        $data["police_post"] = PolicePost::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
-            return $q->where(["district_id" => auth()->user()->district_id]);
-        })->count();
+            $data["police_post"] = PolicePost::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+                return $q->where(["district_id" => auth()->user()->district_id]);
+            })->count();
 
-        $data["police_mobile"] = PoliceMobile::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
-            return $q->where(["district_id" => auth()->user()->district_id]);
-        })->count();
+            $data["police_mobile"] = PoliceMobile::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+                return $q->where(["district_id" => auth()->user()->district_id]);
+            })->count();
 
 
-        $type = FacilityType::get();
-        $facility_chart = [];
-        foreach ($type as $key => $value){
-            array_push($facility_chart,["name"=> $value->name,'y'=> Hospital::where("type",$value->id)->count() ?? 0]);
-        }
-        $data['facility_chart'] = $facility_chart;
-        $data["sensitivity"] = Sensitivity::get();
-       // $meetings = Zoom::getUpcomingMeeting();
-        $role = auth()->user()->roles->pluck('name')[0] ?? '';
-
-        if($role == "Police" || $role == "Polling Station"){
-            $meetings = Meeting::whereCreatedBy(auth()->user()->id)->where("end_time",">=",Carbon::now()->toDateTimeString())->get();
-            $data["archive_meetings"] = Meeting::whereCreatedBy(auth()->user()->id)->where("end_time","<=",Carbon::now()->toDateTimeString())->get();
-
-        }else{
-            $meetings = Meeting::get();
-            $data["archive_meetings"]= [];
-        }
-
-        $invitation = AssignMeetings::with(["meetings"])->whereToUser(auth()->user()->id)->orderBy("id","desc")->get();
-
-
-
-        foreach ($meetings as $key => $value){
-            $value->json_response = json_decode($value->json_response);
-        }
-
-
-        /*foreach ($meetings["data"]["meetings"] as $key => $value){
-            echo date("d-m-Y h:i A",strtotime($value["created_at"]))."<br>";
-        }
-        dd($meetings);*/
-
-
-       $data["meetings"] = $meetings;
-
-       $data["meeting_invitation"] = $invitation;
-
-       // return view('settings::my_apps.index', $data);
-
-        if(auth()->user()->roles->pluck('name')[0] !="Super Admin"){
-
-            $data["go_live"] = "";
-
-            if(auth()->user()->roles->pluck('name')[0] == "Police" || auth()->user()->roles->pluck('name')[0] == "District_User"){
-                $data["go_live"] = Meeting::where(["live_link_for"=>"police_station"])->first();
-            }else if(auth()->user()->roles->pluck('name')[0] == "Polling Station"){
-                $data["go_live"] = Meeting::where(["live_link_for"=>"polling_station"])->first();
-            }else if(auth()->user()->roles->pluck('name')[0] == "Hospital User"){
-                $data["go_live"] = Meeting::where(["live_link_for"=>"hospital"])->first();
-            }else{
-                $data["go_live"] = Meeting::where(["live_link_for"=>"hospital"])->first();
+            $type = FacilityType::get();
+            $facility_chart = [];
+            foreach ($type as $key => $value){
+                array_push($facility_chart,["name"=> $value->name,'y'=> Hospital::where("type",$value->id)->count() ?? 0]);
             }
-
-            return view('dashboard.map', $data);
-        }else{
-            return view('dashboard.map', $data);
-            return view('dashboard.index', $data);
+            $data['facility_chart'] = $facility_chart;
+            $data["sensitivity"] = Sensitivity::get();
         }
+
+
+
+        return view('dashboard.map', $data);
 
     }
 
@@ -304,5 +262,49 @@ class MyAppsController extends Controller
             Session::flash('error', 'Something went wrong, please try later');
             return redirect()->back();
         }
+    }
+
+    public function getRegionalData()
+    {
+        $district_ids = Districts::whereReagin(auth()->user()->region_id)->pluck("id")->all();
+
+        $current_user_role = auth()->user()->roles->pluck('name')[0];
+        $data['region'] = Reagin::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+            return $q->where(["id" => auth()->user()->region_id]);
+        })->get();
+
+        $data['districts'] = Districts::whereProvinceId(1)->where("reagin",auth()->user()->region_id)->get();
+
+        $data['most_sensitive'] = PollingStation::where("sensitivity",1)->whereIn("district_id",$district_ids)->count();
+        $data['sensitive'] = PollingStation::where("sensitivity",2)
+            ->whereIn("district_id",$district_ids)
+            ->count();
+        $data['normal'] = PollingStation::where("sensitivity",3)
+            ->whereIn("district_id",$district_ids)
+            ->count();
+        $data['number_of_male_booth'] = PollingStation::whereIn("district_id",$district_ids)->sum('number_of_male_booth');
+        $data['number_of_female_booth'] = PollingStation::whereIn("district_id",$district_ids)->sum('number_of_female_booth');
+        $data['male_voters'] = PollingStation::whereIn("district_id",$district_ids)->sum('male_voters');
+        $data['female_voters'] = PollingStation::whereIn("district_id",$district_ids)->sum('female_voters');
+
+        $data["total_police_stations"] = PoliceStation::whereIn("district_id",$district_ids)->count();
+        $data["total_polling_station"] = PollingStation::whereIn("district_id",$district_ids)->count();
+        $data["total_hospitals"] = Hospital::whereIn("district_id",$district_ids)->count();
+
+        $data["police_line"] = PoliceLine::whereIn("district_id",$district_ids)->count();
+
+        $data["police_post"] = PolicePost::whereIn("district_id",$district_ids)->count();
+
+        $data["police_mobile"] = PoliceMobile::whereIn("district_id",$district_ids)->count();
+
+
+        $type = FacilityType::get();
+        $facility_chart = [];
+        foreach ($type as $key => $value){
+            array_push($facility_chart,["name"=> $value->name,'y'=> Hospital::where("type",$value->id)->count() ?? 0]);
+        }
+        $data['facility_chart'] = $facility_chart;
+        $data["sensitivity"] = Sensitivity::get();
+        return $data;
     }
 }
