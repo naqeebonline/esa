@@ -19,7 +19,9 @@ class EmergencyAlertsController extends Controller
             'title' => 'Emergency Alerts',
 
         ];
-        $data['districts'] = Districts::get();
+        $data['districts'] = Districts::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+            return $q->where(["id" => auth()->user()->district_id]);
+        })->get();
 
         return view("emergency_alerts.list",$data);
     }
@@ -27,12 +29,20 @@ class EmergencyAlertsController extends Controller
     public function allAlerts()
     {
         $district_id = request()->district_id ?? "";
+        $notification_type = request()->notification_type ?? "";
+        $is_read_filter = request()->is_read_filter ?? "";
         $users = EmergencyAlert::with('district')->with('users')
             ->when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
             return $q->where(["district_id"=>auth()->user()->district_id]);
         })
             ->when($district_id, function ($q) use ($district_id) {
             return $q->where(["district_id"=>$district_id]);
+        })
+            ->when($notification_type, function ($q) use ($notification_type) {
+            return $q->where(["type"=>$notification_type]);
+        })
+            ->when($is_read_filter, function ($q) use ($is_read_filter) {
+            return $q->where(["is_read"=>$is_read_filter]);
         })
         ->orderBy("created_at","desc");
         return DataTables::of($users)

@@ -54,6 +54,7 @@
                                         <th style="width: 10%">No of Female Booth</th>
                                         <th style="width: 10%">Male Voters</th>
                                         <th style="width: 10%">Female Voters</th>--}}
+                                        <th style="width: 10%">In-charge Name</th>
                                         <th style="width: 10%">In-charge Contact</th>
                                         <th style="width: 10%">Lat</th>
                                         <th style="width: 10%">Long</th>
@@ -108,6 +109,7 @@
                     {data: 'number_of_female_booth', name: 'number_of_female_booth'},
                     {data: 'male_voters', name: 'male_voters'},
                     {data: 'female_voters', name: 'female_voters'},*/
+                    {data: 'incharge_name', name: 'incharge_name', searchable: true},
                     {data: 'incharge_contact', name: 'incharge_contact', searchable: true},
                     {data: 'lat', name: 'lat'},
                     {data: 'lng', name: 'lng'},

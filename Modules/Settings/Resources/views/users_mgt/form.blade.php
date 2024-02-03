@@ -474,7 +474,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-6 region_id_div" style="{{($item->police_mobile_id) ? 'display:block' : 'display:none'}}">
+                            <div class="col-md-6 region_id_div" style="{{($item->region_id) ? 'display:block' : 'display:none'}}">
                                 <div class="form-group">
                                     {!! Form::label('region_id', 'Select Region  ', ['class' => 'form-label']) !!}
                                     {!! Form::select('region_id', [null=>'Select Region']+$region->toArray(), $item->region_id ?? null, ['class' => 'form-control select2','id'=>"region_id"]) !!}

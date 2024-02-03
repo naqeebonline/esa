@@ -31,19 +31,39 @@
                 </div>
 
                 <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <select class="form-control select2" id="district_id">
+                                <option value="">Select District</option>
+                                @foreach($districts as $key => $value)
+                                    <option value="{{$value->id}}">{{$value->title}}</option>
+                                @endforeach
+                            </select>
+                        </div>
 
+                        <div class="col-md-3">
+                            <select class="form-control select2" id="notification_type">
+                                <option value="">Select Type...</option>
+                                <option value="Law and Order">Law and Order</option>
+                                <option value="Terorrism">Terorrism</option>
+
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <select class="form-control select2" id="is_read_filter">
+                                <option value="">Select Type...</option>
+                                <option value="1">New</option>
+                                <option value="0">Read</option>
+
+                            </select>
+                        </div>
+                    </div>
                     <div class="row">
 
 
                         <div class="col-12">
-                            <div class="col-md-3">
-                                <select class="form-control select2" id="district_id">
-                                    <option value="">Select District</option>
-                                    @foreach($districts as $key => $value)
-                                    <option value="{{$value->id}}">{{$value->title}}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+
 
                             <div class="table-responsive" style="min-height: 200px">
 
@@ -92,9 +112,20 @@
     <script>
         var id =0;
         district_id = "";
+        notification_type = "";
+        is_read_filter = "";
         $(document).ready(function (){
             $("body").on("change","#district_id",function (e) {
                  district_id = $(this).val();
+                user_table.ajax.reload();
+            });
+
+            $("body").on("change","#notification_type",function (e) {
+                notification_type = $(this).val();
+                user_table.ajax.reload();
+            });
+            $("body").on("change","#is_read_filter",function (e) {
+                is_read_filter = $(this).val();
                 user_table.ajax.reload();
             });
             user_table = $('#users-list').DataTable({
@@ -106,6 +137,8 @@
                     url: '{{route("all.emergency.alerts")}}',
                     data: function (d) {
                         d.district_id = district_id;
+                        d.notification_type = notification_type;
+                        d.is_read_filter = is_read_filter;
                     }
 
                 },

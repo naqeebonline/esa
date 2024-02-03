@@ -29,7 +29,6 @@ class HospitalController extends Controller
         return DataTables::of($users)
             ->addColumn('action', function($cert) {
                 $actionsBtn = '<a class="dropdown-item p-50" href="'.route('edit.hospital',[$cert->id]).'"><i class="bx bx-file-blank mr-1"></i> Edit</a>';
-
                 $actionsBtn .= '<a class="dropdown-item p-50 delete_table_data" data-id="'.$cert->id.'" href="javascript:void(0)"><i class="bx bx-window-close"></i> Delete</a>';
 
 

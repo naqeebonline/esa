@@ -131,7 +131,9 @@ class MeetingController extends Controller
             'title' => 'List Meetings',
 
         ];
-        $data['districts'] = Districts::get();
+        $data['districts'] = Districts::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+            return $q->where(["id" => auth()->user()->district_id]);
+        })->get();
 
 
         if($role == "Super Admins"){
