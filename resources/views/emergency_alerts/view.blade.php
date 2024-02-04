@@ -6,7 +6,7 @@
 
 
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-md-8">
             <div class="card mb-4">
                 <h5 class="card-header">View Emergency Alert</h5>
                 <form class="card-body" method="post" >
@@ -57,6 +57,45 @@
                              @endif
                         </div>
 
+                    </div>
+
+
+
+
+                </form>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <h5 class="card-header">Alert Status</h5>
+                <div class="card-body" method="post" >
+
+
+                    <div class="row g-3">
+
+
+                        <div class="col-md-12">
+                            <label class="form-label" for="multicol-email">Remarks</label>
+                            <select class="form-control" id="alert_status">
+                                <option value="">Select Status...</option>
+                                <option {{ ($data->alert_status == "Pending") ? "selected=selected" : ""  }} value="Pending">Pending</option>
+                                <option {{ ($data->alert_status == "In Process") ? "selected=selected" : ""  }} value="In Process">In Process</option>
+                                <option {{ ($data->alert_status == "Resolved") ? "selected=selected" : ""  }} value="Resolved">Resolved</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label" for="multicol-email">Remarks</label>
+                            <div class="input-group">
+                                <textarea id="remarks" class="form-control" rows="7">{{$data->remarks ?? ""}}</textarea>
+
+                            </div>
+                        </div>
+
+
+                        <div class="col-md-12">
+                            <a class="btn btn-primary" style="color:white" id="update_status">Update Status</a>
+                        </div>
 
 
 
@@ -70,7 +109,7 @@
 
 
 
-                </form>
+                </div>
             </div>
         </div>
 
@@ -119,6 +158,33 @@
         $("body").on("change","#search_district",function (e) {
             search_district_name = $(this).val();
             loadBoundaryData();
+        });
+
+        $("body").on("click","#update_status",function (e) {
+             var alert_status = $("#alert_status").val();
+             var remarks = $("#remarks").val();
+             if(alert_status == "" || remarks == ""){
+                 alert("Please enter complete details");
+                 return false;
+             }
+
+            $.ajax({
+                type: 'post',
+                url: "{{ route('updateAlertStatus') }}",
+                data: {
+                    id: "{{$data->id}}",
+                    alert_status:alert_status,
+                    remarks:remarks,
+                    _token: '{{ csrf_token() }}'
+
+                },
+                success: function(res) {
+                    //user_table.dataTable.reload();
+                    alert("Alert Status updated successfully");
+                    window.location.reload();
+                }
+            });
+
         });
 
         $("body").on("blur","#lat",function (e) {

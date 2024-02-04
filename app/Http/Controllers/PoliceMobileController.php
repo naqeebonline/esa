@@ -272,7 +272,8 @@ class PoliceMobileController extends Controller
 
     public function getMobileHistory()
     {
-        $data = PoliceMobileHistory::where("police_mobile_id",request()->mobile_id)->get();
+        $data = PoliceMobileHistory::where("police_mobile_id",request()->mobile_id)->groupBy('lat')->get();
+
         return ["status"=>true,"data"=>$data];
     }
 

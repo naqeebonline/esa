@@ -267,7 +267,6 @@ class MyAppsController extends Controller
     public function getRegionalData()
     {
         $district_ids = Districts::whereReagin(auth()->user()->region_id)->pluck("id")->all();
-
         $current_user_role = auth()->user()->roles->pluck('name')[0];
         $data['region'] = Reagin::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
             return $q->where(["id" => auth()->user()->region_id]);

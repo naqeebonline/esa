@@ -58,6 +58,18 @@
 
                             </select>
                         </div>
+
+                        <div class="col-md-3">
+                            <select class="form-control select2" id="alert_status">
+                                <option value="">Alert Status...</option>
+
+                                <option value="Pending">Pending</option>
+                                <option  value="In Process">In Process</option>
+                                <option  value="Resolved">Resolved</option>
+
+
+                            </select>
+                        </div>
                     </div>
                     <div class="row">
 
@@ -76,10 +88,9 @@
                                         <th style="width: 10%">User</th>
                                         <th style="width: 10%">message</th>
                                         <th style="width: 10%">Notification Type</th>
-                                        <th style="width: 10%">Image</th>
-                                        <th style="width: 10%">Audio</th>
-                                        <th style="width: 10%">Video</th>
-                                        <th style="width: 10%">Status</th>
+                                        <th style="width: 10%">Read Status</th>
+                                        <th style="width: 10%">Alert Status</th>
+                                        <th style="width: 10%">Created At</th>
                                         <th style="width: 10%">Action</th>
 
                                     </tr>
@@ -114,6 +125,7 @@
         district_id = "";
         notification_type = "";
         is_read_filter = "";
+        alert_status = "";
         $(document).ready(function (){
             $("body").on("change","#district_id",function (e) {
                  district_id = $(this).val();
@@ -128,6 +140,11 @@
                 is_read_filter = $(this).val();
                 user_table.ajax.reload();
             });
+
+            $("body").on("change","#alert_status",function (e) {
+                alert_status = $(this).val();
+                user_table.ajax.reload();
+            });
             user_table = $('#users-list').DataTable({
                 processing: true,
                 serverSide: true,
@@ -139,6 +156,7 @@
                         d.district_id = district_id;
                         d.notification_type = notification_type;
                         d.is_read_filter = is_read_filter;
+                        d.alert_status = alert_status;
                     }
 
                 },
@@ -149,10 +167,9 @@
                     {data: 'users.username', name: 'users.username'},
                     {data: 'message', name: 'message'},
                     {data: 'type', name: 'type'},
-                    {data: 'attachment', name: 'attachment'},
-                    {data: 'audio', name: 'audio'},
-                    {data: 'video', name: 'video'},
                     {data: 'status', name: 'status'},
+                    {data: 'alert_status', name: 'alert_status'},
+                    {data: 'created_at', name: 'created_at'},
                     {data: 'action', name: 'action'},
 
 

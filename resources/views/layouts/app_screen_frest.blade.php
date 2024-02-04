@@ -313,8 +313,9 @@
                                 );
                             })
                             ->where('app_id', '=', $current_app->id)
+                            ->orderBy("order","asc")
                             ->get();
-                        // dd($menu_r->toSql());
+
                     @endphp
 
 

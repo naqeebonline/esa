@@ -115,54 +115,13 @@
     <script src="{{ asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.js') }}"></script>
     <script>
         $(document).ready(function (){
-            user_table = $('#users-list').DataTable({
-                processing: true,
-                serverSide: true,
-
-                lengthMenu: [
-                    [ 100, 250, 500, 1000 ],
-                    [ '100', '250', '500', '1000']
-                ],
-                pageLength: 30,
-                ajax: {
-                    url: '{{route("all.police.line")}}',
-                    data: {
-                        'post_param': '1'
-                    }
-
-                },
-
-                columns: [
-                    {data: 'district_name', name: 'district_name', searchable: true},
-                    {data: 'name', name: 'name'},
-                    {data: 'strength', name: 'strength'},
-                    {data: 'contact_number', name: 'contact_number'},
-                    {data: 'incharge_name', name: 'incharge_name'},
-                    {data: 'incharge_contact', name: 'incharge_contact'},
-                    {data: 'incharge_rank', name: 'incharge_rank'},
-                    {data: 'action', name: 'action', orderable: false, searchable: false}
-                ],
-
-                responsive: true,
-                processing: true,
-                serverSide: true,
-                searching:  true,
-                sorting:    true,
-                paging:     true,
-                dom: 'Bfrtip',
-                buttons: [
-                    'copy', 'csv', 'excel', 'pdf', 'print'
-                ]
-            });
-
-
-            /*$('#users-list').DataTable({
+            $('#users-list').DataTable({
                 lengthMenu: [100, 200, 300, 500],
                 pageLength: 100,
                 processing: true,
                 serverSide:false
 
-            });*/
+            });
         })
     </script>
 @endpush

@@ -65,8 +65,6 @@ class PoliceStationController extends Controller
     public function listPoliceStation()
     {
 
-
-
         $data = [
             'title' => 'List Police Stations',
 

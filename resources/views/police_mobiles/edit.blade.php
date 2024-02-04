@@ -168,6 +168,8 @@
         var lyrGoogleHybrid;
         var lyrOSM;
         var crimeLocations;
+        current_lat = "{{$data->lat}}";
+        current_lng = "{{$data->lng}}";
 
         $('#district_id').on('change', function () {
             var selectedDistrict = $(this).val();
@@ -224,11 +226,12 @@
 
 
         window.onload = function() {
+
             initMap("{{$data->lat}}","{{$data->lng}}");
             //loadBoundaryData();
             loadMarker("{{$data->lat}}","{{$data->lng}}");
             getMobileHistory();
-            // loadIcon();
+
         }
 
         // Initialize map
@@ -266,10 +269,48 @@
             ctlMousePosition = L.control.mousePosition().addTo(myMap);
         }
 
+        function reinitMap() {
+            myMap.off();
+            myMap.remove();
+            myMap = L.map('map', {
+                center: [current_lat,current_lng],
+                zoom: 8,
+                zoomControl: true
+            });
+
+            //add basemap layer         http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}
+            lyrGoogleMap = L.tileLayer('http://mts3.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+                maxZoom: 22,
+                maxNativeZoom: 12
+            }); //lyrGoogleMa
+
+            lyrGoogleHybrid = L.tileLayer('http://mts2.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+                maxZoom: 22,
+                maxNativeZoom: 12
+            }); //lyrGoogleHybrid
+
+            lyrOSM = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 22,
+                maxNativeZoom: 12
+            }); //OSM
+
+            myMap.addLayer(lyrGoogleMap);
+            objBaseMap = {
+                "Google Map": lyrGoogleMap,
+                "Google Hybrid": lyrGoogleHybrid,
+                "OSM map": lyrOSM
+            }
+            L.control.layers(objBaseMap).addTo(myMap);
+            ctlPan = L.control.pan().addTo(myMap);
+            ctlMousePosition = L.control.mousePosition().addTo(myMap);
+
+            loadMarker(current_lat,current_lng);
+        }
+
         function loadMarker(lat,lng) {
 
 
-            var redIcon = L.icon.pulse({iconSize:[14,14], color: "red", fillColor: "blue", animate: true});
+            var redIcon = L.icon.pulse({iconSize:[20,20], color: "red", fillColor: "blue", animate: true});
             var mymarker = L.marker([lat,lng], {icon: redIcon}).addTo(myMap);
             mymarker.bindPopup(`
                                             <div style="line-height:0.2rem">
@@ -279,39 +320,67 @@
                                         `);
 
         }
+        function startMarker(lat,lng) {
+            var myIcon = L.icon({
+                iconUrl: base_url+"markers/sensiteve_ps.png",
+                className:"polling_station_marker most_sensitive",
+                iconSize: [30,30],
+
+            });
+            var mymarker = L.marker([parseFloat(lat).toFixed(6),parseFloat(lng).toFixed(6)], {icon: myIcon}).addTo(myMap);
+
+        }
+        function endMarker(lat,lng) {
+            var myIcon = L.icon({
+                iconUrl: base_url+"markers/chippa.png",
+                className:"hospital_marker",
+                iconSize: [40, 40],
+
+            });
+            var mymarker = L.marker([lat,lng], {icon: myIcon}).addTo(myMap);
+
+        }
 
         function getMobileHistory() {
-
+            reinitMap();
             $.ajax({
                 url: '{{ route("getMobileHistory") }}', // Replace with your actual URL
                 type: 'post',
                 data: {
-                    mobile_id:29,
+                    mobile_id:'{{$data->id}}',
                     police_station_id:$("#police_station_id").val(),
                     districts:$("#search_district").val(),
                     _token: '{{ csrf_token() }}'
 
                 },
                 success: function (response) {
-                    var blackIcon = L.icon.pulse({iconSize:[8,8], color: "black", fillColor: "black", animate: false});
+                    var blackIcon = L.icon.pulse({iconSize:[2,2], color: "black",   animate: false});
                     $("#police_mobile_checkbox_count").text(response.data.length);
-                    $.each(response.data, function (index, item) {
-                        if(item.lat != null && item.lng != null){
 
+                    var latlngs = [];
+
+
+
+
+
+                    $.each(response.data, function (index, item) {
+
+                        if(item.lat != null && item.lng != null){
+                            latlngs.push([item.lat, item.lng]);
                             var myIcon = L.icon({
                                 iconUrl: 'https://w7.pngwing.com/pngs/5/851/png-transparent-marker-map-icon-car-location-automobile-vehicle-target-design.png',
-                                iconSize: [20, 30],
+                                iconSize: [10, 10],
                                 className:"police_mobile_marker"
 
                             });
-                            var mymarker = L.marker([item.lat,item.lng], {icon: blackIcon}).addTo(myMap);
+                             mymarker = L.marker([item.lat,item.lng], {icon: blackIcon}).addTo(myMap);
                             mymarker.bindPopup(`
                                             <div style="line-height:0.2rem">
                                             <h6>Police Mobile</h6>
-                                            <p class="text_height_map"><b>Registration#:</b> ${item.registration_number}</p>
-                                            <p class="text_height_map"><b>Incharge Name:</b> ${item.incharge_name}</p>
-                                            <p class="text_height_map"><b>Contact:</b> ${item.contact_number}</p>
-                                            <a target="_blank" href="${base_url}edit-police-mobile/${item.id}">View Details<a>
+                                            <p class="text_height_map"><b>id#:</b> ${item.id}</p>
+                                            <p class="text_height_map"><b>Registration#:</b> ${item.lat}</p>
+                                            <p class="text_height_map"><b>Incharge Name:</b> ${item.lng}</p>
+
                                             </div>
                                         `);
                         }
@@ -320,9 +389,21 @@
 
                     });
 
+                    var polyline = L.polyline(latlngs, {color: 'red'}).addTo(myMap);
+                    myMap.fitBounds(polyline.getBounds());
+
+                    var count = latlngs.length;
+                   var start_point = latlngs[0];
+                    startMarker(start_point[0],start_point[1]);
+
+                   var end_point = latlngs[count - 1];
+                    endMarker(end_point[0],end_point[1]);
+
                 }
             });
         }
+
+        setInterval(getMobileHistory, 30000);
 
 
 

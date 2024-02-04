@@ -31,6 +31,7 @@ class EmergencyAlertsController extends Controller
         $district_id = request()->district_id ?? "";
         $notification_type = request()->notification_type ?? "";
         $is_read_filter = request()->is_read_filter ?? "";
+        $alert_status = request()->alert_status ?? "";
         $users = EmergencyAlert::with('district')->with('users')
             ->when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
             return $q->where(["district_id"=>auth()->user()->district_id]);
@@ -44,6 +45,10 @@ class EmergencyAlertsController extends Controller
             ->when($is_read_filter, function ($q) use ($is_read_filter) {
             return $q->where(["is_read"=>$is_read_filter]);
         })
+            ->when($alert_status, function ($q) use ($alert_status) {
+            return $q->where(["alert_status"=>$alert_status]);
+        })
+
         ->orderBy("created_at","desc");
         return DataTables::of($users)
             ->addColumn('attachment', function($cert) {
@@ -55,6 +60,7 @@ class EmergencyAlertsController extends Controller
             ->addColumn('video', function($cert) {
                 return '<a href="'.URL::to('storage/')."/".$cert->video.'" target="_blank">Video</a>';
             })
+
             ->addColumn('status', function($cert) {
                 if($cert->is_read == 1){
                     return '<b style="color:red">New</b>';
@@ -63,12 +69,28 @@ class EmergencyAlertsController extends Controller
                 }
             })
 
+            ->addColumn('alert_status', function($cert) {
+                if($cert->alert_status == "Pending"){
+                    return '<b style="color:red">Pending</b>';
+                }else if ($cert->alert_status == "In Process"){
+                    return '<b style="color:orange">In Process</b>';
+                }else{
+                    return '<b style="color:green">Resolved</b>';
+                }
+            })
+
+            ->addColumn('created_at', function($cert) {
+
+                return date("d-m-Y h:i A", strtotime($cert->created_at));
+            })
+
             ->addColumn('action', function($cert) {
+
                 $actionsBtn = '<a class="dropdown-item p-50" href="'.route('view.emergency.alert',[$cert->id]).'"><i class="bx bx-file-blank mr-1"></i> View</a>';
                 return $actionsBtn;
             })
 
-            ->rawColumns(["attachment",'action',"status","audio","video"])
+            ->rawColumns(["attachment",'action',"status","audio","video","alert_status"])
             ->make(true);
     }
 
@@ -110,5 +132,14 @@ class EmergencyAlertsController extends Controller
         }
         return ["status"=>true,"total"=>$res];
 
+    }
+
+    public function updateAlertStatus()
+    {
+        $data = request()->except(["id","_token"]);
+        $data["updated_at"] = date("Y-m-d h:i:s");
+
+        EmergencyAlert::whereId(request()->id)->update($data);
+        return ["status"=>true,"message"=>"Record updated successfully"];
     }
 }

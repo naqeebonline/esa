@@ -22,6 +22,7 @@ use Modules\Settings\Entities\Company;
 use Modules\Settings\Entities\MyApp;
 use Modules\Settings\Entities\MyRole;
 use Modules\Settings\Entities\Section;
+use Yajra\DataTables\DataTables;
 
 class UsersController extends Controller
 {
@@ -54,6 +55,33 @@ class UsersController extends Controller
          
 
         return view('settings::users_mgt.index', $data);
+    }
+
+    public function allUsers()
+    {
+        $users = User::with([
+            'section',
+            'company',
+            'permissions',
+            'roles',
+            'parent',
+            'children'
+        ])
+            ->when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+                return $q->where(["district_id" => auth()->user()->district_id])->where("name","!=","Super Admin");
+            });
+        return DataTables::of($users)
+            ->addColumn('action', function($cert) {
+                $actionsBtn = '<a class="btn btn-warning btn-icon btn-sm" href="'.route('settings.users-mgt.edit', ['id' => encrypt($cert->id)]).'"><i class="tf-icons bx bx-pencil"></i></a>';
+                $actionsBtn .= '<a class="btn btn-primary btn-icon  btn-sm" href="'.route('settings.users-mgt.edit', ['id' => encrypt($cert->id)]).'"><i class="tf-icons bx bx-wrench"></i></a>';
+
+                $actionsBtn .= '<a class="dropdown-item p-50 delete_table_data" data-id="'.$cert->id.'" href="javascript:void(0)"><i class="bx bx-window-close"></i> Delete</a>';
+
+
+                return $actionsBtn;
+            })
+            ->rawColumns(["action"])
+            ->make(true);
     }
 
     /**
