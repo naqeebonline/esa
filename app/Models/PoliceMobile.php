@@ -30,4 +30,9 @@ class PoliceMobile extends Model
     {
         return $this->belongsTo(VehicleType::class, 'vehicle_type', 'id');
     }
+
+    public function mobileUser()
+    {
+        return $this->belongsTo(Users::class, 'id','police_mobile_id');
+    }
 }

@@ -51,6 +51,13 @@ class CommonActionController extends Controller
          * using eloquent approach, make sure to replace the "Restaurant" with your actual model name
          * replace 6371000 with 6371 for kilometer and 3956 for miles
          */
+        $user = auth()->user();
+        $role = auth()->user()->roles->pluck('name')[0];
+        if($role == "Super Admin"){
+            $district_id = "";
+        }else{
+            $district_id = $user->district_id;
+        }
 
         $latitude = request()->lat;
         $longitude = request()->lng;
@@ -67,6 +74,9 @@ class CommonActionController extends Controller
                          ) AS distance", [$latitude, $longitude, $latitude])
             ->whereNotNull("latitude")
             ->whereNotNull("longitude")
+            ->when($district_id,function ($q) use ($district_id){
+                return $q->where("district_id",$district_id);
+            })
             ->having("distance", "<", $radius)->orderBy("distance",'asc')->offset(0)->limit(20)->get();
 
         /*$police_mobile = PoliceMobile::selectRaw("id,contact_number,rank,lat,lng,
@@ -89,7 +99,10 @@ class CommonActionController extends Controller
                          ) AS distance", [$latitude, $longitude, $latitude])
             ->whereNotNull("lat")
             ->whereNotNull("lng")
-            ->having("distance", "<", $radius)->orderBy("distance",'asc')->offset(0)->limit(20)->get();
+            ->when($district_id,function ($q) use ($district_id){
+                return $q->where("district_id",$district_id);
+            })
+            ->having("distance", "<", $radius)->orderBy("distance",'asc')->offset(0)->limit(60)->get();
 
         return response()->json(['error' => false, 'message' => "data found",
             "police_station"=>$police_station,
@@ -106,7 +119,13 @@ class CommonActionController extends Controller
          * using eloquent approach, make sure to replace the "Restaurant" with your actual model name
          * replace 6371000 with 6371 for kilometer and 3956 for miles
          */
-
+        $user = auth()->user();
+        $role = auth()->user()->roles->pluck('name')[0];
+        if($role == "Super Admin"){
+            $district_id = "";
+        }else{
+            $district_id = $user->district_id;
+        }
         $latitude = request()->lat;
         $longitude = request()->lng;
         $radius = 40;
@@ -124,6 +143,9 @@ class CommonActionController extends Controller
                          ) AS distance", [$latitude, $longitude, $latitude])
         ->whereNotNull("lat")
         ->whereNotNull("lng")
+        ->when($district_id,function ($q) use ($district_id){
+                return $q->where("district_id",$district_id);
+        })
         ->having("distance", "<", $radius)->orderBy("distance",'asc')->offset(0)->limit(10)->get();
 
         return response()->json(['error' => false, 'message' => "data found",

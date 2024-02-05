@@ -123,6 +123,10 @@ Route::prefix('settings')->middleware(['auth'])->group(function() {
                 ->name('settings.users-mgt.list')
                 ->middleware(['permission:users.mgt.list']);
 
+            Route::get('all-user-datatable', 'allUsers')
+                ->name('all.user.datatable')
+                ->middleware(['permission:users.mgt.list']);
+
             Route::prefix('user-permissions')->group(function (){
                 Route::get('/{id}', 'show')->name('settings.users-mgt.show');
                 Route::post('/{id}', 'userPermissionsSave')->name('settings.users-mgt.user-permissions-save');

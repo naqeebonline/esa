@@ -13,6 +13,9 @@
             margin: 0px;
             padding: 0px
         }
+        button{
+            height: 26px;
+        }
     </style>
 
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css') }}" />
@@ -28,7 +31,7 @@
             <div class="card">
                 <div class="card-header header-elements-inline">
                     <h6 class="card-title pb-0 mb-0">{{ $title }}</h6>
-                    <button
+                    <div
                             type="button"
                             class="btn btn-success m-1 float-end"
                             data-bs-toggle="modal"
@@ -36,7 +39,7 @@
                             style="width: 200px; color: white"
                     >
                         Create New Meeting
-                    </button>
+                    </div>
 {{--                    <div class="header-elements">--}}
 {{--                        <div class="form-check form-check-right form-check-switchery form-check-switchery-sm">--}}
 
@@ -70,7 +73,7 @@
 
 
                                         <th style="width: 30%">Share with</th>
-                                        <th style="width: 30%">Link For</th>
+
                                         <th style="width: 10%">Status</th>
 
                                         <th  style="width: 10%">Action</th>
@@ -91,9 +94,9 @@
                                             <td>
 
 
-                                                {{--<a target="_blank" href="{{$value->start_url}}" class="bx bx-video" style="color: red"></a>--}}
+                                                <a target="_blank" href="{{$value->start_url}}" class="bx bx-video" style="color: red"></a>
 
-                                                <a onClick="MyWindow=window.open(base_url+'zoom/index.html?id={{$value->zoom_meeting_id}}&pass={{$value->encrypted_password}}&title={{$value->topic}}&email={{auth()->user()->email}}&meeting_role=1&user={{auth()->user()->name}}','MyWindow','width=600,height=600'); return false;"   class="bx bx-video" style="color: green"></a>
+                                               {{-- <a onClick="MyWindow=window.open(base_url+'zoom/index.html?id={{$value->zoom_meeting_id}}&pass={{$value->encrypted_password}}&title={{$value->topic}}&email={{auth()->user()->email}}&meeting_role=1&user={{auth()->user()->name}}','MyWindow','width=600,height=600'); return false;"   class="bx bx-video" style="color: green"></a>--}}
 
                                                 <code id="copy{{$value->id}}" style="display: none">
                                                     <u>Topic:{{$value->topic."\n"}}</u>
@@ -116,12 +119,12 @@
                                             <td>
 
                                                 @foreach($value->meetingUsers as $key2 => $v2)
+                                                    @if($key2 <= 12)
                                                     <code>{{$v2->users?->name ?? ""}}</code>,
+                                                    @endif
                                                  @endforeach
                                             </td>
-                                            <td>
-                                                {{$value->live_link_for ?? ""}}
-                                            </td>
+
 
                                             <td>
                                                 @if(date("Ymdhis",strtotime($value->end_time)) - date("Ymdhis")  > 0 )
@@ -199,7 +202,8 @@
                     <div class="row">
                         <div class="col mb-3">
                             <label for="police_station_users" class="form-label">Police Station Users</label>
-
+                            <button type="button" onclick="selectAllPoliceStationUser()">Select All</button>
+                            <button type="button" onclick="deselectAllPoliceStationUser()">Deselect All</button>
                             {!! Form::select('police_station_users[]', [], null, ['class' => 'form-select select2', 'id' => 'police_station_users', 'multiple' => 'multiple']) !!}
 
                         </div>
@@ -208,6 +212,8 @@
                     <div class="row">
                         <div class="col mb-3">
                             <label for="nameAnimation" class="form-label">Polling Station Users</label>
+                            <button type="button" onclick="selectAll()">Select All</button>
+                            <button type="button" onclick="deselectAll()">Deselect All</button>
                             <select class="form-control select2" id="polling_station_user" multiple="multiple">
                             </select>
                         </div>
@@ -216,6 +222,8 @@
                     <div class="row">
                         <div class="col mb-3">
                             <label for="nameAnimation" class="form-label">Police Mobile Users</label>
+                            <button type="button" onclick="selectAllPoliceMobile()">Select All</button>
+                            <button type="button" onclick="deselectAllPoliceMobile()">Deselect All</button>
                             <select class="form-control select2" id="police_mobile_user" multiple="multiple">
                             </select>
                         </div>
@@ -258,17 +266,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="row">
-                        <div class="col mb-3">
-                            <label for="nameAnimation" class="form-label">Live Link For</label>
-                            <select name="live_link_for" id="live_link_for" class="form-control">
-                                <option value="">Select Link Type</option>
-                                <option value="police_station">Police Station Link</option>
-                                <option value="polling_station">Polling Station Link</option>
-                                <option value="hospital">Hospital Link</option>
-                            </select>
-                        </div>
-                    </div>
+
                     <div class="row">
                         <div class="col mb-3">
                             <label for="nameAnimation" class="form-label">Agenda</label>
@@ -311,6 +309,35 @@
     <script src="{{ asset('assets/vendor/libs/select2/select2.js') }}"></script>
     <script src="{{ asset('assets/js/app-custom.js') }}"></script>
     <script>
+        function selectAll() {
+            $("#polling_station_user > option").prop("selected", true);
+            $("#polling_station_user").trigger("change");
+        }
+
+        function deselectAll() {
+            $("#polling_station_user > option").prop("selected", false);
+            $("#polling_station_user").trigger("change");
+        }
+
+        function selectAllPoliceStationUser() {
+            $("#police_station_users > option").prop("selected", true);
+            $("#police_station_users").trigger("change");
+        }
+
+        function deselectAllPoliceStationUser() {
+            $("#police_station_users > option").prop("selected", false);
+            $("#police_station_users").trigger("change");
+        }
+
+        function selectAllPoliceMobile() {
+            $("#police_mobile_user > option").prop("selected", true);
+            $("#police_mobile_user").trigger("change");
+        }
+
+        function deselectAllPoliceMobile() {
+            $("#police_mobile_user > option").prop("selected", false);
+            $("#police_mobile_user").trigger("change");
+        }
 
         $(document).ready(function (){
             meeting_id = "";
@@ -319,12 +346,8 @@
                 var meeting_type = $("#meeting_type").val();
                 var meeting_title = $("#meeting_title").val();
                 var meeting_date = $("#meeting_date").val();
-                var live_link_for = $("#live_link_for").val();
-                if(live_link_for == ""){
-                    alert("Please Link Type");
-                    $(".create_new_meeting").show();
-                    return false;
-                }
+
+
                 if(meeting_type == ""){
                     alert("Please Select Meeting Type");
                     $(".create_new_meeting").show();
@@ -342,7 +365,7 @@
                         meeting_type: meeting_type,
                         meeting_title: meeting_title,
                         meeting_date: meeting_date,
-                        live_link_for: live_link_for,
+
                         _token: '{{ csrf_token() }}'
 
                     },
@@ -366,6 +389,9 @@
 
             $("body").on("click",".assign_to_user",function (e) {
                 meeting_id= $(this).attr("data-id");
+                $("#police_mobile_user").val("");
+                $("#polling_station_user").val("");
+                $("#police_station_users").val("");
                 $("#animationModal").modal("show");
             });
 
@@ -431,13 +457,13 @@
 
                         var psOptions = '<option value=""></option>';
                         $.each(response.data, function (index, item) {
-                            psOptions += '<option value="' + item.id + '">' + item.name + '</option>';
+                            psOptions += '<option value="' + item.id + '">' + item.username + '</option>';
                         });
                         $("#police_station_users").html(psOptions);
 
                         var psuOptions = '';
                         $.each(response.users.polling_station_user, function (index, item) {
-                            psuOptions += '<option value="' + item.id + '">' + item.name + '</option>';
+                            psuOptions += '<option value="' + item.id + '">' + item.username + '</option>';
                         });
                         $("#polling_station_user").html(psuOptions);
 
@@ -445,13 +471,13 @@
                         var policeMobileOptions = '';
                         $.each(response.users.police_mobile_user, function (index, item) {
 
-                            policeMobileOptions += `<option value="${item.id}">${item.name} ( ${item.police_mobile.registration_number} )</option>`;
+                            policeMobileOptions += `<option value="${item.id}">${item.username} (${item.registration_number}) </option>`;
                         });
                         $("#police_mobile_user").html(policeMobileOptions);
 
                         var police_station_UserOptions = '';
                         $.each(response.users.police_station_users, function (index, item) {
-                            police_station_UserOptions += `<option value="${item.id}">${item.name} </option>`;
+                            police_station_UserOptions += `<option value="${item.id}">${item.username} </option>`;
                         });
                         $("#police_station_users").html(police_station_UserOptions);
 
@@ -499,7 +525,7 @@
 
                         var psuOptions = '';
                         $.each(response.users.polling_station_user, function (index, item) {
-                            psuOptions += '<option value="' + item.id + '">' + item.name + '</option>';
+                            psuOptions += '<option value="' + item.id + '">' + item.username + '</option>';
                         });
                         $("#polling_station_user").html(psuOptions);
 
@@ -507,7 +533,7 @@
                         var policeMobileOptions = '';
                         $.each(response.users.police_mobile_user, function (index, item) {
 
-                            policeMobileOptions += `<option value="${item.id}">${item.name} ( ${item.police_mobile.registration_number} )</option>`;
+                            policeMobileOptions += `<option value="${item.id}">${item.username} ( ${item.police_mobile.registration_number} )</option>`;
                         });
                         $("#police_mobile_user").html(policeMobileOptions);
 
@@ -515,7 +541,7 @@
 
                         var police_station_UserOptions = '';
                         $.each(response.users.police_station_users, function (index, item) {
-                            police_station_UserOptions += `<option value="${item.id}">${item.name} </option>`;
+                            police_station_UserOptions += `<option value="${item.id}">${item.username} </option>`;
                         });
                         $("#police_station_users").html(police_station_UserOptions);
                     }

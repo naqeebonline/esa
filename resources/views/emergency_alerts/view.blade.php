@@ -15,18 +15,29 @@
                     <div class="row g-3">
 
                         <div class="col-md-12">
-                            <label class="form-label" for="multicol-email">Type</label>
-                            <div class="input-group">
-                                 <b>{{$data->type}}</b>
-                            </div>
+                            <label class="form-label" for="multicol-email">District Name: <b>{{$data->district?->title ?? ""}}</b></label>
+
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label" for="multicol-email">Alert Date Time : <b>{{date("d-m-Y h:i A",strtotime($data->created_at))}}</b></label>
+
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label" for="multicol-email">Last Updated On: <b>{{date("d-m-Y h:i A",strtotime($data->updated_at))}}</b></label>
+
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label" for="multicol-email">Type: <b>{{$data->type}}</b></label>
+
                         </div>
 
 
                         <div class="col-md-12">
-                            <label class="form-label" for="multicol-email">Message</label>
-                            <div class="input-group">
-                                <input type="text"  class="form-control" value="{{$data->message}}" onkeypress="limitKeypress(event,this.value,254)" required name="message" placeholder="" >
-                            </div>
+                            <label class="form-label" for="multicol-email">Message: <b>{{$data->message}}</b></label>
+
                         </div>
 
                         <div class="col-md-12">

@@ -1161,12 +1161,12 @@
                 }
 
                 function getAllPoliceLine() {
-
+                alert();
                     $.ajax({
                         url: '{{ route("getAllPoliceLines") }}', // Replace with your actual URL
                         type: 'POST',
                         data: {
-
+                            districts:$("#search_district").val(),
                             _token: '{{ csrf_token() }}'
 
                         },

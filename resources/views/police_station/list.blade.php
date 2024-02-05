@@ -32,13 +32,37 @@
 
                 <div class="card-body">
 
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <select class="form-control select2" id="district_id">
+                                <option value="">Select District</option>
+                                @foreach($districts as $key => $value)
+                                    <option value="{{$value->id}}">{{$value->title}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <select class="form-select select2" multiple="multiple" id="circle_id">
+
+
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <a class="btn btn-primary" href="{{route('exportPoliceStations')}}">Export To Excel</a>
+                        </div>
+
+
+                    </div>
+
                     <div class="row">
 
 
                         <div class="col-12">
 
                             <div class="table-responsive" style="min-height: 200px">
-                                <a class="btn btn-primary" href="{{route('exportPoliceStations')}}">Export To Excel</a>
+
                                 <table id="users-list" class="table table-striped data_mf_table table-condensed" >
 
                                     <thead>
@@ -76,9 +100,19 @@
     <script src="{{ asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/datatables-responsive/datatables.responsive.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.js') }}"></script>
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/select2/select2.css') }}" />
+    <script src="{{ asset('assets/vendor/libs/select2/select2.js') }}"></script>
     <script>
         var id = 0;
         $(document).ready(function (){
+            district_id = "";
+            circle_id = [];
+
+
+
+
+
+
 
             user_table = $('#users-list').DataTable({
                 processing: true,
@@ -91,20 +125,22 @@
                 pageLength: 50,
                 ajax: {
                     url: '{{route("all.police.station")}}',
-                    data: {
-                        'post_param': '1'
+                    data: function (d) {
+                        d.district_id = district_id;
+                        d.circle_id = circle_id;
+
                     }
 
                 },
 
                 columns: [
 
-                    {data: 'district_name', name: 'district_name'},
-                    {data: 'circle_name', name: 'circle_name'},
-                    {data: 'title', name: 'title'},
-                    {data: 'strength', name: 'strength'},
-                    {data: 'latitude', name: 'latitude'},
-                    {data: 'longitude', name: 'longitude'},
+                    {data: 'district_name', name: 'district.title',searchable:true},
+                    {data: 'circle_name', name: 'circle.name',searchable:true},
+                    {data: 'title', name: 'title',searchable:true},
+                    {data: 'strength', name: 'strength',searchable:true},
+                    {data: 'latitude', name: 'latitude',searchable:true},
+                    {data: 'longitude', name: 'longitude',searchable:true},
                     {data: 'action', name: 'action', orderable: false, searchable: false}
                 ],
 
@@ -120,7 +156,39 @@
                 ]
             });
 
+            $("body").on("change","#district_id",function (e) {
+                district_id = $(this).val();
+                user_table.ajax.reload();
+                loadCircle();
+            });
 
+            $("body").on("change","#circle_id",function (e) {
+                circle_id = $(this).val();
+                user_table.ajax.reload();
+
+            });
+
+            function loadCircle() {
+
+                var districts = $("#district_id").val();
+                $.ajax({
+                    url: '{{ route("getCircles") }}/'+ districts, // Replace with your actual URL
+                    method: 'get',
+                    data: {
+
+                        _token: '{{ csrf_token() }}'
+
+                    },
+                    success: function (response) {
+
+                        var psOptions = '<option value="">Select Circle</option>';
+                        $.each(response.data, function (index, item) {
+                            psOptions += '<option value="' + item.id + '">' + item.name + '</option>';
+                        });
+                        $("#circle_id").html(psOptions);
+                    }
+                });
+            }
 
             $("body").on("click",".delete_table_data",function (e) {
                 var id  = $(this).attr("data-id");

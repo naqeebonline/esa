@@ -1457,9 +1457,9 @@
   ),
   'zoom' => 
   array (
-    'client_id' => 'VXa0FqPJQEuQivsUc54Gw',
-    'client_secret' => 'DKzQtSZP1gMAVqhrFJ6nmpp2FjD4J6Is',
-    'account_id' => 'eBmBeTB5S-aua8Jyd5q4mA',
+    'client_id' => 'H0xU3VgTSBSfbixgHmPL4g',
+    'client_secret' => 'Az3ftQi8wViHEOhpwWvTnUKZLExO0Snj',
+    'account_id' => 'Jwd3GmtTT-mHrN2xqJZW0A',
     'base_url' => 'https://api.zoom.us/v2/',
   ),
   'debugbar' => 

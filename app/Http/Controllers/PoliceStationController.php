@@ -22,6 +22,7 @@ class PoliceStationController extends Controller
      */
     public function index()
     {
+
         $data['district'] = Districts::get();
         $data['rank'] = (new CommonApiController())->getRankForWeb();
 
@@ -34,7 +35,7 @@ class PoliceStationController extends Controller
 
     public function allPoliceStations()
     {
-        $users = PoliceStation::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
+        $users = PoliceStation::with(["district","circle"])->when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
             if(auth()->user()->roles->pluck('name')[0] == "Regional User"){
                 $district_ids = Districts::whereReagin(auth()->user()->region_id)->pluck("id")->all();
                 return $q->whereIn("district_id",$district_ids);
@@ -42,6 +43,12 @@ class PoliceStationController extends Controller
                 return $q->where(["district_id"=>auth()->user()->district_id]);
             }
 
+        })
+        ->when(request()->district_id,function ($q){
+            return $q->where("district_id",request()->district_id);
+        })
+        ->when(request()->circle_id,function ($q){
+            return $q->whereIn("circle_id",request()->circle_id);
         });
         return DataTables::of($users)
             ->addColumn('action', function($cert) {
@@ -69,7 +76,11 @@ class PoliceStationController extends Controller
             'title' => 'List Police Stations',
 
         ];
-
+        $data['districts'] = Districts::whereProvinceId(1)
+            ->when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Regional User"), function ($q) {
+                return $q->where(["id" => auth()->user()->district_id]);
+            })
+            ->get();
         return view("police_station.list",$data);
     }
 

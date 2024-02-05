@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\PoliceStationExport;
 use App\Exports\PollingStationExport;
+use App\Models\Districts;
 use App\Models\PollingStation;
 use App\Models\Sensitivity;
 use Illuminate\Http\Request;
@@ -33,7 +34,15 @@ class PollingStationController extends Controller
     {
         $users = PollingStation::with(["district","policeStation","sensitivitys"])
             ->when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
+
                 return $q->where(["district_id"=>auth()->user()->district_id]);
+            })
+            ->when(request()->district_id, function ($q) {
+                return $q->where(["district_id"=>request()->district_id]);
+            })
+
+            ->when(request()->police_station_id, function ($q) {
+                return $q->whereIn("police_station_id",request()->police_station_id);
             });
         return DataTables::of($users)
             ->addColumn('action', function($cert) {
@@ -64,7 +73,11 @@ class PollingStationController extends Controller
             'title' => 'List Polling Stations',
 
         ];
-        $data['data'] = [];
+        $data['districts'] = Districts::whereProvinceId(1)
+            ->when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Regional User"), function ($q) {
+                return $q->where(["id" => auth()->user()->district_id]);
+            })
+            ->get();
 
         return view("polling_station.list",$data);
     }

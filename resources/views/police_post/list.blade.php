@@ -31,7 +31,26 @@
                 </div>
 
                 <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <select class="form-control select2" id="district_id">
+                                <option value="">Select District</option>
+                                @foreach($districts as $key => $value)
+                                    <option value="{{$value->id}}">{{$value->title}}</option>
+                                @endforeach
+                            </select>
+                        </div>
 
+                        <div class="col-md-3">
+                            <select class="form-select select2" multiple="multiple" id="police_station_id">
+
+
+                            </select>
+                        </div>
+
+
+
+                    </div>
                     <div class="row">
 
 
@@ -78,8 +97,12 @@
     <script src="{{ asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/datatables-responsive/datatables.responsive.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.js') }}"></script>
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/select2/select2.css') }}" />
+    <script src="{{ asset('assets/vendor/libs/select2/select2.js') }}"></script>
     <script>
         var id =0;
+        district_id = "";
+        police_station_id = [];
         $(document).ready(function (){
             user_table = $('#users-list').DataTable({
                 processing: true,
@@ -92,8 +115,10 @@
                 pageLength: 50,
                 ajax: {
                     url: '{{route("all.police.post")}}',
-                    data: {
-                        'post_param': '1'
+                    data: function (d) {
+                        d.district_id = district_id;
+                        d.police_station_id = police_station_id;
+
                     }
 
                 },
@@ -141,6 +166,34 @@
                     alert('Why did you press cancel? You should have confirmed');
                 }
             });
-        })
+        });
+
+        $("body").on("change","#district_id",function (e) {
+            district_id = $(this).val();
+            user_table.ajax.reload();
+            loadPoliceStations();
+        });
+
+        $("body").on("change","#police_station_id",function (e) {
+            police_station_id = $(this).val();
+            user_table.ajax.reload();
+
+        });
+
+        function loadPoliceStations() {
+            var district_id = $("#district_id").val();
+            $.ajax({
+                url: '{{ route("getPoliceStations") }}/' + district_id, // Replace with your actual URL
+                method: 'GET',
+                success: function (response) {
+
+                    var psOptions = '<option value="">Select Police Station</option>';
+                    $.each(response.data, function (index, item) {
+                        psOptions += '<option value="' + item.id + '">' + item.title + '</option>';
+                    });
+                    $("#police_station_id").html(psOptions);
+                }
+            });
+        }
     </script>
 @endpush

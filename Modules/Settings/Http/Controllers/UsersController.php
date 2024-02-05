@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
+use jeremykenedy\LaravelRoles\Models\Role;
 use Modules\Settings\Entities\Company;
 use Modules\Settings\Entities\MyApp;
 use Modules\Settings\Entities\MyRole;
@@ -38,6 +39,12 @@ class UsersController extends Controller
         $data = [
             'title' => 'Users List',
             'new_route' => ['settings.users-mgt.create', 'New User'],
+            'districts' => Districts::whereProvinceId(1)
+                ->when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Regional User"), function ($q) {
+                    return $q->where(["id" => auth()->user()->district_id]);
+                })
+                ->get(),
+            'role_data' => Role::get(),
             'items' => User::with([
                 'section',
                 'company',
@@ -49,10 +56,23 @@ class UsersController extends Controller
                 ->when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
                     return $q->where(["district_id" => auth()->user()->district_id])->where("name","!=","Super Admin");
                 })
-
-                ->get()
+                ->when(request()->get('search_by'),function ($q){
+                    return $q->where('username', 'like', '%'.request()->get('search_by').'%');
+                })
+                ->when(request()->get('email'),function ($q){
+                    return $q->where('email', 'like', '%'.request()->get('email').'%');
+                })
+                ->when(request()->get('district_id'),function ($q){
+                    return $q->where('district_id', request()->get("district_id"));
+                })
+                ->when(request()->role_id, function($query){
+                    $query->whereHas('roles', function ($q) {
+                        $q->where('roles.id', request()->role_id);
+                    });
+                })
+                ->paginate(500)
         ];
-         
+
 
         return view('settings::users_mgt.index', $data);
     }
@@ -80,6 +100,7 @@ class UsersController extends Controller
 
                 return $actionsBtn;
             })
+
             ->rawColumns(["action"])
             ->make(true);
     }
@@ -592,7 +613,7 @@ class UsersController extends Controller
     {
 
         $circles = request()->circles;
-        $data =PoliceStation::whereIn("circle_id",$circles)->get();
+        $data =PoliceStation::select(["id","title"])->whereIn("circle_id",$circles)->get();
         return["message"=>"success","data"=>$data];
     }
 
@@ -601,21 +622,23 @@ class UsersController extends Controller
     {
         $district_id = request()->districts;
 
-        $res["polling_station_user"] = User::with("roles")->with('district')->whereHas("roles", function($q) {
+        $res["polling_station_user"] = User::select(["id","name","username"])->with("roles:id,name")->with('district')->whereHas("roles", function($q) {
             $q->whereIn("roles.id", [56]);
-        })->whereIn("district_id",$district_id)->get();
+        })->whereIn("district_id",$district_id)->get()->makeHidden(['roles',"roles_array","permissions_array"]) ;
 
-        $res["police_mobile_user"] = User::with("roles")->with('district')->whereHas("roles", function($q) {
+        $res["police_mobile_user"] = User::select(["id","name","username","police_mobile_id"])->with("roles:id,name")->with('district')->whereHas("roles", function($q) {
             $q->whereIn("roles.id", [58]);
-        })->whereIn("district_id",$district_id)->get();
-
-        $res["police_station_users"] = User::with("roles")->with('district')->whereHas("roles", function($q) {
+        })->whereIn("district_id",$district_id)->get()->makeHidden(['roles',"roles_array","permissions_array"]);
+        foreach ($res["police_mobile_user"] as $key => $value){
+            $value->registration_number = $value->policeMobile?->registration_number ?? "";
+        }
+        $res["police_station_users"] = User::select(["id","name","username"])->with("roles:id,name")->with('district')->whereHas("roles", function($q) {
             $q->whereIn("roles.id", [4]);
         })
             ->whereIn("district_id",$district_id)
-            ->get();
+            ->get()->makeHidden(['roles',"roles_array","permissions_array"]);
 
-        return["message"=>"success","data"=>User::whereDistrictId($district_id)->get(),"users"=>$res];
+        return["message"=>"success","data"=>User::select(["id","name","username"])->whereDistrictId($district_id)->get()->makeHidden(['roles',"roles_array","permissions_array"]),"users"=>$res];
 
 
     }
@@ -654,20 +677,20 @@ class UsersController extends Controller
             $q->whereIn("roles.id", [56]);
             })
             ->whereIn("district_id",$district_id)
-            ->whereIn("police_station_id",$police_station_id)
+           /* ->whereIn("police_station_id",$police_station_id)*/
             ->get();
 
         $res["police_mobile_user"] = User::with("roles")->with('district')->whereHas("roles", function($q) {
             $q->whereIn("roles.id", [58]);
         })
             ->whereIn("district_id",$district_id)
-            ->whereIn("police_station_id",$police_station_id)
+          //  ->whereIn("police_station_id",$police_station_id)
             ->get();
 
         $res["police_station_users"] = User::with("roles")->with('district')->whereHas("roles", function($q) {
             $q->whereIn("roles.id", [4]);
         })
-            ->whereIn("district_id",$district_id)
+            //->whereIn("district_id",$district_id)
             ->whereIn("police_station_id",$police_station_id)
             ->get();
         return["message"=>"success","data"=>User::whereDistrictId($district_id)->get(),"users"=>$res];

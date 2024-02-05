@@ -87,7 +87,17 @@ class PoliceMobileController extends Controller
     {
         $users = PoliceMobile::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
             return $q->where(["district_id"=>auth()->user()->district_id]);
-        });
+        })
+            ->when(request()->district_id,function ($q){
+                return $q->where("district_id",request()->district_id);
+            })
+            ->when(request()->circle_id,function ($q){
+                return $q->whereIn("circle_id",request()->circle_id);
+            })
+            ->when(request()->police_station_id,function ($q){
+                return $q->whereIn("police_station_id",request()->police_station_id);
+            })
+        ->with('mobileUser');
         return DataTables::of($users)
             ->addColumn('action', function($cert) {
                 $actionsBtn = '<a class="dropdown-item p-50" href="'.route('edit.police.mobile',[$cert->id]).'"><i class="bx bx-file-blank mr-1"></i> Edit</a>';
@@ -109,6 +119,10 @@ class PoliceMobileController extends Controller
             ->addColumn('vehicle_type', function($cert) {
                 return $cert->vehicleType->name ?? "";
             })
+
+            ->addColumn('mobile_user_name', function($cert) {
+                return $cert->vehicleType->name ?? "";
+            })
             ->rawColumns(["district_name","police_station_name","circle_name","vehicle_type","action"])
             ->make(true);
     }
@@ -123,6 +137,11 @@ class PoliceMobileController extends Controller
             return $q->where(["district_id"=>auth()->user()->district_id]);
         });
         $data["data"] = $query->get();
+        $data['districts'] = Districts::whereProvinceId(1)
+            ->when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Regional User"), function ($q) {
+                return $q->where(["id" => auth()->user()->district_id]);
+            })
+            ->get();
         return view("police_mobiles.list",$data);
     }
 

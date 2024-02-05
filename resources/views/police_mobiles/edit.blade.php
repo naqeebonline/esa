@@ -332,7 +332,7 @@
         }
         function endMarker(lat,lng) {
             var myIcon = L.icon({
-                iconUrl: base_url+"markers/chippa.png",
+                iconUrl: base_url+"markers/police_mobile.png",
                 className:"hospital_marker",
                 iconSize: [40, 40],
 

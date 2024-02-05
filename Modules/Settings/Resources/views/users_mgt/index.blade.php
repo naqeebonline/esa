@@ -31,6 +31,48 @@
                 </div>
 
                 <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label>District</label>
+                            <select class="form-control select2" id="district_id">
+                                <option value="">Select District</option>
+                                @foreach($districts as $key => $value)
+                                    <option value="{{$value->id}}" {{(isset($_GET['district_id']) && $_GET['district_id'] == $value->id) ? "selected=selected" : ""}}>{{$value->title}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label>Role</label>
+                            <select class="form-control select2" id="role_id">
+                                <option value="">Select Role</option>
+                                @foreach($role_data as $key => $value)
+                                    <option value="{{$value->id}}" {{(isset($_GET['role_id']) && $_GET['role_id'] == $value->id) ? "selected=selected" : ""}}>{{$value->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label>Search By username</label>
+                            <input type="text" class="form-control" value="{{$_GET['search_by'] ?? ""}}" name="search_by" id="search_by" placeholder="search by username...">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label>Search By Email</label>
+                            <input type="text" class="form-control" name="email" value="{{$_GET['email'] ?? ""}}" id="email" placeholder="search by email...">
+                        </div>
+
+                        <div class="col-md-2">
+                            <div class="btn btn-success" id="search_user" style="width: 100%">Search</div>
+                        </div>
+
+                        <div class="col-md-2">
+                            <div class="btn btn-danger" id="show_all" style="width: 100%">Show All</div>
+                        </div>
+
+
+
+                    </div>
 
                     <div class="row">
 
@@ -96,16 +138,21 @@
                                     @endforeach
                                     </tbody>
                                 </table>
-
-
                             </div>
+
                         </div>
+
                     </div>
+
                 </div>
+
             </div>
             <!-- /traffic sources -->
+           {{ $items->links('pagination::bootstrap-4')}}
         </div>
+
     </div>
+
 @endsection
 
 @push('scripts')
@@ -113,56 +160,26 @@
     <script src="{{ asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/datatables-responsive/datatables.responsive.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.js') }}"></script>
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/select2/select2.css') }}" />
+    <script src="{{ asset('assets/vendor/libs/select2/select2.js') }}"></script>
     <script>
-        $(document).ready(function (){
-            user_table = $('#users-list').DataTable({
-                processing: true,
-                serverSide: true,
 
-                lengthMenu: [
-                    [ 100, 250, 500, 1000 ],
-                    [ '100', '250', '500', '1000']
-                ],
-                pageLength: 30,
-                ajax: {
-                    url: '{{route("all.police.line")}}',
-                    data: {
-                        'post_param': '1'
-                    }
+        $("body").on("click","#search_user",function (e) {
+            var district_id = $("#district_id").val();
+            var search_by = $("#search_by").val();
+            var email = $("#email").val();
+            var role_id = $("#role_id").val();
+            var url = `{{route('settings.users-mgt.list')}}?district_id=${district_id}&search_by=${search_by}&email=${email}&role_id=${role_id}`;
+            window.location = url;
 
-                },
+        });
 
-                columns: [
-                    {data: 'district_name', name: 'district_name', searchable: true},
-                    {data: 'name', name: 'name'},
-                    {data: 'strength', name: 'strength'},
-                    {data: 'contact_number', name: 'contact_number'},
-                    {data: 'incharge_name', name: 'incharge_name'},
-                    {data: 'incharge_contact', name: 'incharge_contact'},
-                    {data: 'incharge_rank', name: 'incharge_rank'},
-                    {data: 'action', name: 'action', orderable: false, searchable: false}
-                ],
+        $("body").on("click","#show_all",function (e) {
 
-                responsive: true,
-                processing: true,
-                serverSide: true,
-                searching:  true,
-                sorting:    true,
-                paging:     true,
-                dom: 'Bfrtip',
-                buttons: [
-                    'copy', 'csv', 'excel', 'pdf', 'print'
-                ]
-            });
+            var url = `{{route('settings.users-mgt.list')}}`;
+            window.location = url;
 
+        });
 
-            /*$('#users-list').DataTable({
-                lengthMenu: [100, 200, 300, 500],
-                pageLength: 100,
-                processing: true,
-                serverSide:false
-
-            });*/
-        })
     </script>
 @endpush

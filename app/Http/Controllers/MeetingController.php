@@ -89,7 +89,7 @@ class MeetingController extends Controller
             "start_time" => $start_time, // set your start time
             "template_id" => 'Dv4YdINdTk+Z5RToadh5ug==', // set your template id  Ex: "Dv4YdINdTk+Z5RToadh5ug==" from https://marketplace.zoom.us/docs/api-reference/zoom-api/meetings/meetingtemplates
             "pre_schedule" => false,  // set true if you want to create a pre-scheduled meeting
-            "schedule_for" => 'naqeebonline@gmail.com', // set your schedule for
+            "schedule_for" => 'cpodigit@gmail.com', // set your schedule for
             "settings" => [
                 'join_before_host' => false, // if you want to join before host set true otherwise set false
                 'host_video' => false, // if you want to start video when host join set true otherwise set false
@@ -98,10 +98,12 @@ class MeetingController extends Controller
                 'waiting_room' => false, // if you want to use waiting room for participants set true otherwise set false
                 'audio' => 'both', // values are 'both', 'telephony', 'voip'. default is both.
                 'auto_recording' => 'none', // values are 'none', 'local', 'cloud'. default is none.
-                'approval_type' => 0, // 0 => Automatically Approve, 1 => Manually Approve, 2 => No Registration Required
+                'approval_type' => 2, // 0 => Automatically Approve, 1 => Manually Approve, 2 => No Registration Required
             ],
 
         ]);
+
+       // dd($meetings);
 
         $meeting_data = [
             "live_link_for" => request()->live_link_for,
@@ -336,7 +338,7 @@ class MeetingController extends Controller
             "password"=>$meeting->encrypted_password,
             "start_time"=>$meeting->start_time
         ];
-        $FcmToken = User::whereIn('id',$users_id)->pluck('android_token')->all();
+        $FcmToken = User::whereIn('id',$users_id)->whereNotNull('android_token')->pluck('android_token')->all();
         $this->sendCommonNotification("New Meeting created","Please join the meeting as soon as possiable",$notification_data,$FcmToken);
         return ["status"=>true,"message"=>"Notification has been sent","users_token"=>$FcmToken,"users_id"=>$users_id];
 

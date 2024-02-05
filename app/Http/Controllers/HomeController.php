@@ -145,7 +145,11 @@ class HomeController extends Controller
     public function getAllPoliceLines()
     {
 
-        $data = PoliceLine::whereNotNull("lat")->whereNotNull("lng")->get();
+        $data = PoliceLine::whereNotNull("lat")->whereNotNull("lng")
+            ->when(request()->districts,function ($q){
+                return $q->whereIn("district_id",request()->districts);
+            })
+            ->get();
         return (["data"=>$data]);
 
     }

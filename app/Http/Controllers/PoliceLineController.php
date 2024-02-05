@@ -25,7 +25,10 @@ class PoliceLineController extends Controller
     {
         $users = PoliceLine::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
             return $q->where(["district_id"=>auth()->user()->district_id]);
-        });
+        })
+            ->when(request()->district_id, function ($q) {
+                return $q->where(["district_id"=>request()->district_id]);
+            });
         return DataTables::of($users)
             ->addColumn('action', function($cert) {
                 $actionsBtn = '<a class="dropdown-item p-50" href="'.route('edit.police.line',[$cert->id]).'"><i class="bx bx-file-blank mr-1"></i> Edit</a>';
@@ -48,7 +51,11 @@ class PoliceLineController extends Controller
             'title' => 'List Police Line',
 
         ];
-
+        $data['districts'] = Districts::whereProvinceId(1)
+            ->when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Regional User"), function ($q) {
+                return $q->where(["id" => auth()->user()->district_id]);
+            })
+            ->get();
 
         return view("police_line.list",$data);
     }
