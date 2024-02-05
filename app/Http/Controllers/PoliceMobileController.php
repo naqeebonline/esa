@@ -200,70 +200,26 @@ class PoliceMobileController extends Controller
         return redirect()->route('list.police.mobile')->with('success', 'Police Mobile info updated successfully.');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+    public function viewOnMap($id)
     {
-        //
-    }
+        $data["title"] = "Edit Police Mobile";
+        $data['district'] = Districts::get();
+        $data['vehicle_type'] = VehicleType::get();
+        $data['rank'] = (new CommonApiController())->getRankForWeb();
+        $data["police_stations"] =PoliceStation::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
+            return $q->where(["district_id"=>auth()->user()->district_id]);
+        })->get();
+        $data["circles"] =Circle::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
+            return $q->where(["district_id"=>auth()->user()->district_id]);
+        })->get();
+        $data["police_line"] =PoliceLine::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
+            return $q->where(["district_id"=>auth()->user()->district_id]);
+        })->get();
+        $data["data"] = PoliceMobile::with("district")->whereId($id)->first();
+        $data["district_lat"] = $data["data"]->lat ?? "34.0120849";
+        $data["district_lng"] = $data["data"]->lng ?? "71.555966";
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+        return view("police_mobiles.view_on_map",$data);
     }
 
     private function findNearestPoliceMobile($latitude, $longitude, $radius)
@@ -305,9 +261,20 @@ class PoliceMobileController extends Controller
 
     public function getMobileHistory()
     {
-        $data = PoliceMobileHistory::where("police_mobile_id",request()->mobile_id)->groupBy('lat')->get();
+        $data = PoliceMobileHistory::where("police_mobile_id",request()->mobile_id)->groupBy('lat')
+            ->latest()
+            ->orderBy("created_at","ASC")
+            ->take(300)
+            ->get();
 
-        return ["status"=>true,"data"=>$data];
+        foreach ($data as $key => $value){
+            $value->date_time = date("d-m-Y h:i A",strtotime($value->created_at));
+        }
+
+
+
+
+        return ["status"=>true,"data"=>array_reverse($data->toArray())];
     }
 
 

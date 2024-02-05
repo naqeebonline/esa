@@ -197,8 +197,14 @@
         function loadPoliceStations() {
             var district_id = $("#district_id").val();
             $.ajax({
-                url: '{{ route("getPoliceStations") }}/' + district_id, // Replace with your actual URL
-                method: 'GET',
+                url: '{{ route("getPoliceStations") }}', // Replace with your actual URL
+                method: 'post',
+                data: {
+
+                    district_id:district_id,
+                    _token: '{{ csrf_token() }}'
+
+                },
                 success: function (response) {
 
                     var psOptions = '<option value="">Select Police Station</option>';

@@ -116,6 +116,11 @@ class HomeController extends Controller
                 return $q->whereIn("id",$police_mobile_id);
             })
             ->get();
+
+        foreach ($data as $key => $value){
+            $value->minuts_ago = now()->diffInMinutes($value->updated_at);
+
+        }
         return (["data"=>$data]);
 
     }

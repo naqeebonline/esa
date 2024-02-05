@@ -6,16 +6,25 @@
 
 
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div id="map" class="" style="height: 500px">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12">
             <div class="card mb-4">
                 <h5 class="card-header">Update Police Mobile</h5>
-                <form class="card-body" method="post" action="{{route('update.police.mobile')}}">
+                <form class="card-body" >
                     @csrf
                     <input type="hidden" name="id" value="{{$data->id}}">
                     <h6 class="fw-normal">1. Police Station</h6>
                     <div class="row g-3">
                         @if(auth()->user()->roles->pluck('name')[0] =="Super Admin")
-                        <div class="col-md-6">
+                        <div class="col-md-3">
 
                             <label class="form-label" for="multicol-username">District</label>
                             <select class="form-control select2" required name="district_id" id="district_id">
@@ -28,7 +37,7 @@
                         </div>
                         @endif
 
-                            <div class="col-md-6">
+                            <div class="col-md-3">
                                 <label class="form-label" for="multicol-username">Circle</label>
                                 <select class="form-control select2" required name="circle_id" id="circle_id">
                                     <option value="">Select Circle....</option>
@@ -39,7 +48,7 @@
                                 </select>
                             </div>
 
-                            <div class="col-md-6">
+                            <div class="col-md-3">
                                 <label class="form-label" for="multicol-username">Police Line (Optional)</label>
                                 <select class="form-control select2" name="police_line_id" id="police_line_id">
                                     <option value="">Select Police Line....</option>
@@ -50,7 +59,7 @@
                                 </select>
                             </div>
 
-                            <div class="col-md-6">
+                            <div class="col-md-3">
                                 <label class="form-label" for="multicol-username">Police Station</label>
                                 <select class="form-control select2" required name="police_station_id" id="police_station_id">
                                     <option value="">Select Police Station....</option>
@@ -62,14 +71,14 @@
                             </div>
 
 
-                            <div class="col-md-6">
+                            <div class="col-md-3">
                                 <label class="form-label" for="multicol-email">Registration number</label>
                                 <div class="input-group">
                                     <input type="text"  class="form-control" value="{{$data->registration_number}}" onkeypress="limitKeypress(event,this.value,100)" required name="registration_number" placeholder="" >
                                 </div>
                             </div>
 
-                            <div class="col-md-6">
+                            <div class="col-md-3">
                                 <label class="form-label" for="multicol-username">Vehicle Type</label>
                                 <select class="form-control select2" required name="vehicle_type" id="vehicle_type">
                                     <option value="">Select Vehicle Type....</option>
@@ -80,18 +89,18 @@
                                 </select>
                             </div>
 
-                            <div class="col-md-6">
+                            <div class="col-md-3">
                                 <label class="form-label" for="multicol-first-name">Incharge Name</label>
                                 <input type="text" class="form-control" value="{{$data->incharge_name}}" name="incharge_name" onkeypress="limitKeypress(event,this.value,100)" placeholder="">
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-3">
                                 <label class="form-label" for="multicol-last-name">Contact Details</label>
                                 <input type="number" class="form-control" value="{{$data->contact_number}}" onkeypress="limitKeypress(event,this.value,11)" name="contact_number" placeholder="">
                             </div>
 
 
 
-                            <div class="col-md-6">
+                            <div class="col-md-3">
                                 <label class="form-label" for="multicol-username">Rank</label>
                                 <select class="form-control select2" name="rank" id="rank">
                                     <option value="">Select Rank....</option>
@@ -103,7 +112,7 @@
                                 </select>
                             </div>
 
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <label class="form-label" for="multicol-email">Total Strength</label>
                             <div class="input-group">
                                 <input type="number"  class="form-control" value="{{$data->strength}}" required name="strength" placeholder="Strength" >
@@ -112,14 +121,14 @@
 
 
 
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <label class="form-label" for="multicol-email">Lat</label>
                             <div class="input-group">
                                 <input type="text"  name="lat" onkeypress="limitKeypress(event,this.value,11)" id="lat" value="{{$data->lat}}" class="form-control" placeholder="lat" >
                             </div>
                         </div>
 
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <label class="form-label" for="multicol-email">Long</label>
                             <div class="input-group">
                                 <input type="text"  name="lng" onkeypress="limitKeypress(event,this.value,11)" id="lng" value="{{$data->lng}}"  class="form-control" placeholder="long" >
@@ -138,14 +147,7 @@
             </div>
         </div>
 
-        <div class="col-md-6">
-            <div class="card mb-4">
-                <div class="card-body">
-                    <div id="map" class="" style="height: 500px">
-                </div>
-            </div>
-        </div>
-    </div>
+        
 
 
 
@@ -231,106 +233,21 @@
             //loadBoundaryData();
             loadMarker("{{$data->lat}}","{{$data->lng}}");
             getMobileHistory();
-            findNearest();
-        }
 
-        function findNearest() {
-
-            $.ajax({
-                url: '{{ route("findNearestResource") }}', // Replace with your actual URL
-                method: 'post',
-                data: {
-
-                    lat:"{{$data->lat}}",
-                    lng:"{{$data->lng}}",
-                    _token: '{{ csrf_token() }}'
-
-                },
-                success: function (response) {
-
-
-                    $.each(response.police_station, function (index, item) {
-
-                        var myIcon = L.icon({
-                            iconUrl: base_url+"markers/ps.png",
-                            className:"police_stations_marker",
-                            iconSize: [40, 40],
-
-                        });
-                        var mymarker = L.marker([item.latitude,item.longitude], {icon: myIcon}).addTo(myMap);
-                        mymarker.bindPopup(`
-                                           <div style="line-height:0.2rem">
-                                            <h6>Police Stations</h6>
-                                            <p class="text_height_map"><b>Name:</b> ${item.title}</p>
-                                            <p class="text_height_map"><b>Contact:</b> ${item.ps_contact_number}</p>
-                                            <p class="text_height_map"><b>Distanse:</b> ${parseFloat(item.distance).toFixed(2)} Km</p>
-                                            </div>
-                                        `);
-
-
-
-                    });
-
-
-                    $.each(response.hospitals, function (index, item) {
-
-                        var myIcon = L.icon({
-                            iconUrl: base_url+"markers/hospital.png",
-                            className:"police_stations_marker",
-                            iconSize: [40, 40],
-
-                        });
-                        var mymarker = L.marker([item.lat,item.lng], {icon: myIcon}).addTo(myMap);
-                        mymarker.bindPopup(`
-                                           <div style="line-height:0.2rem">
-                                            <h6>Health Facility</h6>
-                                            <p class="text_height_map"><b>Name:</b> ${item.name}</p>
-                                            <p class="text_height_map"><b>Contact:</b> ${item.contact_number}</p>
-                                            <p class="text_height_map"><b>Distanse:</b> ${parseFloat(item.distance).toFixed(2)} Km</p>
-                                            </div>
-                                        `);
-
-
-
-                    });
-
-                    $.each(response.police_mobile, function (index, item) {
-
-                        var myIcon = L.icon({
-                            iconUrl: base_url+"markers/police_mobile.png",
-                            className:"police_stations_marker",
-                            iconSize: [40, 40],
-
-                        });
-                        var mymarker = L.marker([item.lat,item.lng], {icon: myIcon}).addTo(myMap);
-                        mymarker.bindPopup(`
-                                           <div style="line-height:0.2rem">
-                                            <h6>Police Mobile</h6>
-                                            <p class="text_height_map"><b>Reg #:</b> ${item.registration_number}</p>
-                                            <p class="text_height_map"><b>Contact:</b> ${item.contact_number}</p>
-                                            <p class="text_height_map"><b>Distanse:</b> ${parseFloat(item.distance).toFixed(2)} Km</p>
-                                            </div>
-                                        `);
-
-
-
-                    });
-                }
-            });
         }
 
         // Initialize map
         function initMap(lat,lng) {
             myMap = L.map('map', {
-                center: [lat,lng],
-                zoom: 14,
+                center: [34.0151,71.5249],
+                zoom: 12,
                 zoomControl: true
             });
 
             //add basemap layer
             lyrGoogleMap = L.tileLayer('http://mts3.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
                 maxZoom: 22,
-                maxNativeZoom: 18
+                maxNativeZoom: 12
             }); //lyrGoogleMa
 
             lyrGoogleHybrid = L.tileLayer('http://mts2.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
@@ -358,7 +275,7 @@
             myMap.off();
             myMap.remove();
             myMap = L.map('map', {
-                center: [current_lat,current_lng],
+                center: ["{{$district_lat}}","{{$district_lng}}"],
                 zoom: 8,
                 zoomControl: true
             });
@@ -423,11 +340,22 @@
 
             });
             var mymarker = L.marker([lat,lng], {icon: myIcon}).addTo(myMap);
+            mymarker.bindPopup(`
+                                            <div style="line-height:0.2rem">
+                                            <h6>Police Mobile</h6>
+
+                                            <p class="text_height_map"><b>Registration#:</b> "{{$data->registration_number}}"</p>
+                                            <p class="text_height_map"><b>Incharge Name:</b> "{{$data->incharge_name}}"</p>
+                                            <p class="text_height_map"><b>Incharge Name:</b> "{{$data->contact_number}}"</p>
+                                            <p class="text_height_map"><b>Last Update Time:</b> "{{date("d-m-Y h:i A",strtotime($data->updated_at))}}"</p>
+
+                                            </div>
+                                        `);
 
         }
 
         function getMobileHistory() {
-           // reinitMap();
+            reinitMap();
             $.ajax({
                 url: '{{ route("getMobileHistory") }}', // Replace with your actual URL
                 type: 'post',
@@ -443,11 +371,6 @@
                     $("#police_mobile_checkbox_count").text(response.data.length);
 
                     var latlngs = [];
-
-
-
-
-
                     $.each(response.data, function (index, item) {
 
                         if(item.lat != null && item.lng != null){
@@ -462,9 +385,11 @@
                             mymarker.bindPopup(`
                                             <div style="line-height:0.2rem">
                                             <h6>Police Mobile</h6>
-                                            <p class="text_height_map"><b>id#:</b> ${item.id}</p>
-                                            <p class="text_height_map"><b>Registration#:</b> ${item.lat}</p>
-                                            <p class="text_height_map"><b>Incharge Name:</b> ${item.lng}</p>
+
+                                            <p class="text_height_map"><b>Registration#:</b> "{{$data->registration_number}}"</p>
+                                            <p class="text_height_map"><b>Incharge Name:</b> "{{$data->incharge_name}}"</p>
+                                            <p class="text_height_map"><b>Incharge Name:</b> "{{$data->contact_number}}"</p>
+                                            <p class="text_height_map"><b>Date Time:</b> ${item.date_time}</p>
 
                                             </div>
                                         `);
@@ -488,7 +413,7 @@
             });
         }
 
-        //setInterval(getMobileHistory, 30000);
+        setInterval(getMobileHistory, 30000);
 
 
 

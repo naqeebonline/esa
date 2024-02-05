@@ -524,9 +524,9 @@ class UsersController extends Controller
         return["message"=>"success","data"=>Tehsils::whereDistrictId($district_id)->get()];
     }
 
-    public function getPoliceStations($district_id)
+    public function getPoliceStations()
     {
-        return["message"=>"success","data"=>PoliceStation::whereDistrictId($district_id)->get()];
+        return["message"=>"success","data"=>PoliceStation::whereDistrictId(request()->district_id)->get()];
     }
 
     public function getCirclePoliceStations($circle_id)

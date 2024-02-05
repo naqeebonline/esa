@@ -197,9 +197,93 @@
             initMap("{{$data->lat}}","{{$data->lng}}");
             loadBoundaryData();
             loadMarker("{{$data->lat}}","{{$data->lng}}");
+            findNearest();
             // loadIcon();
         }
+        function findNearest() {
 
+            $.ajax({
+                url: '{{ route("findNearestResource") }}', // Replace with your actual URL
+                method: 'post',
+                data: {
+
+                    lat:"{{$data->lat}}",
+                    lng:"{{$data->lng}}",
+                    _token: '{{ csrf_token() }}'
+
+                },
+                success: function (response) {
+
+
+                    $.each(response.police_station, function (index, item) {
+
+                        var myIcon = L.icon({
+                            iconUrl: base_url+"markers/ps.png",
+                            className:"police_stations_marker",
+                            iconSize: [40, 40],
+
+                        });
+                        var mymarker = L.marker([item.latitude,item.longitude], {icon: myIcon}).addTo(myMap);
+                        mymarker.bindPopup(`
+                                           <div style="line-height:0.2rem">
+                                            <h6>Police Stations</h6>
+                                            <p class="text_height_map"><b>Name:</b> ${item.title}</p>
+                                            <p class="text_height_map"><b>Contact:</b> ${item.ps_contact_number}</p>
+                                            <p class="text_height_map"><b>Distanse:</b> ${parseFloat(item.distance).toFixed(2)} Km</p>
+                                            </div>
+                                        `);
+
+
+
+                    });
+
+
+                    $.each(response.hospitals, function (index, item) {
+
+                        var myIcon = L.icon({
+                            iconUrl: base_url+"markers/hospital.png",
+                            className:"police_stations_marker",
+                            iconSize: [40, 40],
+
+                        });
+                        var mymarker = L.marker([item.lat,item.lng], {icon: myIcon}).addTo(myMap);
+                        mymarker.bindPopup(`
+                                           <div style="line-height:0.2rem">
+                                            <h6>Health Facility</h6>
+                                            <p class="text_height_map"><b>Name:</b> ${item.name}</p>
+                                            <p class="text_height_map"><b>Contact:</b> ${item.contact_number}</p>
+                                            <p class="text_height_map"><b>Distanse:</b> ${parseFloat(item.distance).toFixed(2)} Km</p>
+                                            </div>
+                                        `);
+
+
+
+                    });
+
+                    $.each(response.police_mobile, function (index, item) {
+
+                        var myIcon = L.icon({
+                            iconUrl: base_url+"markers/police_mobile.png",
+                            className:"police_stations_marker",
+                            iconSize: [40, 40],
+
+                        });
+                        var mymarker = L.marker([item.lat,item.lng], {icon: myIcon}).addTo(myMap);
+                        mymarker.bindPopup(`
+                                           <div style="line-height:0.2rem">
+                                            <h6>Police Mobile</h6>
+                                            <p class="text_height_map"><b>Reg #:</b> ${item.registration_number}</p>
+                                            <p class="text_height_map"><b>Contact:</b> ${item.contact_number}</p>
+                                            <p class="text_height_map"><b>Distanse:</b> ${parseFloat(item.distance).toFixed(2)} Km</p>
+                                            </div>
+                                        `);
+
+
+
+                    });
+                }
+            });
+        }
         // Initialize map
         function initMap(lat,lng) {
             myMap = L.map('map', {

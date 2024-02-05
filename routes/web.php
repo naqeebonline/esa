@@ -135,6 +135,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('list-police-mobile', [\App\Http\Controllers\PoliceMobileController::class, 'listPoliceMobile'])->name('list.police.mobile');
     Route::post('save-police-mobile', [\App\Http\Controllers\PoliceMobileController::class, 'savePoliceMobile'])->name('save.police.mobile');
     Route::get('edit-police-mobile/{id}', [\App\Http\Controllers\PoliceMobileController::class, 'editPoliceMobile'])->name('edit.police.mobile');
+    Route::get('view-on-map/{id}', [\App\Http\Controllers\PoliceMobileController::class, 'viewOnMap'])->name('viewOnMap');
     Route::post('update-police-mobile', [\App\Http\Controllers\PoliceMobileController::class, 'updatePoliceMobile'])->name('update.police.mobile');
     Route::get('police-mobile', [\App\Http\Controllers\PoliceMobileController::class, 'policeMobile'])->name('all.police.mobile');
     Route::get('exportPoliceMobile', [\App\Http\Controllers\PoliceMobileController::class, 'exportPoliceMobile'])->name('exportPoliceMobile');
@@ -171,4 +172,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('view-emergency-alert/{id}', [\App\Http\Controllers\EmergencyAlertsController::class, 'viewEmergencyAlert'])->name('view.emergency.alert');
     Route::get('getCountEmergencyAlerts', [\App\Http\Controllers\EmergencyAlertsController::class, 'getCountEmergencyAlerts'])->name('getCountEmergencyAlerts');
     Route::post('update-alert-status', [\App\Http\Controllers\EmergencyAlertsController::class, 'updateAlertStatus'])->name('updateAlertStatus');
+
+
+    Route::post('findNearestResource', [\App\Http\Controllers\PollingStationController::class, 'findNearestResource'])->name('findNearestResource');
 });

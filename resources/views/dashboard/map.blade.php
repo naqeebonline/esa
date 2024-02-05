@@ -1134,12 +1134,22 @@
                             $.each(response.data, function (index, item) {
                                 if(item.lat != null && item.lng != null){
 
-                                    var myIcon = L.icon({
-                                        iconUrl: 'https://w7.pngwing.com/pngs/5/851/png-transparent-marker-map-icon-car-location-automobile-vehicle-target-design.png',
-                                        iconSize: [20, 30],
-                                        className:"police_mobile_marker"
+                                    if(item.minuts_ago <= 500){
+                                        var myIcon = L.icon({
+                                            iconUrl: base_url+"markers/police_mobile.png",
+                                            iconSize: [30, 30],
+                                            className:"police_mobile_marker"
 
-                                    });
+                                        });
+                                    }else{
+                                        var myIcon = L.icon({
+                                            iconUrl: 'https://w7.pngwing.com/pngs/5/851/png-transparent-marker-map-icon-car-location-automobile-vehicle-target-design.png',
+                                            iconSize: [10, 20],
+                                            className:"police_mobile_marker"
+
+                                        });
+                                    }
+
                                     var mymarker = L.marker([item.lat,item.lng], {icon: myIcon}).addTo(myMap);
                                     mymarker.bindPopup(`
                                             <div style="line-height:0.2rem">
@@ -1147,7 +1157,8 @@
                                             <p class="text_height_map"><b>Registration#:</b> ${item.registration_number}</p>
                                             <p class="text_height_map"><b>Incharge Name:</b> ${item.incharge_name}</p>
                                             <p class="text_height_map"><b>Contact:</b> ${item.contact_number}</p>
-                                            <a target="_blank" href="${base_url}edit-police-mobile/${item.id}">View Details<a>
+                                            <a target="_blank" href="${base_url}view-on-map/${item.id}">View Details<a>
+
                                             </div>
                                         `);
                                 }

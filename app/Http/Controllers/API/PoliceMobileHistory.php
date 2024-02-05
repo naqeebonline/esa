@@ -34,7 +34,8 @@ class PoliceMobileHistory extends Controller
         \App\Models\PoliceMobileHistory::create($data);
         PoliceMobile::whereId($user->police_mobile_id)->update([
             "lat"               => request()->lat,
-            "lng"               => request()->lng
+            "lng"               => request()->lng,
+            "updated_at"        => date("Y-m-d h:i:s")
         ]);
         return response()->json(['error' => false, 'message' => "Location Updated Successfully"],200);
 
