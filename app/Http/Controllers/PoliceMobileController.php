@@ -86,7 +86,14 @@ class PoliceMobileController extends Controller
     public function policeMobile()
     {
         $users = PoliceMobile::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
-            return $q->where(["district_id"=>auth()->user()->district_id]);
+
+            if(auth()->user()->roles->pluck('slug')[0] == "regional.user"){
+                $district_ids = Districts::whereReagin(auth()->user()->region_id)->pluck("id")->all();
+                return $q->whereIn("district_id",$district_ids);
+            }else{
+                return $q->where(["district_id" => auth()->user()->district_id]);
+            }
+
         })
             ->when(request()->district_id,function ($q){
                 return $q->where("district_id",request()->district_id);
@@ -129,6 +136,7 @@ class PoliceMobileController extends Controller
 
     public function listPoliceMobile()
     {
+
         $data = [
             'title' => 'List Police Mobile',
 
@@ -138,8 +146,14 @@ class PoliceMobileController extends Controller
         });
         $data["data"] = $query->get();
         $data['districts'] = Districts::whereProvinceId(1)
-            ->when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Regional User"), function ($q) {
-                return $q->where(["id" => auth()->user()->district_id]);
+            ->when((auth()->user()->roles->pluck('name')[0] != "Super Admin"), function ($q) {
+                if(auth()->user()->roles->pluck('slug')[0] == "regional.user"){
+                    $district_ids = Districts::whereReagin(auth()->user()->region_id)->pluck("id")->all();
+                    return $q->whereIn("id",$district_ids);
+                }else{
+                    return $q->where(["id" => auth()->user()->district_id]);
+                }
+
             })
             ->get();
         return view("police_mobiles.list",$data);

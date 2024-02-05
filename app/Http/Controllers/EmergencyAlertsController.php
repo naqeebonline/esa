@@ -20,7 +20,13 @@ class EmergencyAlertsController extends Controller
 
         ];
         $data['districts'] = Districts::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
-            return $q->where(["id" => auth()->user()->district_id]);
+            if(auth()->user()->roles->pluck('slug')[0] == "regional.user"){
+                $district_ids = Districts::whereReagin(auth()->user()->region_id)->pluck("id")->all();
+                return $q->whereIn("id",$district_ids);
+            }else{
+                return $q->where(["id" => auth()->user()->district_id]);
+            }
+
         })->get();
 
         return view("emergency_alerts.list",$data);
@@ -34,7 +40,13 @@ class EmergencyAlertsController extends Controller
         $alert_status = request()->alert_status ?? "";
         $users = EmergencyAlert::with('district')->with('users')
             ->when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
-            return $q->where(["district_id"=>auth()->user()->district_id]);
+                if(auth()->user()->roles->pluck('slug')[0] == "regional.user"){
+                    $district_ids = Districts::whereReagin(auth()->user()->region_id)->pluck("id")->all();
+                    return $q->whereIn("district_id",$district_ids);
+                }else{
+                    return $q->where(["district_id" => auth()->user()->district_id]);
+                }
+
         })
             ->when($district_id, function ($q) use ($district_id) {
             return $q->where(["district_id"=>$district_id]);

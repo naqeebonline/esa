@@ -82,7 +82,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('getMultiDistricts', [\Modules\Settings\Http\Controllers\UsersController::class, 'getMultiDistricts'])->name('getMultiDistricts');
     Route::post('getAllPollingStations', [\Modules\Settings\Http\Controllers\UsersController::class, 'getAllPollingStations'])->name('getAllPollingStations');
     Route::post('loadMultiPoliceStations', [\Modules\Settings\Http\Controllers\UsersController::class, 'loadMultiPoliceStations'])->name('loadMultiPoliceStations');
-    Route::get('getPoliceStations/{id?}', [\Modules\Settings\Http\Controllers\UsersController::class, 'getPoliceStations'])->name('getPoliceStations');
+    Route::post('loadMultiPollingStations', [\Modules\Settings\Http\Controllers\UsersController::class, 'loadMultiPollingStations'])->name('loadMultiPollingStations');
+    Route::post('getPoliceStations', [\Modules\Settings\Http\Controllers\UsersController::class, 'getPoliceStations'])->name('getPoliceStations');
     Route::get('getPoliceStationUser/{id?}', [\Modules\Settings\Http\Controllers\UsersController::class, 'getPoliceStationUser'])->name('getPoliceStationUser');
     Route::get('getDistrictUser/{id?}', [\Modules\Settings\Http\Controllers\UsersController::class, 'getDistrictUser'])->name('getDistrictUser');
     Route::get('getCirclePoliceStations/{circle_id?}', [\Modules\Settings\Http\Controllers\UsersController::class, 'getCirclePoliceStations'])->name('getCirclePoliceStations');

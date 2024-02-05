@@ -44,7 +44,9 @@ class UsersController extends Controller
                     return $q->where(["id" => auth()->user()->district_id]);
                 })
                 ->get(),
-            'role_data' => Role::get(),
+            'role_data' => Role::when((auth()->user()->roles->pluck('name')[0] != "Super Admin"), function ($q) {
+                return $q->whereIn("id",[56,57,58]);
+            })->get(),
             'items' => User::with([
                 'section',
                 'company',
@@ -597,7 +599,7 @@ class UsersController extends Controller
     {
 
         $district_id = request()->districts;
-        $data =Circle::whereIn("district_id",$district_id)->get();
+        $data =Circle::select(["id","name"])->whereIn("district_id",$district_id)->get();
         return["message"=>"success","data"=>$data];
     }
 
@@ -617,26 +619,77 @@ class UsersController extends Controller
         return["message"=>"success","data"=>$data];
     }
 
+    public function loadMultiPollingStations()
+    {
+
+        $district_id = request()->district_id;
+        $circle_id = request()->circle_id ?? "";
+        $police_station_id = "";
+        if($circle_id){
+            $police_station_id = PoliceStation::whereIn("circle_id",$circle_id)->pluck("id")->all();
+        }
+
+        $data =PollingStation::select(["id","polling_station_name"])
+            ->when($district_id, function ($q) use ($district_id) {
+                return $q->whereIn("district_id",$district_id);
+            })
+            ->when($police_station_id, function ($q) use ($police_station_id) {
+                return $q->whereIn("police_station_id",$police_station_id);
+            })
+            ->get();
+        return["message"=>"success","data"=>$data];
+    }
+
 
     public function getMultiDistrictUser()
     {
+        $police_station_id = "";
         $district_id = request()->districts;
+        $circle_id = request()->circle_id ?? "";
+        $polling_stations_id = "";
+        $circle_police_mobiles = "";
+        if($circle_id){
+            $police_station_id = PoliceStation::whereIn("circle_id",$circle_id)->pluck("id")->all();
+            $polling_stations_id = PollingStation::whereIn("police_station_id",$police_station_id)->pluck("id")->all();
+            $circle_police_mobiles = PoliceMobile::whereIn("police_station_id",$police_station_id)->pluck("id")->all();
+        }
+        if(request()->polling_stations_id){
+            $polling_stations_id = request()->polling_stations_id;
+        }
 
         $res["polling_station_user"] = User::select(["id","name","username"])->with("roles:id,name")->with('district')->whereHas("roles", function($q) {
             $q->whereIn("roles.id", [56]);
-        })->whereIn("district_id",$district_id)->get()->makeHidden(['roles',"roles_array","permissions_array"]) ;
+        })
+            ->whereIn("district_id",$district_id)
+            ->when($polling_stations_id, function ($q) use ($polling_stations_id) {
+                return $q->whereIn("polling_station_id",$polling_stations_id);
+            })
+            ->get()
+            ->makeHidden(['roles',"roles_array","permissions_array"]) ;
+
+       //============== get police mobile on bases of police station . police station will get from circle id ..=========//
 
         $res["police_mobile_user"] = User::select(["id","name","username","police_mobile_id"])->with("roles:id,name")->with('district')->whereHas("roles", function($q) {
             $q->whereIn("roles.id", [58]);
-        })->whereIn("district_id",$district_id)->get()->makeHidden(['roles',"roles_array","permissions_array"]);
+        })
+            ->whereIn("district_id",$district_id)
+            ->when($circle_police_mobiles, function ($q) use ($circle_police_mobiles) {
+                return $q->whereIn("police_mobile_id",$circle_police_mobiles);
+            })
+            ->get()->makeHidden(['roles',"roles_array","permissions_array"]);
+
         foreach ($res["police_mobile_user"] as $key => $value){
             $value->registration_number = $value->policeMobile?->registration_number ?? "";
         }
-        $res["police_station_users"] = User::select(["id","name","username"])->with("roles:id,name")->with('district')->whereHas("roles", function($q) {
+
+        //========== end of getting police mobiles  ================//
+        $res["police_station_users"] = [];
+
+        /*$res["police_station_users"] = User::select(["id","name","username"])->with("roles:id,name")->with('district')->whereHas("roles", function($q) {
             $q->whereIn("roles.id", [4]);
         })
             ->whereIn("district_id",$district_id)
-            ->get()->makeHidden(['roles',"roles_array","permissions_array"]);
+            ->get()->makeHidden(['roles',"roles_array","permissions_array"]);*/
 
         return["message"=>"success","data"=>User::select(["id","name","username"])->whereDistrictId($district_id)->get()->makeHidden(['roles',"roles_array","permissions_array"]),"users"=>$res];
 

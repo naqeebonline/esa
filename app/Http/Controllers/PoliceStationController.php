@@ -27,6 +27,7 @@ class PoliceStationController extends Controller
         $data['rank'] = (new CommonApiController())->getRankForWeb();
 
         $data["circles"] =Circle::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
+
             return $q->where(["district_id"=>auth()->user()->district_id]);
         })->get();
 
@@ -36,11 +37,11 @@ class PoliceStationController extends Controller
     public function allPoliceStations()
     {
         $users = PoliceStation::with(["district","circle"])->when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
-            if(auth()->user()->roles->pluck('name')[0] == "Regional User"){
+            if(auth()->user()->roles->pluck('slug')[0] == "regional.user"){
                 $district_ids = Districts::whereReagin(auth()->user()->region_id)->pluck("id")->all();
                 return $q->whereIn("district_id",$district_ids);
             }else{
-                return $q->where(["district_id"=>auth()->user()->district_id]);
+                return $q->where(["district_id" => auth()->user()->district_id]);
             }
 
         })
@@ -77,8 +78,14 @@ class PoliceStationController extends Controller
 
         ];
         $data['districts'] = Districts::whereProvinceId(1)
-            ->when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Regional User"), function ($q) {
-                return $q->where(["id" => auth()->user()->district_id]);
+            ->when((auth()->user()->roles->pluck('name')[0] != "Super Admin"), function ($q) {
+                if(auth()->user()->roles->pluck('slug')[0] == "regional.user"){
+                    $district_ids = Districts::whereReagin(auth()->user()->region_id)->pluck("id")->all();
+                    return $q->whereIn("id",$district_ids);
+                }else{
+                    return $q->where(["id" => auth()->user()->district_id]);
+                }
+
             })
             ->get();
         return view("police_station.list",$data);

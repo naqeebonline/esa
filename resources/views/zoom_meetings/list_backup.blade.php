@@ -40,15 +40,15 @@
                     >
                         Create New Meeting
                     </div>
-                    {{--                    <div class="header-elements">--}}
-                    {{--                        <div class="form-check form-check-right form-check-switchery form-check-switchery-sm">--}}
+{{--                    <div class="header-elements">--}}
+{{--                        <div class="form-check form-check-right form-check-switchery form-check-switchery-sm">--}}
 
-                    {{--                            --}}{{--<label class="form-check-label">--}}
-                    {{--                                Live update:--}}
-                    {{--                                <input type="checkbox" class="form-input-switchery" checked data-fouc>--}}
-                    {{--                            </label>--}}
-                    {{--                        </div>--}}
-                    {{--                    </div>--}}
+{{--                            --}}{{--<label class="form-check-label">--}}
+{{--                                Live update:--}}
+{{--                                <input type="checkbox" class="form-input-switchery" checked data-fouc>--}}
+{{--                            </label>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
                 </div>
 
                 <div class="card-body">
@@ -65,7 +65,7 @@
 
                                     <thead>
                                     <tr>
-                                        {{--                                        <th>#</th>--}}
+{{--                                        <th>#</th>--}}
                                         <th style="width: 25%">Meeting ID</th>
                                         <th style="width: 10%">Start Meeting</th>
                                         <th  style="width: 15%">Topic</th>
@@ -96,7 +96,7 @@
 
                                                 <a target="_blank" href="{{$value->start_url}}" class="bx bx-video" style="color: red"></a>
 
-                                                {{-- <a onClick="MyWindow=window.open(base_url+'zoom/index.html?id={{$value->zoom_meeting_id}}&pass={{$value->encrypted_password}}&title={{$value->topic}}&email={{auth()->user()->email}}&meeting_role=1&user={{auth()->user()->name}}','MyWindow','width=600,height=600'); return false;"   class="bx bx-video" style="color: green"></a>--}}
+                                               {{-- <a onClick="MyWindow=window.open(base_url+'zoom/index.html?id={{$value->zoom_meeting_id}}&pass={{$value->encrypted_password}}&title={{$value->topic}}&email={{auth()->user()->email}}&meeting_role=1&user={{auth()->user()->name}}','MyWindow','width=600,height=600'); return false;"   class="bx bx-video" style="color: green"></a>--}}
 
                                                 <code id="copy{{$value->id}}" style="display: none">
                                                     <u>Topic:{{$value->topic."\n"}}</u>
@@ -120,9 +120,9 @@
 
                                                 @foreach($value->meetingUsers as $key2 => $v2)
                                                     @if($key2 <= 12)
-                                                        <code>{{$v2->users?->name ?? ""}}</code>,
+                                                    <code>{{$v2->users?->name ?? ""}}</code>,
                                                     @endif
-                                                @endforeach
+                                                 @endforeach
                                             </td>
 
 
@@ -138,7 +138,7 @@
                                                 <a  class="btn btn-primary assign_to_user" data-id="{{$value->zoom_meeting_id}}"><i class="tf-icons bx bx-wrench"></i></a>
 
                                                 @if(count($value->meetingUsers) > 0)
-                                                    <a  class="btn btn-danger generate_push" data-id="{{$value->zoom_meeting_id}}"><i class="tf-icons bx bx-play"></i></a>
+                                                <a  class="btn btn-danger generate_push" data-id="{{$value->zoom_meeting_id}}"><i class="tf-icons bx bx-play"></i></a>
                                                 @endif
 
                                             </td>
@@ -170,7 +170,7 @@
                             <select class="form-control select2" id="district_id" multiple="multiple">
                                 <option value="">Select District...</option>
                                 @foreach($districts as $key => $value)
-                                    <option value="{{$value->id}}">{{$value->title}}</option>
+                                <option value="{{$value->id}}">{{$value->title}}</option>
                                 @endforeach
 
                             </select>
@@ -190,7 +190,7 @@
                         </div>
                     </div>
 
-                    {{--<div class="row">
+                    <div class="row">
                         <div class="col mb-3">
 
                             {!! Form::label('Police Station', 'Police Station  ', ['class' => 'form-label']) !!}
@@ -198,20 +198,8 @@
 
                         </div>
                     </div>
---}}
 
                     <div class="row">
-                        <div class="col mb-3">
-
-                            {!! Form::label('Polling Station', 'Polling Station  ', ['class' => 'form-label']) !!}
-                            <button type="button" onclick="selectAllPollingStationUser()">Select All</button>
-                            <button type="button" onclick="deselectAllPollingStationUser()">Deselect All</button>
-                            {!! Form::select('polling_stations_id', [],  null, ['class' => 'form-control select2','id'=>"polling_stations_id","multiple"=>"multiple"]) !!}
-
-                        </div>
-                    </div>
-
-                   {{-- <div class="row">
                         <div class="col mb-3">
                             <label for="police_station_users" class="form-label">Police Station Users</label>
                             <button type="button" onclick="selectAllPoliceStationUser()">Select All</button>
@@ -219,7 +207,7 @@
                             {!! Form::select('police_station_users[]', [], null, ['class' => 'form-select select2', 'id' => 'police_station_users', 'multiple' => 'multiple']) !!}
 
                         </div>
-                    </div>--}}
+                    </div>
 
                     <div class="row">
                         <div class="col mb-3">
@@ -282,7 +270,7 @@
                     <div class="row">
                         <div class="col mb-3">
                             <label for="nameAnimation" class="form-label">Agenda</label>
-                            <input type="text" class="form-control" id="meeting_type">
+                             <input type="text" class="form-control" id="meeting_type">
                         </div>
                     </div>
 
@@ -331,14 +319,14 @@
             $("#polling_station_user").trigger("change");
         }
 
-        function selectAllPollingStationUser() {
-            $("#polling_stations_id > option").prop("selected", true);
-            $("#polling_stations_id").trigger("change");
+        function selectAllPoliceStationUser() {
+            $("#police_station_users > option").prop("selected", true);
+            $("#police_station_users").trigger("change");
         }
 
-        function deselectAllPollingStationUser() {
-            $("#polling_stations_id > option").prop("selected", false);
-            $("#polling_stations_id").trigger("change");
+        function deselectAllPoliceStationUser() {
+            $("#police_station_users > option").prop("selected", false);
+            $("#police_station_users").trigger("change");
         }
 
         function selectAllPoliceMobile() {
@@ -418,22 +406,22 @@
 
                     },
                     success: function (response) {
-                        alert("Invitation has been sent to all users");
+                       alert("Invitation has been sent to all users");
                     }
                 });
 
             });
 
             $("body").on("click",".assign_user_to_meeting",function (e) {
-                var district_id = $("#district_id").val();
-                var police_station_id = "";
-                var police_station_users = [];
+               var district_id = $("#district_id").val();
+               var police_station_id = $("#police_station_id").val();
+                var police_station_users = $("#police_station_users").val();
                 var polling_station_user = $("#polling_station_user").val();
                 var police_mobile_user = $("#police_mobile_user").val();
-                /*if(police_station_users.length == 0){
-                    alert("Please assign users to meeting");
-                    return false;
-                }*/
+               /*if(police_station_users.length == 0){
+                   alert("Please assign users to meeting");
+                   return false;
+               }*/
                 $.ajaxSetup({
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -445,7 +433,7 @@
                     data:{meeting_id,district_id,police_station_id,police_station_users,polling_station_user,police_mobile_user, _token: '{{ csrf_token() }}'},
                     success: function (response) {
                         if(response.status == true){
-                            window.location.reload();
+                             window.location.reload();
                         }
 
                     }
@@ -455,9 +443,49 @@
 
 
             $('#district_id').on('change', function () {
+                var selectedDistrict = $(this).val();
+                $.ajax({
+                    url: '{{ route("getMultiDistrictUser") }}', // Replace with your actual URL
+                    method: 'post',
+                    data: {
+                        districts: selectedDistrict,
+                        _token: '{{ csrf_token() }}'
+
+                    },
+                    success: function (response) {
+                        console.log(response);
+
+                        var psOptions = '<option value=""></option>';
+                        $.each(response.data, function (index, item) {
+                            psOptions += '<option value="' + item.id + '">' + item.username + '</option>';
+                        });
+                        $("#police_station_users").html(psOptions);
+
+                        var psuOptions = '';
+                        $.each(response.users.polling_station_user, function (index, item) {
+                            psuOptions += '<option value="' + item.id + '">' + item.username + '</option>';
+                        });
+                        $("#polling_station_user").html(psuOptions);
 
 
-                /*$.ajax({
+                        var policeMobileOptions = '';
+                        $.each(response.users.police_mobile_user, function (index, item) {
+
+                            policeMobileOptions += `<option value="${item.id}">${item.username} (${item.registration_number}) </option>`;
+                        });
+                        $("#police_mobile_user").html(policeMobileOptions);
+
+                        var police_station_UserOptions = '';
+                        $.each(response.users.police_station_users, function (index, item) {
+                            police_station_UserOptions += `<option value="${item.id}">${item.username} </option>`;
+                        });
+                        $("#police_station_users").html(police_station_UserOptions);
+
+
+                    }
+                });
+
+                $.ajax({
                     url: '{{ route("getPoliceStations") }}/' + selectedDistrict, // Replace with your actual URL
                     method: 'GET',
                     success: function (response) {
@@ -467,24 +495,15 @@
                         });
                         $("#police_station_id").html(psOptions);
                     }
-                });*/
-                loadUsers();
+                });
+
                 loadCircle();
-                loadMultiPollingStations();
 
 
             });
 
             $("body").on("change","#circle_id",function (e) {
-                loadMultiPollingStations();
-                loadUsers();
-
-            });
-
-            $("body").on("change","#polling_stations_id",function (e) {
-
-                loadUsers();
-
+                loadMultiPoliceStations();
             });
 
             $('#police_station_id').on('change', function () {
@@ -544,54 +563,6 @@
 
         }
 
-        function loadUsers() {
-            var selectedDistrict = $("#district_id").val();
-            var circle_id = $("#circle_id").val();
-            var polling_stations_id = $("#polling_stations_id").val();
-            $.ajax({
-                url: '{{ route("getMultiDistrictUser") }}', // Replace with your actual URL
-                method: 'post',
-                data: {
-                    districts: selectedDistrict,
-                    circle_id: circle_id,
-                    polling_stations_id: polling_stations_id,
-                    _token: '{{ csrf_token() }}'
-
-                },
-                success: function (response) {
-                    console.log(response);
-
-                    var psOptions = '<option value=""></option>';
-                    $.each(response.data, function (index, item) {
-                        psOptions += '<option value="' + item.id + '">' + item.username + '</option>';
-                    });
-                    $("#police_station_users").html(psOptions);
-
-                    var psuOptions = '';
-                    $.each(response.users.polling_station_user, function (index, item) {
-                        psuOptions += '<option value="' + item.id + '">' + item.username + '</option>';
-                    });
-                    $("#polling_station_user").html(psuOptions);
-
-
-                    var policeMobileOptions = '';
-                    $.each(response.users.police_mobile_user, function (index, item) {
-
-                        policeMobileOptions += `<option value="${item.id}">${item.username} (${item.registration_number}) </option>`;
-                    });
-                    $("#police_mobile_user").html(policeMobileOptions);
-
-                    var police_station_UserOptions = '';
-                    $.each(response.users.police_station_users, function (index, item) {
-                        police_station_UserOptions += `<option value="${item.id}">${item.username} </option>`;
-                    });
-                    $("#police_station_users").html(police_station_UserOptions);
-
-
-                }
-            });
-        }
-
         function loadCircle() {
 
             var districts = $('#district_id').val();
@@ -636,57 +607,5 @@
             });
         }
 
-
-
-        function loadMultiPollingStations() {
-
-            var district_id = $("#district_id").val();
-            var circle_id = $("#circle_id").val();
-            $.ajax({
-                url: '{{ route("loadMultiPollingStations") }}' , // Replace with your actual URL
-                method: 'post',
-                data: {
-                    district_id: district_id,
-                    circle_id: circle_id,
-                    _token: '{{ csrf_token() }}'
-
-                },
-                success: function (response) {
-                    var psOptions = '<option value="">Select Polling Stations</option>';
-                    $.each(response.data, function (index, item) {
-                        psOptions += '<option value="' + item.id + '">' + item.polling_station_name + '</option>';
-                    });
-                    $("#polling_stations_id").html(psOptions);
-                    psOptions = "";
-                }
-            });
-        }
-
     </script>
 @endpush
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

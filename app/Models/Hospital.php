@@ -20,4 +20,9 @@ class Hospital extends Model
     {
         return $this->belongsTo(PoliceStation::class, 'police_station_id');
     }
+
+    public function district()
+    {
+        return $this->belongsTo(Districts::class, 'district_id');
+    }
 }

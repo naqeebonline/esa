@@ -45,9 +45,11 @@
                                     <tr>
 {{--                                        <th>#</th>--}}
 
-                                        <th  style="width: 7%">Name</th>
+                                        <th  style="width: 7%">District</th>
+
                                         <th style="width: 10%">Police Station</th>
                                         <th style="width: 10%">Facility Type</th>
+                                        <th  style="width: 7%">Name</th>
 
                                         <th style="width: 10%">Contact#</th>
                                         <th style="width: 10%">Lat</th>
@@ -97,9 +99,11 @@
 
                 columns: [
 
-                    {data: 'name', name: 'name'},
+
+                    {data: 'district_name', name: 'district.name'},
                     {data: 'police_station_name', name: 'police_station_name'},
                     {data: 'facility_type', name: 'facility_type'},
+                    {data: 'name', name: 'name'},
                     {data: 'contact_number', name: 'contact_number'},
                     {data: 'lat', name: 'lat'},
                     {data: 'lng', name: 'lng'},

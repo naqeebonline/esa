@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Districts;
 use App\Models\FacilityType;
 use App\Models\Hospital;
 use Illuminate\Http\Request;
@@ -22,9 +23,15 @@ class HospitalController extends Controller
 
     public function allHospital()
     {
-        $users = Hospital::with(["facilityType"])
+        $users = Hospital::with(["facilityType","district"])
             ->when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
-                return $q->where(["district_id" => auth()->user()->district_id]);
+                if(auth()->user()->roles->pluck('slug')[0] == "regional.user"){
+                    $district_ids = Districts::whereReagin(auth()->user()->region_id)->pluck("id")->all();
+                    return $q->whereIn("district_id",$district_ids);
+                }else{
+                    return $q->where(["district_id" => auth()->user()->district_id]);
+                }
+
             });
         return DataTables::of($users)
             ->addColumn('action', function($cert) {
@@ -41,7 +48,10 @@ class HospitalController extends Controller
             ->addColumn('facility_type', function($cert) {
                 return $cert->facilityType->name ?? "";
             })
-            ->rawColumns(["police_station_name","facility_type","action"])
+            ->addColumn('district_name', function($cert) {
+                return $cert->district->title ?? "";
+            })
+            ->rawColumns(["police_station_name","facility_type","district_name","action"])
             ->make(true);
     }
 
