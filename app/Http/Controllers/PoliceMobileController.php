@@ -17,6 +17,7 @@ use App\Models\Reagin;
 use App\Models\Sensitivity;
 use App\Models\VehicleType;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use Modules\Settings\Entities\MyApp;
@@ -34,15 +35,15 @@ class PoliceMobileController extends Controller
         $data['district'] = Districts::get();
         $data['vehicle_type'] = VehicleType::get();
         $data['rank'] = (new CommonApiController())->getRankForWeb();
-        $data["police_stations"] =PoliceStation::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
+        $data["police_stations"] =PoliceStation::when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly"), function ($q) {
             return $q->where(["district_id"=>auth()->user()->district_id]);
         })->get();
 
-        $data["police_line"] =PoliceLine::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
+        $data["police_line"] =PoliceLine::when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly"), function ($q) {
             return $q->where(["district_id"=>auth()->user()->district_id]);
         })->get();
 
-        $data["circles"] =Circle::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
+        $data["circles"] =Circle::when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly"), function ($q) {
             return $q->where(["district_id"=>auth()->user()->district_id]);
         })->get();
         return view("police_mobiles.add",$data);
@@ -85,7 +86,9 @@ class PoliceMobileController extends Controller
 
     public function policeMobile()
     {
-        $users = PoliceMobile::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
+
+
+        $users = PoliceMobile::when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly"), function ($q) {
 
             if(auth()->user()->roles->pluck('slug')[0] == "regional.user"){
                 $district_ids = Districts::whereReagin(auth()->user()->region_id)->pluck("id")->all();
@@ -107,11 +110,17 @@ class PoliceMobileController extends Controller
         ->with('mobileUser');
         return DataTables::of($users)
             ->addColumn('action', function($cert) {
-                $actionsBtn = '<a class="dropdown-item p-50" href="'.route('edit.police.mobile',[$cert->id]).'"><i class="bx bx-file-blank mr-1"></i> Edit</a>';
+                if(in_array(auth()->user()->roles->pluck('name')[0],["Super Admin","District Super Admin"])){
+                    $actionsBtn = '<a class="dropdown-item p-50" href="'.route('edit.police.mobile',[$cert->id]).'"><i class="bx bx-file-blank mr-1"></i> Edit</a>';
 
-                $actionsBtn .= '<a class="dropdown-item p-50 delete_table_data" data-id="'.$cert->id.'" href="javascript:void(0)"><i class="bx bx-window-close"></i> Delete</a>';
 
+                    $actionsBtn .= '<a class="dropdown-item p-50 delete_table_data" data-id="'.$cert->id.'" href="javascript:void(0)"><i class="bx bx-window-close"></i> Delete</a>';
 
+                }else{
+                    $actionsBtn = "";
+                }
+
+                $actionsBtn .= '<a class="dropdown-item p-50" href="'.route('viewOnMap',[$cert->id]).'"><i class="bx bx-file-blank mr-1"></i> Track Vehicle</a>';
                 return $actionsBtn;
             })
             ->addColumn('district_name', function($cert) {
@@ -141,12 +150,12 @@ class PoliceMobileController extends Controller
             'title' => 'List Police Mobile',
 
         ];
-        $query = PoliceMobile::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
+        $query = PoliceMobile::when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly"), function ($q) {
             return $q->where(["district_id"=>auth()->user()->district_id]);
         });
         $data["data"] = $query->get();
         $data['districts'] = Districts::whereProvinceId(1)
-            ->when((auth()->user()->roles->pluck('name')[0] != "Super Admin"), function ($q) {
+            ->when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly"), function ($q) {
                 if(auth()->user()->roles->pluck('slug')[0] == "regional.user"){
                     $district_ids = Districts::whereReagin(auth()->user()->region_id)->pluck("id")->all();
                     return $q->whereIn("id",$district_ids);
@@ -177,13 +186,13 @@ class PoliceMobileController extends Controller
         $data['district'] = Districts::get();
         $data['vehicle_type'] = VehicleType::get();
         $data['rank'] = (new CommonApiController())->getRankForWeb();
-        $data["police_stations"] =PoliceStation::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
+        $data["police_stations"] =PoliceStation::when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly"), function ($q) {
             return $q->where(["district_id"=>auth()->user()->district_id]);
         })->get();
-        $data["circles"] =Circle::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
+        $data["circles"] =Circle::when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly"), function ($q) {
             return $q->where(["district_id"=>auth()->user()->district_id]);
         })->get();
-        $data["police_line"] =PoliceLine::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
+        $data["police_line"] =PoliceLine::when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly"), function ($q) {
             return $q->where(["district_id"=>auth()->user()->district_id]);
         })->get();
         $data["data"] = PoliceMobile::whereId($id)->first();
@@ -206,13 +215,13 @@ class PoliceMobileController extends Controller
         $data['district'] = Districts::get();
         $data['vehicle_type'] = VehicleType::get();
         $data['rank'] = (new CommonApiController())->getRankForWeb();
-        $data["police_stations"] =PoliceStation::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
+        $data["police_stations"] =PoliceStation::when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly"), function ($q) {
             return $q->where(["district_id"=>auth()->user()->district_id]);
         })->get();
-        $data["circles"] =Circle::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
+        $data["circles"] =Circle::when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly"), function ($q) {
             return $q->where(["district_id"=>auth()->user()->district_id]);
         })->get();
-        $data["police_line"] =PoliceLine::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
+        $data["police_line"] =PoliceLine::when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly"), function ($q) {
             return $q->where(["district_id"=>auth()->user()->district_id]);
         })->get();
         $data["data"] = PoliceMobile::with("district")->whereId($id)->first();
@@ -252,7 +261,7 @@ class PoliceMobileController extends Controller
             ->join("vehicle_type","vehicle_type.id","=","police_mobiles.vehicle_type")
             ->join("police_stations","police_stations.id","=","police_mobiles.police_station_id")
             ->join("districts","districts.id","=","police_mobiles.district_id")
-            ->when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
+            ->when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly"), function ($q) {
                 return $q->where(["police_mobiles.district_id"=>auth()->user()->district_id]);
             })
             ->get();

@@ -14,7 +14,13 @@
 
     <div class="row">
         <div class="col-12">
+            @if(in_array("Super Admin", auth()->user()->roles->toArray()))
+                <h4>this is Super admin</h4>
+            @endif
 
+            @if(!in_array("Super Admin", Auth::user()->roles->toArray()))
+                    <h4>this is not super admin</h4>
+        @endif
             <!-- Traffic sources -->
             <div class="card">
                 <div class="card-header header-elements-inline">

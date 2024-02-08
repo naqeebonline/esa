@@ -6,110 +6,52 @@
 
 
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-6">
             <div class="card mb-4">
-                <h5 class="card-header">View Emergency Alert</h5>
-                <form class="card-body" method="post" >
-
+                <h5 class="card-header">Add Credentials</h5>
+                <form class="card-body" method="post" enctype="multipart/form-data" action="{{route('save.credentials')}}">
+                    @csrf
 
                     <div class="row g-3">
 
                         <div class="col-md-12">
-                            <label class="form-label" for="multicol-email">District Name: <b>{{$data->district?->title ?? ""}}</b></label>
+                            <label class="form-label" for="multicol-username">District</label>
+                            <select class="form-control select2" required name="district_id" id="district_id">
+                                <option value="">Select Type....</option>
+                                @foreach($district as $key => $value)
+                                    <option   value="{{$value->id}}">{{$value->title}}</option>
+                                @endforeach
 
-                        </div>
-
-                        <div class="col-md-12">
-                            <label class="form-label" for="multicol-email">Alert Date Time : <b>{{date("d-m-Y h:i A",strtotime($data->created_at))}}</b></label>
-
-                        </div>
-
-                        <div class="col-md-12">
-                            <label class="form-label" for="multicol-email">Last Updated On: <b>{{date("d-m-Y h:i A",strtotime($data->updated_at))}}</b></label>
-
-                        </div>
-
-                        <div class="col-md-12">
-                            <label class="form-label" for="multicol-email">Type: <b>{{$data->type}}</b></label>
-
-                        </div>
-
-
-                        <div class="col-md-12">
-                            <label class="form-label" for="multicol-email">Message: <b>{{$data->message}}</b></label>
-
-                        </div>
-
-                        <div class="col-md-12">
-                            @if($data->audio)
-                                <audio controls autoplay>
-                                    <source src="{{$data->audio}}" type="audio/ogg">
-                                    <source src="{{$data->audio}}" type="audio/mpeg">
-
-                                </audio>
-                            @endif
-
-
-                        </div>
-
-                        <div class="col-md-12">
-                            @if($data->video)
-                                <video width="400" controls>
-                                    <source src="{{$data->video}}" type="video/mp4">
-                                    <source src="{{$data->video}}" type="video/ogg">
-
-                                </video>
-                            @endif
-                        </div>
-
-                        <div class="col-md-12">
-                             @if($data->attachment)
-                                 <img class="img img-thumbnail" src="{{$data->attachment}}">
-                             @endif
-                        </div>
-
-                    </div>
-
-
-
-
-                </form>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card mb-4">
-                <h5 class="card-header">Alert Status</h5>
-                <div class="card-body" method="post" >
-
-
-                    <div class="row g-3">
-
-
-                        <div class="col-md-12">
-                            <label class="form-label" for="multicol-email">Alert Current Status</label>
-                            <select class="form-control" id="alert_status">
-                                <option value="">Select Status...</option>
-                                <option {{ ($data->alert_status == "Pending") ? "selected=selected" : ""  }} value="Pending">Pending</option>
-                                <option {{ ($data->alert_status == "In Process") ? "selected=selected" : ""  }} value="In Process">In Process</option>
-                                <option {{ ($data->alert_status == "Resolved") ? "selected=selected" : ""  }} value="Resolved">Resolved</option>
                             </select>
                         </div>
 
                         <div class="col-md-12">
-                            <label class="form-label" for="multicol-email">Remarks</label>
+                            <label class="form-label" for="multicol-email">Email</label>
                             <div class="input-group">
-                                <textarea id="remarks" class="form-control" rows="7">{{$data->remarks ?? ""}}</textarea>
-
+                                <input type="text"  class="form-control" onkeypress="limitKeypress(event,this.value,254)" required name="email" placeholder="" >
                             </div>
                         </div>
 
-
                         <div class="col-md-12">
-                            <a class="btn btn-primary" style="color:white" id="update_status">Update Status</a>
+                            <label class="form-label" for="multicol-email">Account Id</label>
+                            <div class="input-group">
+                                <input type="text"  class="form-control" onkeypress="limitKeypress(event,this.value,254)" required name="ZOOM_ACCOUNT_ID" placeholder="" >
+                            </div>
                         </div>
 
+                        <div class="col-md-12">
+                            <label class="form-label" for="multicol-email">Client ID</label>
+                            <div class="input-group">
+                                <input type="text"  class="form-control" onkeypress="limitKeypress(event,this.value,254)" required name="ZOOM_CLIENT_KEY" placeholder="" >
+                            </div>
+                        </div>
 
-
+                        <div class="col-md-12">
+                            <label class="form-label" for="multicol-email">Client Secret</label>
+                            <div class="input-group">
+                                <input type="text"  class="form-control" onkeypress="limitKeypress(event,this.value,254)" required name="ZOOM_CLIENT_SECRET" placeholder="" >
+                            </div>
+                        </div>
 
 
 
@@ -120,10 +62,17 @@
 
 
 
-                </div>
+
+                    <div class="pt-4">
+                        <button type="submit" class="btn btn-primary me-sm-3 me-1">Submit</button>
+                        <button type="reset" class="btn btn-label-secondary">Cancel</button>
+                    </div>
+                </form>
             </div>
         </div>
 
+
+    </div>
 
 
 
@@ -137,7 +86,6 @@
 @push('scripts')
     <script src="{{ asset('assets/vendor/libs/select2/select2.js') }}"></script>
     <script src="{{ asset('assets/js/app-custom.js') }}"></script>
-
     <script>
         // var kp_bhus;
         var kp_boundary;
@@ -171,33 +119,6 @@
             loadBoundaryData();
         });
 
-        $("body").on("click","#update_status",function (e) {
-             var alert_status = $("#alert_status").val();
-             var remarks = $("#remarks").val();
-             if(alert_status == "" || remarks == ""){
-                 alert("Please enter complete details");
-                 return false;
-             }
-
-            $.ajax({
-                type: 'post',
-                url: "{{ route('updateAlertStatus') }}",
-                data: {
-                    id: "{{$data->id}}",
-                    alert_status:alert_status,
-                    remarks:remarks,
-                    _token: '{{ csrf_token() }}'
-
-                },
-                success: function(res) {
-                    //user_table.dataTable.reload();
-                    alert("Alert Status updated successfully");
-                    window.location.reload();
-                }
-            });
-
-        });
-
         $("body").on("blur","#lat",function (e) {
             var lat = $("#lat").val();
             var long = $("#lng").val();
@@ -225,9 +146,10 @@
 
 
         window.onload = function() {
-            initMap("{{$data->lat}}","{{$data->lng}}");
+            initMap(34.1241,72.4613);
             loadBoundaryData();
-            loadMarker("{{$data->lat}}","{{$data->lng}}");
+
+            loadMarker(34.1241,72.4613);
             // loadIcon();
         }
 
@@ -255,7 +177,7 @@
                 maxNativeZoom: 18
             }); //OSM
 
-            myMap.addLayer(lyrGoogleMap);
+            myMap.addLayer(lyrOSM);
             objBaseMap = {
                 "Google Map": lyrGoogleMap,
                 "Google Hybrid": lyrGoogleHybrid,
@@ -272,8 +194,9 @@
             var mymarker = L.marker([lat,lng], {icon: redIcon}).addTo(myMap);
             mymarker.bindPopup(`
                                             <div style="line-height:0.2rem">
-                                            <p><b>Name:</b>{{$data->name}}</p>
-
+                                            <p><b>Name:</b>Hospital Name Here</p>
+                                            <p><b>Lat:</b> 34.09</p>
+                                            <p><b>Long:</b> 34.56</p>
                                             </div>
                                         `);
 
@@ -303,4 +226,5 @@
             }
         }
     </script>
+
 @endpush

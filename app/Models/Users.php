@@ -10,4 +10,11 @@ class Users extends Model
     use HasFactory;
     protected $table = "users";
     protected $guarded = ["id"];
+
+    public function district()
+    {
+        return $this->belongsTo(Districts::class, 'district_id');
+    }
+
+
 }

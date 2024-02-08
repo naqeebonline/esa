@@ -16,6 +16,11 @@
         button{
             height: 26px;
         }
+
+        .circle_drop .select2-selection__rendered{
+            height: 100px;
+            overflow-y: auto !important;
+        }
     </style>
 
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css') }}" />
@@ -69,14 +74,14 @@
                                         <th style="width: 25%">Meeting ID</th>
                                         <th style="width: 10%">Start Meeting</th>
                                         <th  style="width: 15%">Topic</th>
-                                        <th style="width: 15%">Agenda</th>
+
 
 
                                         <th style="width: 30%">Share with</th>
 
                                         <th style="width: 10%">Status</th>
 
-                                        <th  style="width: 10%">Action</th>
+                                        <th  style="width: 20%">Action</th>
                                     </tr>
                                     </thead>
 
@@ -112,7 +117,7 @@
 
 
                                             <td>{{$value->topic}}</td>
-                                            <td>{{$value->agenda}}</td>
+
 
 
 
@@ -127,7 +132,7 @@
 
 
                                             <td>
-                                                @if(date("Ymdhis",strtotime($value->end_time)) - date("Ymdhis")  > 0 )
+                                                @if($value->is_active == 1)
                                                     <button type="button" class="btn btn-xs btn-success">Active</button>
                                                 @else
                                                     <button type="button" class="btn btn-xs btn-danger">Expired</button>
@@ -135,10 +140,10 @@
                                             </td>
 
                                             <td>
-                                                <a  class="btn btn-primary assign_to_user" data-id="{{$value->zoom_meeting_id}}"><i class="tf-icons bx bx-wrench"></i></a>
+                                                <a  class="btn btn-primary btn-sm assign_to_user" data-id="{{$value->zoom_meeting_id}}"><i class="tf-icons bx bx-wrench"></i></a>
 
                                                 @if(count($value->meetingUsers) > 0)
-                                                    <a  class="btn btn-danger generate_push" data-id="{{$value->zoom_meeting_id}}"><i class="tf-icons bx bx-play"></i></a>
+                                                    <a  class="btn btn-danger btn-sm generate_push" data-id="{{$value->zoom_meeting_id}}"><i class="tf-icons bx bx-play"></i></a>
                                                 @endif
 
                                             </td>
@@ -201,7 +206,7 @@
 --}}
 
                     <div class="row">
-                        <div class="col mb-3">
+                        <div class="col mb-3 circle_drop">
 
                             {!! Form::label('Polling Station', 'Polling Station  ', ['class' => 'form-label']) !!}
                             <button type="button" onclick="selectAllPollingStationUser()">Select All</button>
@@ -222,7 +227,7 @@
                     </div>--}}
 
                     <div class="row">
-                        <div class="col mb-3">
+                        <div class="col mb-3 circle_drop">
                             <label for="nameAnimation" class="form-label">Polling Station Users</label>
                             <button type="button" onclick="selectAll()">Select All</button>
                             <button type="button" onclick="deselectAll()">Deselect All</button>
@@ -232,11 +237,24 @@
                     </div>
 
                     <div class="row">
-                        <div class="col mb-3">
+                        <div class="col mb-3 circle_drop">
                             <label for="nameAnimation" class="form-label">Police Mobile Users</label>
                             <button type="button" onclick="selectAllPoliceMobile()">Select All</button>
                             <button type="button" onclick="deselectAllPoliceMobile()">Deselect All</button>
                             <select class="form-control select2" id="police_mobile_user" multiple="multiple">
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col mb-3 circle_drop">
+                            <label for="nameAnimation" class="form-label" style="font-weight: bold; color: green">Specific Users</label>
+                            <button type="button" onclick="selectAllUsers()">Select All</button>
+                            <button type="button" onclick="deselectAllUsers()">Deselect All</button>
+                            <select class="form-control select2" id="specific_users" multiple="multiple">
+                                @foreach($specific_users as $key => $value2)
+                                <option value="{{$value2->id}}">{!! $value2->full_name  !!}</option>
+                                @endforeach
                             </select>
                         </div>
                     </div>
@@ -255,8 +273,8 @@
 
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary assign_user_to_meeting">Assign Users to Meeting</button>
+                    <div type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Close</div>
+                    <div type="button" class="btn btn-primary assign_user_to_meeting">Assign Users to Meeting</div>
                 </div>
             </div>
         </div>
@@ -329,6 +347,7 @@
         function deselectAll() {
             $("#polling_station_user > option").prop("selected", false);
             $("#polling_station_user").trigger("change");
+
         }
 
         function selectAllPollingStationUser() {
@@ -349,6 +368,18 @@
         function deselectAllPoliceMobile() {
             $("#police_mobile_user > option").prop("selected", false);
             $("#police_mobile_user").trigger("change");
+
+        }
+
+        function selectAllUsers() {
+            $("#specific_users > option").prop("selected", true);
+            $("#specific_users").trigger("change");
+        }
+
+        function deselectAllUsers() {
+            $("#specific_users > option").prop("selected", false);
+            $("#specific_users").trigger("change");
+
         }
 
         $(document).ready(function (){
@@ -401,9 +432,9 @@
 
             $("body").on("click",".assign_to_user",function (e) {
                 meeting_id= $(this).attr("data-id");
-                $("#police_mobile_user").val("");
-                $("#polling_station_user").val("");
-                $("#police_station_users").val("");
+
+
+
                 $("#animationModal").modal("show");
             });
 
@@ -425,11 +456,13 @@
             });
 
             $("body").on("click",".assign_user_to_meeting",function (e) {
+
                 var district_id = $("#district_id").val();
                 var police_station_id = "";
                 var police_station_users = [];
                 var polling_station_user = $("#polling_station_user").val();
                 var police_mobile_user = $("#police_mobile_user").val();
+                var specific_users = $("#specific_users").val();
                 /*if(police_station_users.length == 0){
                     alert("Please assign users to meeting");
                     return false;
@@ -442,7 +475,7 @@
                 $.ajax({
                     url: '{{ route("assignUserToMeeting") }}', // Replace with your actual URL
                     method: 'post',
-                    data:{meeting_id,district_id,police_station_id,police_station_users,polling_station_user,police_mobile_user, _token: '{{ csrf_token() }}'},
+                    data:{meeting_id,district_id,police_station_id,police_station_users,polling_station_user,police_mobile_user,specific_users, _token: '{{ csrf_token() }}'},
                     success: function (response) {
                         if(response.status == true){
                             window.location.reload();
@@ -500,7 +533,7 @@
 
                     },
                     success: function (response) {
-                        console.log(response);
+
 
 
 
@@ -652,7 +685,7 @@
 
                 },
                 success: function (response) {
-                    var psOptions = '<option value="">Select Polling Stations</option>';
+                    var psOptions = '';
                     $.each(response.data, function (index, item) {
                         psOptions += '<option value="' + item.id + '">' + item.polling_station_name + '</option>';
                     });

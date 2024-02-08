@@ -26,7 +26,7 @@ class PoliceStationController extends Controller
         $data['district'] = Districts::get();
         $data['rank'] = (new CommonApiController())->getRankForWeb();
 
-        $data["circles"] =Circle::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
+        $data["circles"] =Circle::when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly"), function ($q) {
 
             return $q->where(["district_id"=>auth()->user()->district_id]);
         })->get();
@@ -36,7 +36,7 @@ class PoliceStationController extends Controller
 
     public function allPoliceStations()
     {
-        $users = PoliceStation::with(["district","circle"])->when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
+        $users = PoliceStation::with(["district","circle"])->when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly"), function ($q) {
             if(auth()->user()->roles->pluck('slug')[0] == "regional.user"){
                 $district_ids = Districts::whereReagin(auth()->user()->region_id)->pluck("id")->all();
                 return $q->whereIn("district_id",$district_ids);
@@ -53,11 +53,17 @@ class PoliceStationController extends Controller
         });
         return DataTables::of($users)
             ->addColumn('action', function($cert) {
-                $actionsBtn = '<a class="dropdown-item p-50" href="'.route('edit.police.station',[$cert->id]).'"><i class="bx bx-file-blank mr-1"></i> Edit</a>';
-                $actionsBtn .= '<a class="dropdown-item p-50 delete_table_data" data-id="'.$cert->id.'" href="javascript:void(0)"><i class="bx bx-window-close"></i> Delete</a>';
+                if(in_array(auth()->user()->roles->pluck('name')[0],["Super Admin","District Super Admin"])){
+                    $actionsBtn = '<a class="dropdown-item p-50" href="'.route('edit.police.station',[$cert->id]).'"><i class="bx bx-file-blank mr-1"></i> Edit</a>';
+                    $actionsBtn .= '<a class="dropdown-item p-50 delete_table_data" data-id="'.$cert->id.'" href="javascript:void(0)"><i class="bx bx-window-close"></i> Delete</a>';
+
+                }else{
+                    $actionsBtn = "";
+                }
 
 
                 return $actionsBtn;
+
             })
             ->addColumn('district_name', function($cert) {
                 return $cert->district->title ?? "";
@@ -110,7 +116,7 @@ class PoliceStationController extends Controller
         $data["title"] = "Edit Police Station";
         $data['district'] = Districts::get();
         $data['rank'] = (new CommonApiController())->getRankForWeb();
-        $data["circles"] =Circle::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
+        $data["circles"] =Circle::when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly"), function ($q) {
             return $q->where(["district_id"=>auth()->user()->district_id]);
         })->get();
         $data["data"] = PoliceStation::whereId($id)->first();

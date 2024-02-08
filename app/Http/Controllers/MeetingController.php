@@ -6,9 +6,12 @@ use App\Models\AssignMeetings;
 use App\Models\Districts;
 use App\Models\Meeting;
 use App\Models\User;
+use App\Models\Users;
+use App\Models\ZoomCredentials;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Jubaer\Zoom\Facades\Zoom;
+use League\Flysystem\Config;
 
 class MeetingController extends Controller
 {
@@ -76,6 +79,26 @@ class MeetingController extends Controller
        // $start_time = Carbon::now()->toDateTimeString();
         $end_time = $start_time->addMinutes(60)->toDateTimeString();
 
+        if (auth()->user()->roles->pluck('name')[0] == "Super Admin") {
+            $details = ZoomCredentials::where(["user_type"=>"ControllRoom"])->first();
+            config([
+                'zoom.client_id' =>  $details->ZOOM_CLIENT_KEY,
+                'zoom.client_secret' =>  $details->ZOOM_CLIENT_SECRET,
+                'zoom.account_id' =>  $details->ZOOM_ACCOUNT_ID,
+            ]);
+
+
+        }else{
+            $details = ZoomCredentials::where(["district_id"=>auth()->user()->district_id])->whereNull("user_type")->first();
+
+            config([
+                'zoom.client_id' =>  $details->ZOOM_CLIENT_KEY,
+                'zoom.client_secret' =>  $details->ZOOM_CLIENT_SECRET,
+                'zoom.account_id' =>  $details->ZOOM_ACCOUNT_ID,
+            ]);
+
+
+        }
 
 
         $meetings = Zoom::createMeeting([
@@ -89,7 +112,7 @@ class MeetingController extends Controller
             "start_time" => $start_time, // set your start time
             "template_id" => 'Dv4YdINdTk+Z5RToadh5ug==', // set your template id  Ex: "Dv4YdINdTk+Z5RToadh5ug==" from https://marketplace.zoom.us/docs/api-reference/zoom-api/meetings/meetingtemplates
             "pre_schedule" => false,  // set true if you want to create a pre-scheduled meeting
-            "schedule_for" => 'cpodigit@gmail.com', // set your schedule for
+            "schedule_for" => $details->email, // set your schedule for
             "settings" => [
                 'join_before_host' => false, // if you want to join before host set true otherwise set false
                 'host_video' => false, // if you want to start video when host join set true otherwise set false
@@ -103,7 +126,7 @@ class MeetingController extends Controller
 
         ]);
 
-       // dd($meetings);
+
 
         $meeting_data = [
             "live_link_for" => request()->live_link_for,
@@ -128,6 +151,8 @@ class MeetingController extends Controller
 
     public function listMeeting()
     {
+
+
         $role = auth()->user()->roles->pluck('name')[0] ?? '';
         $data = [
             'title' => 'List Meetings',
@@ -145,12 +170,29 @@ class MeetingController extends Controller
 
 
         if($role == "Super Admins"){
-            $meetings = Meeting::where("end_time",">=",Carbon::now()->toDateTimeString())->get();
+            $meetings = Meeting::whereCreatedBy(auth()->user()->id)->orderBy("created_at","desc")->get();
 
         }else{
             $meetings = Meeting::whereCreatedBy(auth()->user()->id)->get();
         }
-        $data['data'] = Meeting::where("created_by",auth()->user()->id)->with(["meetingUsers"])->get();
+        $data["specific_users"] = Users::select(["id","name","username","district_id"])
+            ->with("district:id,title")->where(["is_specific"=>1])
+            ->when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly"), function ($q) {
+                if(auth()->user()->roles->pluck('slug')[0] == "regional.user"){
+                    $district_ids = Districts::whereReagin(auth()->user()->region_id)->pluck("id")->all();
+                    return $q->whereIn("district_id",$district_ids);
+                }else{
+                    return $q->where(["district_id" => auth()->user()->district_id]);
+                }
+
+            })
+            ->get();
+        foreach ($data["specific_users"] as $key => $value){
+            $value->full_name = $value->username." :".$value->district?->title."";
+        }
+
+        $data['data'] = Meeting::where("created_by",auth()->user()->id)->with(["meetingUsers"])->orderBy("is_active","desc")->get();
+
         return view("zoom_meetings.list",$data);
     }
 
@@ -159,6 +201,7 @@ class MeetingController extends Controller
         $police_station_users = [];
         $polling_station_user = [];
         $police_mobile_user = [];
+        $specific_users = [];
         if(request()->police_station_users){
             $police_station_users = request()->police_station_users;
         }
@@ -168,8 +211,11 @@ class MeetingController extends Controller
         if(request()->police_mobile_user){
             $police_mobile_user = request()->police_mobile_user;
         }
+        if(request()->specific_users){
+            $specific_users = request()->specific_users;
+        }
 
-        $mergedArray = array_merge($police_station_users, $polling_station_user,$police_mobile_user);
+        $mergedArray = array_merge($police_station_users, $polling_station_user,$police_mobile_user,$specific_users);
 
 
         $res = [];
@@ -333,6 +379,7 @@ class MeetingController extends Controller
 
     public function sendMeetingNotification()
     {
+
         $meeting_id = request()->meeting_id;
         $users_id = AssignMeetings::where("zoom_meeting_id",$meeting_id)->pluck('to_user');
         $meeting = Meeting::where("zoom_meeting_id",$meeting_id)->first();

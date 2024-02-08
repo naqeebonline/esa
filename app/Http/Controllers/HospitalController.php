@@ -24,7 +24,7 @@ class HospitalController extends Controller
     public function allHospital()
     {
         $users = Hospital::with(["facilityType","district"])
-            ->when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+            ->when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly"), function ($q) {
                 if(auth()->user()->roles->pluck('slug')[0] == "regional.user"){
                     $district_ids = Districts::whereReagin(auth()->user()->region_id)->pluck("id")->all();
                     return $q->whereIn("district_id",$district_ids);
@@ -35,11 +35,14 @@ class HospitalController extends Controller
             });
         return DataTables::of($users)
             ->addColumn('action', function($cert) {
-                $actionsBtn = '<a class="dropdown-item p-50" href="'.route('edit.hospital',[$cert->id]).'"><i class="bx bx-file-blank mr-1"></i> Edit</a>';
-                $actionsBtn .= '<a class="dropdown-item p-50 delete_table_data" data-id="'.$cert->id.'" href="javascript:void(0)"><i class="bx bx-window-close"></i> Delete</a>';
-
-
+                if(in_array(auth()->user()->roles->pluck('name')[0],["Super Admin","District Super Admin"])){
+                    $actionsBtn = '<a class="dropdown-item p-50" href="'.route('edit.hospital',[$cert->id]).'"><i class="bx bx-file-blank mr-1"></i> Edit</a>';
+                    $actionsBtn .= '<a class="dropdown-item p-50 delete_table_data" data-id="'.$cert->id.'" href="javascript:void(0)"><i class="bx bx-window-close"></i> Delete</a>';
+                }else{
+                    $actionsBtn = "";
+                }
                 return $actionsBtn;
+
             })
 
             ->addColumn('police_station_name', function($cert) {
@@ -72,7 +75,7 @@ class HospitalController extends Controller
     {
 
         $data = request()->except(["_token"]);
-        if (auth()->user()->roles->pluck('name')[0] != "Super Admin") {
+        if ((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly")) {
             $data['district_id'] = auth()->user()->district_id;
             $data['created_by'] = auth()->user()->id;
         }

@@ -296,9 +296,16 @@
                     </select>
                 </div>
 
+                <div class="col-md-2 ">
+                    <label>Search Police Mobile</label>
+                    <input class="form-control" name="search_mobile" id="search_mobile">
+                </div>
+
                 <div class="col-md-3 ">
                     <div class="btn btn-success checkbox_change mt-4">Search</div>
                 </div>
+
+
 
 
 
@@ -422,6 +429,9 @@
 @push('scripts')
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <script>
+        $("body").on("blur","#search_mobile",function () {
+            reload_map();
+        });
         // Sample data for the pie chart
         var chartData = [{
             name: 'Most Sensitive',
@@ -533,7 +543,8 @@
                 getAllPoliceLine();
             }
             if(count_checkbox == 0){
-                loadBoundaryData();
+                alert("Select minimum one checkbox to load data");
+                //loadBoundaryData();
             }
         }
         $("body").on("click",".checkbox_change",function () {
@@ -1100,14 +1111,6 @@
                                         `);
 
                                     }
-
-
-
-
-
-
-
-
                                 }
                             }).addTo(myMap);
                         }
@@ -1118,13 +1121,14 @@
 
 
                 function getAllPoliceMobiles() {
-
+                       var search_police_mobile = $("#search_mobile").val();
                     $.ajax({
                         url: '{{ route("getAllPoliceMobiles") }}', // Replace with your actual URL
                         type: 'post',
                         data: {
                             police_station_id:$("#police_station_id").val(),
                             districts:$("#search_district").val(),
+                            search_police_mobile:search_police_mobile,
                             _token: '{{ csrf_token() }}'
 
                         },
@@ -1134,18 +1138,18 @@
                             $.each(response.data, function (index, item) {
                                 if(item.lat != null && item.lng != null){
 
-                                    if(item.minuts_ago <= 500){
+                                    if(item.minuts_ago <= 480){
                                         var myIcon = L.icon({
                                             iconUrl: base_url+"markers/police_mobile.png",
                                             iconSize: [30, 30],
-                                            className:"police_mobile_marker"
+                                            className:"active_cars_on_map"
 
                                         });
                                     }else{
                                         var myIcon = L.icon({
                                             iconUrl: 'https://w7.pngwing.com/pngs/5/851/png-transparent-marker-map-icon-car-location-automobile-vehicle-target-design.png',
-                                            iconSize: [10, 20],
-                                            className:"police_mobile_marker"
+                                            iconSize: [30, 30],
+                                            className:"deactive_cars_on_map"
 
                                         });
                                     }

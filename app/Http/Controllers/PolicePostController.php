@@ -14,7 +14,7 @@ class PolicePostController extends Controller
     {
         $data['district'] = Districts::get();
         $data['rank'] = (new CommonApiController())->getRankForWeb();
-        $data['police_stations'] = PoliceStation::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
+        $data['police_stations'] = PoliceStation::when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly"), function ($q) {
             return $q->where(["district_id"=>auth()->user()->district_id]);
         })->get();
         return view("police_post.add",$data);
@@ -22,7 +22,7 @@ class PolicePostController extends Controller
 
     public function allPolicePost()
     {
-        $users = PolicePost::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
+        $users = PolicePost::when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly"), function ($q) {
             if(auth()->user()->roles->pluck('slug')[0] == "regional.user"){
                 $district_ids = Districts::whereReagin(auth()->user()->region_id)->pluck("id")->all();
                 return $q->whereIn("district_id",$district_ids);
@@ -40,12 +40,15 @@ class PolicePostController extends Controller
             });
         return DataTables::of($users)
             ->addColumn('action', function($cert) {
-                $actionsBtn = '<a class="dropdown-item p-50" href="'.route('edit.police.post',[$cert->id]).'"><i class="bx bx-file-blank mr-1"></i> Edit</a>';
+                if(in_array(auth()->user()->roles->pluck('name')[0],["Super Admin","District Super Admin"])){
+                    $actionsBtn = '<a class="dropdown-item p-50" href="'.route('edit.police.post',[$cert->id]).'"><i class="bx bx-file-blank mr-1"></i> Edit</a>';
+                    $actionsBtn .= '<a class="dropdown-item p-50 delete_table_data" data-id="'.$cert->id.'" href="javascript:void(0)"><i class="bx bx-window-close"></i> Delete</a>';
 
-                $actionsBtn .= '<a class="dropdown-item p-50 delete_table_data" data-id="'.$cert->id.'" href="javascript:void(0)"><i class="bx bx-window-close"></i> Delete</a>';
-
-
+                }else{
+                    $actionsBtn = "";
+                }
                 return $actionsBtn;
+
             })
             ->addColumn('district_name', function($cert) {
                 return $cert->district->title ?? "";
@@ -65,7 +68,7 @@ class PolicePostController extends Controller
 
         ];
         $data['districts'] = Districts::whereProvinceId(1)
-            ->when((auth()->user()->roles->pluck('name')[0] != "Super Admin"), function ($q) {
+            ->when(((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly")), function ($q) {
                 if(auth()->user()->roles->pluck('slug')[0] == "regional.user"){
                     $district_ids = Districts::whereReagin(auth()->user()->region_id)->pluck("id")->all();
                     return $q->whereIn("id",$district_ids);
@@ -81,7 +84,7 @@ class PolicePostController extends Controller
     public function savePolicePost()
     {
         $res = request()->except(["_token"]);
-        if(auth()->user()->roles->pluck('name')[0] !="Super Admin"){
+        if((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly")){
             $res['district_id'] = auth()->user()->district_id;
             $data['created_by'] = auth()->user()->id;
         }
@@ -97,7 +100,7 @@ class PolicePostController extends Controller
         $data["title"] = "Edit Police Post";
         $data['district'] = Districts::get();
         $data['rank'] = (new CommonApiController())->getRankForWeb();
-        $data['police_stations'] = PoliceStation::when(auth()->user()->roles->pluck('name')[0] !="Super Admin", function ($q) {
+        $data['police_stations'] = PoliceStation::when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly"), function ($q) {
             return $q->where(["district_id"=>auth()->user()->district_id]);
         })->get();
         $data["data"] = PolicePost::whereId($id)->first();
@@ -108,7 +111,7 @@ class PolicePostController extends Controller
     {
         $data = request()->except(["_token","id"]);
 
-        if(auth()->user()->roles->pluck('name')[0] !="Super Admin"){
+        if((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly")){
             $data['district_id'] = auth()->user()->district_id;
         }
 

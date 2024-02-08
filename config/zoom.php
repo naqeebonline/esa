@@ -1,4 +1,10 @@
 <?php
+return [
+    'client_id' => "",
+    'client_secret' => "",
+    'account_id' => "",
+    'base_url' => 'https://api.zoom.us/v2/',
+];
 
 return [
     'client_id' => env('ZOOM_CLIENT_KEY'),

@@ -173,6 +173,14 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('getCountEmergencyAlerts', [\App\Http\Controllers\EmergencyAlertsController::class, 'getCountEmergencyAlerts'])->name('getCountEmergencyAlerts');
     Route::post('update-alert-status', [\App\Http\Controllers\EmergencyAlertsController::class, 'updateAlertStatus'])->name('updateAlertStatus');
 
+    Route::get('add-credentials', [\App\Http\Controllers\ZoomCredentialsController::class, 'index'])->name('add.new.credentials');
+    Route::get('list-credentials', [\App\Http\Controllers\ZoomCredentialsController::class, 'listCredentials'])->name('list.credentials');
+    Route::post('save-credentials', [\App\Http\Controllers\ZoomCredentialsController::class, 'saveCredentials'])->name('save.credentials');
+    Route::get('edit-credentials/{id}', [\App\Http\Controllers\ZoomCredentialsController::class, 'editCredentials'])->name('edit.credentials');
+    Route::post('update-credentials', [\App\Http\Controllers\ZoomCredentialsController::class, 'updateCredentials'])->name('update.credentials');
+    Route::get('credentials', [\App\Http\Controllers\ZoomCredentialsController::class, 'allCredentials'])->name('all.credentials');
+
+
 
     Route::post('findNearestResource', [\App\Http\Controllers\PollingStationController::class, 'findNearestResource'])->name('findNearestResource');
 });

@@ -202,4 +202,6 @@ class User extends Authenticatable implements JWTSubject, HasMedia
     {
         return $this->morphMany(\Modules\Settings\Entities\FirebaseNotification::class, 'morphable');
     }
+
+
 }

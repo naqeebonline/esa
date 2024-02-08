@@ -100,6 +100,7 @@ class HomeController extends Controller
 
     public function getAllPoliceMobiles()
     {
+        $search_police_mobile = request()->search_police_mobile ?? "";
         $district_id = request()->districts ?? "";
         $police_station_id = request()->police_station_id ?? "";
         $police_mobile_id = request()->police_mobile_id ?? "";
@@ -115,10 +116,27 @@ class HomeController extends Controller
             ->when($police_mobile_id, function ($q) use ($police_mobile_id) {
                 return $q->whereIn("id",$police_mobile_id);
             })
+            ->when($search_police_mobile, function ($q) use ($search_police_mobile) {
+
+                return $q->where('registration_number', 'like', '%'.$search_police_mobile.'%');
+
+            })
             ->get();
 
         foreach ($data as $key => $value){
-            $value->minuts_ago = now()->diffInMinutes($value->updated_at);
+
+            $start = date_create(date("Y-m-d h:i:s",strtotime($value->updated_at)));
+            //$start = date_create("2024-02-07 11:28:26");
+
+            $end = date_create(date("Y-m-d h:i:s"));
+
+            $diff=date_diff($end,$start);
+
+            //===============   calculation of minuts  =========//
+            $minutes = $diff->days * 24 * 60;
+            $minutes += $diff->h * 60;
+            $minutes += $diff->i;
+            $value->minuts_ago = $minutes;
 
         }
         return (["data"=>$data]);

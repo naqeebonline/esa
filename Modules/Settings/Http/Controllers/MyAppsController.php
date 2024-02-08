@@ -49,63 +49,64 @@ class MyAppsController extends Controller
             $data = array_merge($data,$res);
 
         }else{
-            $data['region'] = Reagin::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+
+            $data['region'] = Reagin::when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly"), function ($q) {
                 return $q->where(["id" => auth()->user()->district->reagin ?? 0]);
             })
                 ->get();
             $data['districts'] = Districts::whereProvinceId(1)
-                ->when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Regional User"), function ($q) {
+                ->when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly"), function ($q) {
                     return $q->where(["id" => auth()->user()->district_id]);
                 })
                 ->get();
 
             $data['most_sensitive'] = PollingStation::where("sensitivity",1)
-                ->when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+                ->when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly"), function ($q) {
                     return $q->where(["district_id" => auth()->user()->district_id]);
                 })
                 ->count();
             $data['sensitive'] = PollingStation::where("sensitivity",2)
-                ->when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+                ->when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly"), function ($q) {
                     return $q->where(["district_id" => auth()->user()->district_id]);
                 })
                 ->count();
             $data['normal'] = PollingStation::where("sensitivity",3)
-                ->when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+                ->when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly"), function ($q) {
                     return $q->where(["district_id" => auth()->user()->district_id]);
                 })
                 ->count();
-            $data['number_of_male_booth'] = PollingStation::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+            $data['number_of_male_booth'] = PollingStation::when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly"), function ($q) {
                 return $q->where(["district_id" => auth()->user()->district_id]);
             })->sum('number_of_male_booth');
-            $data['number_of_female_booth'] = PollingStation::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+            $data['number_of_female_booth'] = PollingStation::when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly"), function ($q) {
                 return $q->where(["district_id" => auth()->user()->district_id]);
             })->sum('number_of_female_booth');
-            $data['male_voters'] = PollingStation::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+            $data['male_voters'] = PollingStation::when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly"), function ($q) {
                 return $q->where(["district_id" => auth()->user()->district_id]);
             })->sum('male_voters');
-            $data['female_voters'] = PollingStation::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+            $data['female_voters'] = PollingStation::when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly"), function ($q) {
                 return $q->where(["district_id" => auth()->user()->district_id]);
             })->sum('female_voters');
 
-            $data["total_police_stations"] = PoliceStation::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+            $data["total_police_stations"] = PoliceStation::when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly"), function ($q) {
                 return $q->where(["district_id" => auth()->user()->district_id]);
             })->count();
-            $data["total_polling_station"] = PollingStation::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+            $data["total_polling_station"] = PollingStation::when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly"), function ($q) {
                 return $q->where(["district_id" => auth()->user()->district_id]);
             })->count();
-            $data["total_hospitals"] = Hospital::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
-                return $q->where(["district_id" => auth()->user()->district_id]);
-            })->count();
-
-            $data["police_line"] = PoliceLine::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+            $data["total_hospitals"] = Hospital::when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly"), function ($q) {
                 return $q->where(["district_id" => auth()->user()->district_id]);
             })->count();
 
-            $data["police_post"] = PolicePost::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+            $data["police_line"] = PoliceLine::when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly"), function ($q) {
                 return $q->where(["district_id" => auth()->user()->district_id]);
             })->count();
 
-            $data["police_mobile"] = PoliceMobile::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+            $data["police_post"] = PolicePost::when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly"), function ($q) {
+                return $q->where(["district_id" => auth()->user()->district_id]);
+            })->count();
+
+            $data["police_mobile"] = PoliceMobile::when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly"), function ($q) {
                 return $q->where(["district_id" => auth()->user()->district_id]);
             })->count();
 
@@ -268,7 +269,7 @@ class MyAppsController extends Controller
     {
         $district_ids = Districts::whereReagin(auth()->user()->region_id)->pluck("id")->all();
         $current_user_role = auth()->user()->roles->pluck('name')[0];
-        $data['region'] = Reagin::when(auth()->user()->roles->pluck('name')[0] != "Super Admin", function ($q) {
+        $data['region'] = Reagin::when((auth()->user()->roles->pluck('name')[0] != "Super Admin" && auth()->user()->roles->pluck('name')[0] != "Readonly"), function ($q) {
             return $q->where(["id" => auth()->user()->region_id]);
         })->get();
 
