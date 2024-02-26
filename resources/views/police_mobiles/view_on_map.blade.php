@@ -161,7 +161,10 @@
 @push('scripts')
     <script src="{{ asset('assets/vendor/libs/select2/select2.js') }}"></script>
     <script src="{{ asset('assets/js/app-custom.js') }}"></script>
-
+            <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+            <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+            <script src="{{ asset('assets/js/MovingMarker.js') }}"></script>
+            <script src="{{ asset('assets/js/leaflet.polylineDecorator.js') }}"></script>
     <script>
         // var kp_bhus;
         var kp_boundary;
@@ -310,17 +313,6 @@
         }
 
         function loadMarker(lat,lng) {
-
-
-            var redIcon = L.icon.pulse({iconSize:[20,20], color: "red", fillColor: "blue", animate: true});
-            var mymarker = L.marker([lat,lng], {icon: redIcon}).addTo(myMap);
-            mymarker.bindPopup(`
-                                            <div style="line-height:0.2rem">
-                                            <p><b>Name:</b>{{$data->name}}</p>
-
-                                            </div>
-                                        `);
-
         }
         function startMarker(lat,lng) {
             var myIcon = L.icon({
@@ -330,6 +322,14 @@
 
             });
             var mymarker = L.marker([parseFloat(lat).toFixed(6),parseFloat(lng).toFixed(6)], {icon: myIcon}).addTo(myMap);
+            mymarker.bindPopup(`
+                                            <div style="line-height:0.2rem">
+                                            <h6>Police Mobile</h6>
+
+                                            <p class="text_height_map">Starting Point</p>
+
+                                            </div>
+                                        `);
 
         }
         function endMarker(lat,lng) {
@@ -354,6 +354,8 @@
 
         }
 
+
+
         function getMobileHistory() {
             reinitMap();
             $.ajax({
@@ -367,21 +369,26 @@
 
                 },
                 success: function (response) {
-                    var blackIcon = L.icon.pulse({iconSize:[2,2], color: "black",   animate: false});
+                    var blackIcon = L.icon.pulse({iconSize:[2,2], color: "#ffff",   animate: false});
                     $("#police_mobile_checkbox_count").text(response.data.length);
 
                     var latlngs = [];
+                     newlngs = [];
+                    var waypoints = [];
                     $.each(response.data, function (index, item) {
 
                         if(item.lat != null && item.lng != null){
                             latlngs.push([item.lat, item.lng]);
+                            newlngs.push([parseFloat(item.lat), parseFloat(item.lng)]);
+
+
                             var myIcon = L.icon({
                                 iconUrl: 'https://w7.pngwing.com/pngs/5/851/png-transparent-marker-map-icon-car-location-automobile-vehicle-target-design.png',
                                 iconSize: [10, 10],
                                 className:"police_mobile_marker"
 
                             });
-                             mymarker = L.marker([item.lat,item.lng], {icon: blackIcon}).addTo(myMap);
+                            /* mymarker = L.marker([item.lat,item.lng], {icon: blackIcon}).addTo(myMap);
                             mymarker.bindPopup(`
                                             <div style="line-height:0.2rem">
                                             <h6>Police Mobile</h6>
@@ -392,28 +399,142 @@
                                             <p class="text_height_map"><b>Date Time:</b> ${item.date_time}</p>
 
                                             </div>
-                                        `);
+                                        `);*/
                         }
 
 
 
                     });
 
-                    var polyline = L.polyline(latlngs, {color: 'red'}).addTo(myMap);
-                    myMap.fitBounds(polyline.getBounds());
+                    var count = latlngs.length;
+                    var start_point = latlngs[0];
+                    var start_point2 = latlngs[5];
+                    var end_point = latlngs[count - 1];
+
+                    my_polyline = L.polyline(latlngs, {color: 'red'}).addTo(myMap);
+                    myMap.fitBounds(my_polyline.getBounds());
 
                     var count = latlngs.length;
                    var start_point = latlngs[0];
                     startMarker(start_point[0],start_point[1]);
 
                    var end_point = latlngs[count - 1];
-                    endMarker(end_point[0],end_point[1]);
+                   // endMarker(end_point[0],end_point[1]);
+
+
+                /* Moving marker begin here */
+                    var myicon = L.icon({
+                        iconUrl: base_url+"markers/police_mobile.png",
+                       // iconUrl: "https://static.thenounproject.com/png/331565-200.png",
+                        className:"my_car_location",
+
+                        iconSize:[30,30]
+                    });
+
+                    marker1 = L.Marker.movingMarker(latlngs, 1200,{autostart: true,icon:myicon})
+
+                        .addTo(myMap);
+
+                    marker1.bindPopup(`
+                                            <div style="line-height:0.2rem">
+                                            <h6>Police Mobile</h6>
+
+                                            <p class="text_height_map"><b>Registration#:</b> "{{$data->registration_number}}"</p>
+                                            <p class="text_height_map"><b>Incharge Name:</b> "{{$data->incharge_name}}"</p>
+                                            <p class="text_height_map"><b>Incharge Name:</b> "{{$data->contact_number}}"</p>
+                                            <p class="text_height_map"><b>Last Update Time:</b> "<span class='last_updated_at'>{{date("d-m-Y h:i A",strtotime($data->updated_at))}}</span>"</p>
+
+                                            </div>
+                                        `).openPopup();
+                    marker1.start();
+
+
+
+
+
+
+                    //marker1.moveTo([44.65302, 39.99023], 200000);
+
 
                 }
             });
         }
+        i = 1;
+        function moveToNewLocation(){
 
-        setInterval(getMobileHistory, 30000);
+            if (marker1.isEnded()) {
+                if(i==1){
+                    my_polyline.addLatLng([33.97912, 71.31844]);
+                    marker1.moveTo([33.97912, 71.31844], 8000);
+                    newlngs.push([33.97912, 71.31844]);
+                    drawDirections();
+
+
+
+                }
+                else if(i <= 5){
+                    my_polyline.addLatLng([33.8894, 71.2732]);
+                    marker1.moveTo([33.8894, 71.2732], 8000);
+                    newlngs.push([33.8894, 71.2732]);
+                    drawDirections();
+
+                }
+                else{
+                    my_polyline.addLatLng([34.0209, 71.4911]);
+                    marker1.moveTo([34.0209, 71.4911], 8000);
+                    newlngs.push([34.0209, 71.4911]);
+                    drawDirections();
+
+                }
+
+
+                /*$.ajax({
+                    url: '{{ route("getThisMobileLocation") }}', // Replace with your actual URL
+                    type: 'post',
+                    data: {
+                        mobile_id:'{{$data->id}}',
+                        police_station_id:$("#police_station_id").val(),
+                        districts:$("#search_district").val(),
+                        _token: '{{ csrf_token() }}'
+
+                    },
+                    success: function (response) {
+
+                        var res = response.data;
+                        my_polyline.addLatLng([res.lat, res.lng]);
+                        marker1.moveTo([res.lat, res.lng], 8000);
+                        newlngs.push([parseFloat(res.lat), parseFloat(res.lng)]);
+                        drawDirections();
+                    }
+                });*/
+            }
+
+            i++;
+        }
+
+        function drawDirections(){
+
+            var pathPattern = L.polylineDecorator(
+                newlngs,
+                {
+                    patterns: [
+                        { offset: 0, repeat: 100, symbol: L.Symbol.dash({pixelSize: 2, pathOptions: {color: '#000', weight: 1, opacity: 0.1}}) },
+                        { offset: '0%', repeat: 100, symbol: L.Symbol.marker({rotate: true, markerOptions: {
+                                    icon: L.icon({
+                                        iconUrl: base_url+"markers/car_go.png",
+                                        className:"my_live_car",
+
+                                        iconAnchor: [16, 16]
+                                    })
+                                }})}
+                    ]
+                }
+            ).addTo(myMap);
+        }
+
+        setInterval(moveToNewLocation, 6000);
+
+       // setInterval(getMobileHistory, 300000000);
 
 
 
@@ -421,6 +542,10 @@
 
 
         search_district_name = '';
+
+
+
+
         function loadBoundaryData() {
 
             if (myMap.hasLayer(kp_boundary)) {
@@ -438,5 +563,10 @@
                 return true;
             }
         }
+
+
+
     </script>
+
+
 @endpush

@@ -428,6 +428,7 @@
 
 @push('scripts')
     <script src="https://code.highcharts.com/highcharts.js"></script>
+
     <script>
         $("body").on("blur","#search_mobile",function () {
             reload_map();

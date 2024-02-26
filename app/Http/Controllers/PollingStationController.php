@@ -303,4 +303,10 @@ class PollingStationController extends Controller
              "police_mobile" => $police_mobile,
          ];
     }
+
+    public function getThisMobileLocation()
+    {
+        $res =  PoliceMobile::whereId(request()->mobile_id)->first();
+        return ["status" => true,"data"=>$res];
+    }
 }

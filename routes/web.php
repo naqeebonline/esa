@@ -183,4 +183,5 @@ Route::group(['middleware' => 'auth'], function () {
 
 
     Route::post('findNearestResource', [\App\Http\Controllers\PollingStationController::class, 'findNearestResource'])->name('findNearestResource');
+    Route::post('getThisMobileLocation', [\App\Http\Controllers\PollingStationController::class, 'getThisMobileLocation'])->name('getThisMobileLocation');
 });
